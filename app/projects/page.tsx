@@ -6,7 +6,6 @@ export default function ProjectsPage() {
       
       {/* --- FONDO ABSTRACTO --- */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-          {/* Manchas distribuidas */}
           <div className="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-r from-lime-300/60 to-green-300/60 rounded-full mix-blend-multiply filter blur-[64px] opacity-70"></div>
           <div className="absolute top-0 -right-20 w-96 h-96 bg-gradient-to-r from-purple-300/60 to-pink-300/60 rounded-full mix-blend-multiply filter blur-[80px] opacity-60"></div>
           <div className="absolute top-[30%] -left-20 w-72 h-72 bg-gradient-to-r from-orange-300/50 to-amber-300/50 rounded-full mix-blend-multiply filter blur-[64px] opacity-60"></div>
@@ -26,29 +25,36 @@ export default function ProjectsPage() {
         {/* GRID CONTENEDOR */}
         <div className="grid grid-cols-1 gap-4 flex-1 content-start">
 
-            {/* BLOQUE TÍTULO (Cristal Transparente y Ajustado) */}
+            {/* BLOQUE TÍTULO (Cristal Transparente) */}
             <div className="rounded-3xl border border-white/40 p-5 pt-4 flex flex-col justify-center h-auto bg-transparent backdrop-blur-md shadow-sm ring-1 ring-white/30">
                 <h1 className="text-4xl md:text-6xl font-bold uppercase tracking-tighter leading-none">
                     Projects
                 </h1>
             </div>
 
-            {/* CARD COINFLIIP (Cristal Oscuro) */}
+            {/* CARD COINFLIIP (Lima Cristal & Pequeña) */}
+            {/* CAMBIOS: 
+               - max-w-3xl mx-auto: Centrado y más pequeño (aprox 50% visualmente respecto al ancho total).
+               - h-[250px]: Altura controlada.
+               - bg-lime/40: Cristal lima por defecto.
+               - text-offblack: Texto oscuro.
+            */}
             <a 
             href="https://www.coinfliip.com/" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="w-full aspect-video md:aspect-[21/9] rounded-3xl text-bone flex flex-col items-center justify-center group hover:bg-lime hover:text-offblack transition-all duration-500 relative overflow-hidden
-            bg-offblack/80 backdrop-blur-md border border-white/10 shadow-lg"
+            className="w-full max-w-3xl mx-auto h-[250px] rounded-3xl text-offblack flex flex-col items-center justify-center group hover:bg-lime/60 hover:scale-[1.02] transition-all duration-500 relative overflow-hidden
+            bg-lime/40 backdrop-blur-md border border-white/20 shadow-lg ring-1 ring-white/20"
             >
             <div className="text-center z-10 p-4">
-                <h2 className="text-4xl md:text-7xl font-bold mb-4">COINFLIIP</h2>
-                <p className="uppercase tracking-widest text-xs md:text-sm border-b border-current inline-block pb-1">
+                <h2 className="text-4xl md:text-6xl font-bold mb-2">COINFLIIP</h2>
+                <p className="uppercase tracking-widest text-xs md:text-sm border-b border-current inline-block pb-1 opacity-70 group-hover:opacity-100">
                 Visit Website ↗
                 </p>
             </div>
             
-            <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            {/* Brillo sutil en hover */}
+            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </a>
 
         </div>

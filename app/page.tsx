@@ -2,8 +2,6 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    // CAMBIO: h-[100dvh] asegura que ocupe EXACTAMENTE la pantalla del móvil (sin barra de navegador molestando).
-    // bg-[#EAE8E0] un tono "hueso" un pelín más oscuro para que el brillo blanco destaque.
     <main className="relative h-[100dvh] p-3 md:p-8 max-w-7xl mx-auto text-offblack bg-[#EAE8E0] flex flex-col overflow-hidden">
       
       {/* --- FONDO ABSTRACTO --- */}
@@ -20,11 +18,9 @@ export default function Home() {
       <div className="relative z-10 flex flex-col flex-1 h-full">
         
         {/* GRID PRINCIPAL */}
-        {/* grid-rows-[auto_1fr] hace que la fila de abajo crezca para llenar el espacio vacío en móvil y PC */}
         <div className="grid grid-cols-1 md:grid-cols-3 grid-rows-[auto_1fr] gap-2 md:gap-5 font-sans flex-1">
           
           {/* HEADER BLOCK */}
-          {/* bg-transparent: Sin color de fondo, solo cristal */}
           <div className="md:col-span-3 rounded-3xl p-4 md:p-10 flex flex-col justify-center h-auto min-h-0 bg-transparent backdrop-blur-md border border-white/40 shadow-sm ring-1 ring-white/30">
             <h1 className="text-4xl md:text-7xl font-bold tracking-tighter uppercase mb-0 leading-none">
               ANTONIO
@@ -34,17 +30,19 @@ export default function Home() {
             </p>
           </div>
 
-          {/* FILA INFERIOR (Se estira gracias al 1fr del grid) */}
+          {/* FILA INFERIOR */}
           
           {/* PHOTOGRAPHY */}
           <Link href="/photography" className="md:col-span-2 relative h-full group overflow-hidden rounded-3xl cursor-pointer block transition-all duration-500
               bg-transparent backdrop-blur-md border border-white/40 shadow-sm ring-1 ring-white/30 text-offblack
               hover:bg-white/20 hover:border-lime/50 hover:shadow-lime/10">
             
+            {/* 01 */}
             <div className="absolute top-4 right-4 border border-current w-8 h-8 rounded-full flex items-center justify-center z-20">
               <span className="font-mono text-xs font-medium">01</span>
             </div>
             
+            {/* TEXTO */}
             <div className="absolute bottom-0 left-0 p-4 md:p-8 z-20 w-full">
               <h2 className="text-3xl md:text-5xl font-bold uppercase mb-1 tracking-tight leading-none">
                 Photography
@@ -56,26 +54,25 @@ export default function Home() {
           </Link>
 
           {/* PROJECTS */}
-          {/* CAMBIO: Ahora es transparente y con texto oscuro, igual que el de foto */}
           <Link href="/projects" className="md:col-span-1 relative h-full group overflow-hidden rounded-3xl cursor-pointer block transition-all duration-500
               bg-transparent backdrop-blur-md border border-white/40 shadow-sm ring-1 ring-white/30 text-offblack
               hover:bg-white/20 hover:border-lime/50 hover:shadow-lime/10">
-            <div className="h-full flex flex-col justify-between p-4 md:p-8">
-              <div className="self-end">
-                <div className="w-8 h-8 md:w-10 md:h-10 border border-current rounded-full flex items-center justify-center font-mono text-xs md:text-lg">
-                  <span>02</span>
-                </div>
+              
+              {/* 02 - AHORA POSICIONADO IGUAL QUE EL 01 */}
+              <div className="absolute top-4 right-4 border border-current w-8 h-8 rounded-full flex items-center justify-center z-20">
+                 <span className="font-mono text-xs font-medium">02</span>
               </div>
               
-              <div>
+              {/* TEXTO - AHORA POSICIONADO IGUAL QUE EL DE PHOTOGRAPHY */}
+              <div className="absolute bottom-0 left-0 p-4 md:p-8 z-20 w-full">
                 <h2 className="text-3xl md:text-5xl font-bold uppercase mb-1 tracking-tight leading-none">
                   Projects
                 </h2>
-                <p className="text-softgray text-xs md:text-sm font-medium group-hover:opacity-100 leading-tight">
+                {/* CAMBIO: md:text-base para igualar tamaño */}
+                <p className="text-softgray font-medium group-hover:text-offblack transition-colors text-xs md:text-base leading-tight">
                   Experiments & Code.
                 </p>
               </div>
-            </div>
           </Link>
 
         </div>
