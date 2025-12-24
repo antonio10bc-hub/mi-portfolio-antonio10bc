@@ -9,18 +9,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bone: '#F2F0E9',
-        offblack: '#111111',
-        lime: '#D4FF00',
-        softgray: '#B0B0B0',
+        bone: '#F2F0E9',      // Blanco hueso
+        offblack: '#111111',  // Negro casi puro
+        lime: '#D4FF00',      // Lima
+        softgray: '#B0B0B0',  // Gris
       },
       fontFamily: {
         sans: ['var(--font-inter)'],
         mono: ['var(--font-roboto-mono)'],
       },
-      // --- NUEVA SECCIÓN DE ANIMACIÓN ---
+      // --- ANIMACIÓN DE ALTA INTENSIDAD ---
       animation: {
-        blob: "blob 7s infinite", // Define la clase 'animate-blob' (7 segundos, bucle infinito)
+        // Cambio 1: De 7s a 4s (Más rápido)
+        blob: "blob 4s infinite", 
       },
       keyframes: {
         blob: {
@@ -28,20 +29,18 @@ const config: Config = {
             transform: "translate(0px, 0px) scale(1)",
           },
           "33%": {
-            // Se mueve arriba/derecha y crece un poco
-            transform: "translate(30px, -50px) scale(1.1)",
+            // Cambio 2: Movimiento más amplio (de 30px a 60px/80px) y escala mayor (1.2)
+            transform: "translate(60px, -80px) scale(1.2)",
           },
           "66%": {
-            // Se mueve abajo/izquierda y se encoge un poco
-            transform: "translate(-20px, 20px) scale(0.9)",
+            // Cambio 3: Movimiento opuesto fuerte y reducción de tamaño (0.8)
+            transform: "translate(-40px, 50px) scale(0.8)",
           },
           "100%": {
-            // Vuelve al inicio
             transform: "translate(0px, 0px) scale(1)",
           },
         },
       },
-      // ----------------------------------
     },
   },
   plugins: [],

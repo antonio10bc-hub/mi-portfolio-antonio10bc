@@ -4,14 +4,14 @@ export default function ProjectsPage() {
   return (
     <main className="relative min-h-screen p-4 md:p-8 max-w-7xl mx-auto text-offblack bg-[#EAE8E0] flex flex-col overflow-x-hidden">
       
-      {/* --- FONDO ABSTRACTO ANIMADO --- */}
+      {/* --- FONDO ABSTRACTO INTENSO --- */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-          <div className="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-r from-lime-300/60 to-green-300/60 rounded-full mix-blend-multiply filter blur-[64px] opacity-70 animate-blob"></div>
-          <div className="absolute top-0 -right-20 w-96 h-96 bg-gradient-to-r from-purple-300/60 to-pink-300/60 rounded-full mix-blend-multiply filter blur-[80px] opacity-60 animate-blob [animation-delay:2s]"></div>
-          <div className="absolute top-[30%] -left-20 w-72 h-72 bg-gradient-to-r from-orange-300/50 to-amber-300/50 rounded-full mix-blend-multiply filter blur-[64px] opacity-60 animate-blob [animation-delay:4s]"></div>
-          <div className="absolute top-[50%] -right-20 w-80 h-80 bg-gradient-to-r from-cyan-300/50 to-blue-300/50 rounded-full mix-blend-multiply filter blur-[70px] opacity-60 animate-blob [animation-delay:6s]"></div>
-          <div className="absolute -bottom-20 left-10 w-96 h-96 bg-gradient-to-r from-indigo-300/50 to-violet-300/50 rounded-full mix-blend-multiply filter blur-[90px] opacity-50 animate-blob [animation-delay:3s]"></div>
-          <div className="absolute bottom-10 right-10 w-64 h-64 bg-gradient-to-r from-yellow-200/60 to-lime-200/60 rounded-full mix-blend-multiply filter blur-[64px] opacity-60 animate-blob [animation-delay:5s]"></div>
+          <div className="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-r from-lime-400/80 to-green-500/80 rounded-full mix-blend-multiply filter blur-[64px] opacity-80 animate-blob"></div>
+          <div className="absolute top-0 -right-20 w-96 h-96 bg-gradient-to-r from-purple-500/80 to-pink-500/80 rounded-full mix-blend-multiply filter blur-[80px] opacity-80 animate-blob [animation-delay:2s]"></div>
+          <div className="absolute top-[30%] -left-20 w-72 h-72 bg-gradient-to-r from-orange-400/80 to-amber-500/80 rounded-full mix-blend-multiply filter blur-[64px] opacity-80 animate-blob [animation-delay:4s]"></div>
+          <div className="absolute top-[50%] -right-20 w-80 h-80 bg-gradient-to-r from-cyan-400/80 to-blue-500/80 rounded-full mix-blend-multiply filter blur-[70px] opacity-80 animate-blob [animation-delay:6s]"></div>
+          <div className="absolute -bottom-20 left-10 w-96 h-96 bg-gradient-to-r from-indigo-500/80 to-violet-500/80 rounded-full mix-blend-multiply filter blur-[90px] opacity-80 animate-blob [animation-delay:3s]"></div>
+          <div className="absolute bottom-10 right-10 w-64 h-64 bg-gradient-to-r from-yellow-400/80 to-lime-500/80 rounded-full mix-blend-multiply filter blur-[64px] opacity-80 animate-blob [animation-delay:5s]"></div>
       </div>
 
       <div className="relative z-10 flex flex-col flex-1">
