@@ -78,7 +78,7 @@ export default function PhotographyPage() {
             </h1>
         </div>
 
-        {/* FOTOS (MINIATURAS) */}
+        {/* FOTOS */}
         {photos.map((photo, index) => {
            const isFirst = index === 0;
            const sizesAttr = isFirst 
@@ -102,10 +102,8 @@ export default function PhotographyPage() {
               className="object-cover transition-transform duration-700 group-hover:scale-105"
             />
             
-            {/* Capa de hover con icono LUPA y título */}
             <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-lime opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                {/* --- ICONO DE LUPA NUEVO --- */}
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10">
                   <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                 </svg>
@@ -119,13 +117,13 @@ export default function PhotographyPage() {
 
       </div>
 
-      {/* FOOTER */}
-      <footer className="mt-8 md:mt-12 flex flex-col md:flex-row justify-between text-xs text-softgray font-bold uppercase tracking-widest border-t border-softgray/20 pt-6 gap-4">
+      {/* FOOTER ACTUALIZADO */}
+      <footer className="mt-8 md:mt-12 flex flex-col md:flex-row justify-between text-[10px] md:text-xs text-softgray font-bold uppercase tracking-widest border-t border-softgray/20 pt-6 gap-4">
         <div className="flex flex-col md:flex-row gap-2 md:gap-4">
             <span>© 2025 Antonio Asis Bastos de Cordoba</span>
             <span className="hidden md:inline text-softgray/50">|</span>
-            <a href="https://www.instagram.com/antonio10bc/" target="_blank" rel="noopener noreferrer" className="hover:text-offblack transition-colors">
-              Instagram ↗
+            <a href="https://www.instagram.com/antonio10bc/" target="_blank" rel="noopener noreferrer" className="hover:text-offblack transition-colors underline decoration-softgray/50 hover:decoration-offblack">
+              Instagram
             </a>
         </div>
         <span>Madrid, ES</span>
@@ -138,22 +136,19 @@ export default function PhotographyPage() {
           onClick={closeModal}
         >
           
-          {/* FLECHA IZQUIERDA */}
+          {/* FLECHAS */}
           <button 
             onClick={handlePrevious}
-            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-50 text-bone/70 hover:text-lime p-4 hover:bg-white/10 rounded-full transition-all cursor-pointer"
-            aria-label="Previous image"
+            className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-50 text-bone/70 hover:text-lime p-2 md:p-4 hover:bg-white/10 rounded-full transition-all cursor-pointer"
           >
              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8 md:w-10 md:h-10">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
             </svg>
           </button>
 
-          {/* FLECHA DERECHA */}
            <button 
             onClick={handleNext}
-            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-50 text-bone/70 hover:text-lime p-4 hover:bg-white/10 rounded-full transition-all cursor-pointer"
-            aria-label="Next image"
+            className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 z-50 text-bone/70 hover:text-lime p-2 md:p-4 hover:bg-white/10 rounded-full transition-all cursor-pointer"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8 md:w-10 md:h-10">
               <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
@@ -161,7 +156,6 @@ export default function PhotographyPage() {
           </button>
 
 
-          {/* BOTÓN CERRAR (X) */}
           <button 
               onClick={closeModal}
               className="absolute top-4 right-4 z-50 bg-black/50 text-bone p-2 rounded-full hover:bg-lime hover:text-offblack transition-colors cursor-pointer"
@@ -171,7 +165,7 @@ export default function PhotographyPage() {
               </svg>
             </button>
 
-          {/* CONTENEDOR IMAGEN GRANDE */}
+          {/* IMAGEN GRANDE */}
           <div 
             className="relative w-full h-full max-w-6xl max-h-[85vh] rounded-lg overflow-hidden"
             onClick={(e) => e.stopPropagation()} 
@@ -186,8 +180,10 @@ export default function PhotographyPage() {
               priority
             />
           </div>
-           {/* Título abajo */}
-           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-bone text-sm uppercase tracking-widest font-bold bg-black/50 px-4 py-2 rounded-full pointer-events-none">
+           
+           {/* TEXTO INFERIOR (Ajustado) */}
+           {/* text-[10px] en móvil, text-sm en PC. whitespace-nowrap para que no salte de línea */}
+           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-bone text-[10px] md:text-sm uppercase tracking-widest font-bold bg-black/50 px-4 py-2 rounded-full pointer-events-none whitespace-nowrap">
               {selectedPhoto.title}
               <span className="text-bone/60 ml-2 normal-case">
                 ({selectedIndex !== null ? selectedIndex + 1 : 0} / {photos.length})
