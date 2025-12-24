@@ -2,9 +2,10 @@ import Link from "next/link";
 
 export default function ProjectsPage() {
   return (
-    <main className="relative min-h-screen p-4 md:p-8 max-w-7xl mx-auto text-offblack bg-[#EAE8E0] flex flex-col overflow-x-hidden">
+    // 1. CAPA EXTERNA: W-FULL para el fondo
+    <div className="relative min-h-screen w-full bg-[#EAE8E0] overflow-x-hidden text-offblack font-sans">
       
-      {/* --- FONDO ABSTRACTO INTENSO --- */}
+      {/* --- FONDO ANIMADO INTENSO --- */}
       <div className="fixed inset-0 z-0 pointer-events-none">
           <div className="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-r from-lime-400/80 to-green-500/80 rounded-full mix-blend-multiply filter blur-[64px] opacity-80 animate-blob"></div>
           <div className="absolute top-0 -right-20 w-96 h-96 bg-gradient-to-r from-purple-500/80 to-pink-500/80 rounded-full mix-blend-multiply filter blur-[80px] opacity-80 animate-blob [animation-delay:2s]"></div>
@@ -14,7 +15,8 @@ export default function ProjectsPage() {
           <div className="absolute bottom-10 right-10 w-64 h-64 bg-gradient-to-r from-yellow-400/80 to-lime-500/80 rounded-full mix-blend-multiply filter blur-[64px] opacity-80 animate-blob [animation-delay:5s]"></div>
       </div>
 
-      <div className="relative z-10 flex flex-col flex-1">
+      {/* 2. CAPA INTERNA: Contenido centrado (max-w-7xl) */}
+      <div className="relative z-10 w-full min-h-screen max-w-7xl mx-auto p-4 md:p-8 flex flex-col">
         {/* BOTÓN BACK */}
         <div className="mb-6">
             <Link href="/" className="inline-block text-sm md:text-base font-bold uppercase tracking-widest hover:text-lime transition-colors">
@@ -65,6 +67,6 @@ export default function ProjectsPage() {
         </footer>
       </div>
 
-    </main>
+    </div>
   );
 }

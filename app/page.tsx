@@ -2,35 +2,26 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="relative min-h-[100dvh] p-3 md:p-8 max-w-7xl mx-auto text-offblack bg-[#EAE8E0] flex flex-col overflow-hidden">
+    // 1. CAPA EXTERNA: Ocupa todo el ancho (w-full) y tiene el color de fondo.
+    // Esto asegura que NO haya márgenes blancos a los lados.
+    <div className="relative min-h-screen w-full bg-[#EAE8E0] overflow-hidden text-offblack font-sans">
       
-      {/* --- FONDO ABSTRACTO INTENSO --- */}
+      {/* --- FONDO ANIMADO INTENSO (LÁMPARA DE LAVA) --- */}
+      {/* Está posicionado absoluto respecto a la pantalla completa */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-          {/* 1. Lima/Verde Potente */}
           <div className="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-r from-lime-400/80 to-green-500/80 rounded-full mix-blend-multiply filter blur-[64px] opacity-80 animate-blob"></div>
-          
-          {/* 2. Morado/Rosa Fuerte */}
-          <div className="absolute -top-10 -right-10 w-96 h-96 bg-gradient-to-r from-purple-500/80 to-pink-500/80 rounded-full mix-blend-multiply filter blur-[80px] opacity-80 animate-blob [animation-delay:2s]"></div>
-          
-          {/* 3. Naranja/Ámbar Vivo */}
+          <div className="absolute top-0 -right-20 w-96 h-96 bg-gradient-to-r from-purple-500/80 to-pink-500/80 rounded-full mix-blend-multiply filter blur-[80px] opacity-80 animate-blob [animation-delay:2s]"></div>
           <div className="absolute top-[30%] -left-20 w-72 h-72 bg-gradient-to-r from-orange-400/80 to-amber-500/80 rounded-full mix-blend-multiply filter blur-[64px] opacity-80 animate-blob [animation-delay:4s]"></div>
-          
-          {/* 4. Cian/Azul Eléctrico */}
-          <div className="absolute top-[40%] -right-20 w-80 h-80 bg-gradient-to-r from-cyan-400/80 to-blue-500/80 rounded-full mix-blend-multiply filter blur-[70px] opacity-80 animate-blob [animation-delay:6s]"></div>
-          
-          {/* 5. Indigo Profundo */}
-          <div className="absolute -bottom-20 left-20 w-96 h-96 bg-gradient-to-r from-indigo-500/80 to-violet-500/80 rounded-full mix-blend-multiply filter blur-[90px] opacity-80 animate-blob [animation-delay:3s]"></div>
-          
-          {/* 6. Amarillo/Lima Neón */}
-          <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-gradient-to-r from-yellow-400/80 to-lime-500/80 rounded-full mix-blend-multiply filter blur-[64px] opacity-80 animate-blob [animation-delay:5s]"></div>
+          <div className="absolute top-[50%] -right-20 w-80 h-80 bg-gradient-to-r from-cyan-400/80 to-blue-500/80 rounded-full mix-blend-multiply filter blur-[70px] opacity-80 animate-blob [animation-delay:6s]"></div>
+          <div className="absolute -bottom-20 left-10 w-96 h-96 bg-gradient-to-r from-indigo-500/80 to-violet-500/80 rounded-full mix-blend-multiply filter blur-[90px] opacity-80 animate-blob [animation-delay:3s]"></div>
+          <div className="absolute bottom-10 right-10 w-64 h-64 bg-gradient-to-r from-yellow-400/80 to-lime-500/80 rounded-full mix-blend-multiply filter blur-[64px] opacity-80 animate-blob [animation-delay:5s]"></div>
       </div>
 
-      {/* --- CONTENIDO PRINCIPAL --- */}
-      <div className="relative z-10 flex flex-col flex-1 h-full">
+      {/* 2. CAPA INTERNA (CONTENIDO): Aquí aplicamos el límite de ancho (max-w-7xl) y el padding. */}
+      <main className="relative z-10 w-full h-screen max-w-7xl mx-auto p-3 md:p-8 flex flex-col">
         
         {/* GRID PRINCIPAL */}
-        {/* md:grid-rows-[auto_1fr] para evitar huecos grandes en móvil */}
-        <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-[auto_1fr] gap-2 md:gap-5 font-sans flex-1 content-start md:content-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-[auto_1fr] gap-2 md:gap-5 flex-1 content-start md:content-stretch">
           
           {/* HEADER BLOCK */}
           <div className="md:col-span-3 rounded-3xl p-4 md:p-10 flex flex-col justify-center h-auto min-h-0 bg-transparent backdrop-blur-md border border-white/40 shadow-sm ring-1 ring-white/30">
@@ -96,7 +87,7 @@ export default function Home() {
           <span>Madrid, ES</span>
         </footer>
 
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
