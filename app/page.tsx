@@ -4,25 +4,21 @@ export default function Home() {
   return (
     <main className="relative min-h-[100dvh] p-3 md:p-8 max-w-7xl mx-auto text-offblack bg-[#EAE8E0] flex flex-col overflow-hidden">
       
-      {/* --- FONDO ABSTRACTO (ESTÁTICO Y ESTABLE) --- */}
+      {/* --- FONDO ABSTRACTO ANIMADO (LÁMPARA DE LAVA) --- */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-r from-lime-300/60 to-green-300/60 rounded-full mix-blend-multiply filter blur-[64px] opacity-70"></div>
-          <div className="absolute -top-10 -right-10 w-96 h-96 bg-gradient-to-r from-purple-300/60 to-pink-300/60 rounded-full mix-blend-multiply filter blur-[80px] opacity-60"></div>
-          <div className="absolute top-[30%] -left-20 w-72 h-72 bg-gradient-to-r from-orange-300/50 to-amber-300/50 rounded-full mix-blend-multiply filter blur-[64px] opacity-60"></div>
-          <div className="absolute top-[40%] -right-20 w-80 h-80 bg-gradient-to-r from-cyan-300/50 to-blue-300/50 rounded-full mix-blend-multiply filter blur-[70px] opacity-60"></div>
-          <div className="absolute -bottom-20 left-20 w-96 h-96 bg-gradient-to-r from-indigo-300/50 to-violet-300/50 rounded-full mix-blend-multiply filter blur-[90px] opacity-50"></div>
-          <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-gradient-to-r from-yellow-200/60 to-lime-200/60 rounded-full mix-blend-multiply filter blur-[64px] opacity-60"></div>
+          {/* Añadido 'animate-blob' y diferentes delays a cada mancha */}
+          <div className="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-r from-lime-300/60 to-green-300/60 rounded-full mix-blend-multiply filter blur-[64px] opacity-70 animate-blob"></div>
+          <div className="absolute -top-10 -right-10 w-96 h-96 bg-gradient-to-r from-purple-300/60 to-pink-300/60 rounded-full mix-blend-multiply filter blur-[80px] opacity-60 animate-blob [animation-delay:2s]"></div>
+          <div className="absolute top-[30%] -left-20 w-72 h-72 bg-gradient-to-r from-orange-300/50 to-amber-300/50 rounded-full mix-blend-multiply filter blur-[64px] opacity-60 animate-blob [animation-delay:4s]"></div>
+          <div className="absolute top-[40%] -right-20 w-80 h-80 bg-gradient-to-r from-cyan-300/50 to-blue-300/50 rounded-full mix-blend-multiply filter blur-[70px] opacity-60 animate-blob [animation-delay:6s]"></div>
+          <div className="absolute -bottom-20 left-20 w-96 h-96 bg-gradient-to-r from-indigo-300/50 to-violet-300/50 rounded-full mix-blend-multiply filter blur-[90px] opacity-50 animate-blob [animation-delay:3s]"></div>
+          <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-gradient-to-r from-yellow-200/60 to-lime-200/60 rounded-full mix-blend-multiply filter blur-[64px] opacity-60 animate-blob [animation-delay:5s]"></div>
       </div>
 
       {/* --- CONTENIDO PRINCIPAL --- */}
       <div className="relative z-10 flex flex-col flex-1 h-full">
         
         {/* GRID PRINCIPAL */}
-        {/* CORRECCIÓN AQUÍ: 
-           Cambiamos 'grid-rows-[auto_1fr]' por 'md:grid-rows-[auto_1fr]'.
-           Esto hace que en móvil las filas no se estiren artificialmente,
-           manteniendo el hueco pequeño de 'gap-2' entre todos los bloques.
-        */}
         <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-[auto_1fr] gap-2 md:gap-5 font-sans flex-1 content-start md:content-stretch">
           
           {/* HEADER BLOCK */}
