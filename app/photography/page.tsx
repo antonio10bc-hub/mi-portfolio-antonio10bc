@@ -1,41 +1,29 @@
 import Link from "next/link";
-import Image from "next/image"; // Importamos el componente optimizado de Next.js
+import Image from "next/image";
 
 export default function PhotographyPage() {
   
-  // AQUÍ CONFIGURAS TUS FOTOS REALES
-  // Asegúrate de que los nombres de archivo (src) coincidan con los que subiste a public/images
+  // LISTA DE FOTOS ACTUALIZADA CON TUS ARCHIVOS REALES
+  // He asignado títulos según lo que parecen las miniaturas, puedes cambiarlos a tu gusto.
   const photos = [
-    { 
-      id: 1, 
-      src: "/images/foto1.jpg", 
-      alt: "Descripción de la foto 1", 
-      title: "Urban Silence" 
-    },
-    { 
-      id: 2, 
-      src: "/images/foto2.jpg", 
-      alt: "Descripción de la foto 2", 
-      title: "Neon Lights" 
-    },
-    { 
-      id: 3, 
-      src: "/images/foto3.jpg", 
-      alt: "Descripción de la foto 3", 
-      title: "Nature" 
-    },
-    { 
-      id: 4, 
-      src: "/images/foto4.jpg", 
-      alt: "Descripción de la foto 4", 
-      title: "Architecture" 
-    },
-    { 
-      id: 5, 
-      src: "/images/foto5.jpg", 
-      alt: "Descripción de la foto 5", 
-      title: "Portrait" 
-    },
+    { id: 1, src: "/images/foto1.jpg", alt: "Ciudad de noche con luces de neón", title: "City Nights" },
+    { id: 4, src: "/images/foto4.jpg", alt: "Río urbano", title: "Urban River" },
+    { id: 6, src: "/images/foto6.jpg", alt: "Luz en la oscuridad", title: "Minimal Light" },
+    { id: 7, src: "/images/foto7.jpg", alt: "Lago y montañas", title: "Lake Mirror" },
+    { id: 8, src: "/images/foto8.jpg", alt: "Picos de montaña rocosos", title: "Rocky Peaks" },
+    { id: 9, src: "/images/foto9.jpg", alt: "Árbol solitario", title: "Solitude" },
+    { id: 10, src: "/images/foto10.jpg", alt: "Pueblo medieval panorámico", title: "Old Town" },
+    { id: 11, src: "/images/foto11.jpg", alt: "Pueblo en el acantilado", title: "Cliffside" },
+    { id: 12, src: "/images/foto12.jpg", alt: "Paisaje de montaña abierto", title: "Highlands" },
+    { id: 13, src: "/images/foto13.jpg", alt: "Montaña nevada en blanco y negro", title: "Snow Peak" },
+    { id: 14, src: "/images/foto14.jpg", alt: "Montañas con niebla", title: "Misty Mood" },
+    { id: 15, src: "/images/foto15.jpg", alt: "Colina verde iluminada", title: "Green Hill" },
+    { id: 16, src: "/images/foto16.jpg", alt: "Mar y nubes tormentosas", title: "Storm Horizon" },
+    { id: 17, src: "/images/foto17.jpg", alt: "Rayos de sol sobre el agua", title: "Sun Rays" },
+    { id: 18, src: "/images/foto18.jpg", alt: "Valle neblinoso", title: "The Valley" },
+    { id: 19, src: "/images/foto19.jpg", alt: "Montañas kársticas oscuras", title: "Dark Karst" },
+    { id: 20, src: "/images/foto20.jpg", alt: "Textura de campo o líneas", title: "Abstract Lines" },
+    { id: 21, src: "/images/foto21.jpg", alt: "Vista aérea o textura de tierra", title: "Earth Texture" },
   ];
 
   return (
@@ -62,13 +50,11 @@ export default function PhotographyPage() {
         {photos.map((photo, index) => (
           <div 
             key={photo.id}
-            // La primera foto ocupa 2 espacios en escritorio (aspect-[16/9]), las demás son verticales
+            // La primera foto (foto1) será grande. El resto tamaño estándar.
             className={`relative rounded-2xl overflow-hidden border border-softgray/20 group hover:shadow-xl transition-all duration-300 ${
               index === 0 ? 'md:col-span-2 aspect-[16/9]' : 'aspect-[4/5]'
             }`}
           >
-            {/* COMPONENTE DE IMAGEN DE NEXT.JS */}
-            {/* 'fill' hace que la imagen llene el contenedor. 'object-cover' hace que no se deforme */}
             <Image 
               src={photo.src} 
               alt={photo.alt}
