@@ -2,18 +2,21 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen p-3 md:p-8 max-w-7xl mx-auto text-offblack bg-bone flex flex-col">
+    // CAMBIO MAIN: 
+    // - Móvil: 'min-h-screen' (crece si hace falta).
+    // - PC (md): 'h-screen' (fuerza altura exacta de pantalla) y 'overflow-hidden' (corta el scroll).
+    <main className="min-h-screen md:h-screen p-3 md:p-8 max-w-7xl mx-auto text-offblack bg-bone flex flex-col md:overflow-hidden">
       
       {/* GRID PRINCIPAL */}
-      {/* CAMBIOS PARA PC (md):
-         - md:grid-rows-[auto_380px]: Antes 450px. Reducimos altura para evitar scroll.
-         - md:gap-5: Antes gap-6. Compactamos un poco la separación.
-         - MÓVIL (content-start) se mantiene INTACTO.
+      {/* CAMBIOS GRID PC:
+          - md:grid-rows-[auto_1fr]: Fila 1 automática, Fila 2 llena el resto.
+          - md:gap-5: Espacio equilibrado.
+          - flex-1: Empuja el footer hacia abajo si sobra espacio.
       */}
-      <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-[auto_380px] gap-2 md:gap-5 font-sans content-start md:content-center md:flex-1">
+      <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-[auto_1fr] gap-2 md:gap-5 font-sans content-start md:content-stretch flex-1">
         
         {/* --- HEADER BLOCK --- */}
-        {/* md:p-10 (Antes p-12). Un poco menos de aire en PC */}
+        {/* En PC: h-full para que llene su celda 'auto' asignada */}
         <div className="md:col-span-3 bg-white rounded-3xl border border-softgray/30 p-4 md:p-10 flex flex-col justify-center h-auto min-h-0">
            <h1 className="text-4xl md:text-7xl font-bold tracking-tighter uppercase mb-0 leading-none">
             ANTONIO
@@ -25,6 +28,10 @@ export default function Home() {
 
 
         {/* --- FILA INFERIOR --- */}
+        {/* MAGIA AQUÍ: 
+            En PC usamos 'md:h-full'. Como la fila es '1fr', esto hará que los bloques
+            se estiren o encojan milimétricamente para llenar la pantalla.
+        */}
         
         {/* BLOQUE 1: PHOTOGRAPHY */}
         <Link href="/photography" className="md:col-span-2 relative h-[200px] md:h-full group overflow-hidden rounded-3xl border border-softgray/30 bg-white text-offblack hover:bg-lime transition-all duration-500 cursor-pointer block">
@@ -66,7 +73,8 @@ export default function Home() {
       </div>
       
       {/* FOOTER */}
-      <footer className="mt-2 md:mt-8 flex flex-col md:flex-row justify-between text-[10px] md:text-xs text-softgray font-bold uppercase tracking-widest border-t border-softgray/20 pt-4 gap-4">
+      {/* En PC: mt-4 para darle aire respecto a los bloques estirados */}
+      <footer className="mt-2 md:mt-4 flex flex-col md:flex-row justify-between text-[10px] md:text-xs text-softgray font-bold uppercase tracking-widest border-t border-softgray/20 pt-4 gap-4 shrink-0">
         <div className="flex flex-col md:flex-row gap-2 md:gap-4">
             <span>© 2025 Antonio Asis Bastos de Cordoba</span>
             <span className="hidden md:inline text-softgray/50">|</span>
