@@ -78,8 +78,7 @@ export default function PhotographyPage() {
         {/* GRID CONTENEDOR */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-1 content-start">
             
-            {/* BLOQUE TÍTULO (Cristal Transparente y Ajustado) */}
-            {/* p-5 (ajustado) y sin min-h-[150px] para que no sobre espacio */}
+            {/* BLOQUE TÍTULO */}
             <div className="col-span-1 md:col-span-2 lg:col-span-3 rounded-3xl border border-white/40 p-5 pt-4 flex flex-col justify-center h-auto bg-transparent backdrop-blur-md shadow-sm ring-1 ring-white/30">
                 <h1 className="text-4xl md:text-6xl font-bold uppercase tracking-tighter leading-none">
                 Photography

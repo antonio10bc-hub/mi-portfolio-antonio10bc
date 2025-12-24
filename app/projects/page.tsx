@@ -25,20 +25,14 @@ export default function ProjectsPage() {
         {/* GRID CONTENEDOR */}
         <div className="grid grid-cols-1 gap-4 flex-1 content-start">
 
-            {/* BLOQUE TÍTULO (Cristal Transparente) */}
+            {/* BLOQUE TÍTULO */}
             <div className="rounded-3xl border border-white/40 p-5 pt-4 flex flex-col justify-center h-auto bg-transparent backdrop-blur-md shadow-sm ring-1 ring-white/30">
                 <h1 className="text-4xl md:text-6xl font-bold uppercase tracking-tighter leading-none">
                     Projects
                 </h1>
             </div>
 
-            {/* CARD COINFLIIP (Lima Cristal & Pequeña) */}
-            {/* CAMBIOS: 
-               - max-w-3xl mx-auto: Centrado y más pequeño (aprox 50% visualmente respecto al ancho total).
-               - h-[250px]: Altura controlada.
-               - bg-lime/40: Cristal lima por defecto.
-               - text-offblack: Texto oscuro.
-            */}
+            {/* CARD COINFLIIP */}
             <a 
             href="https://www.coinfliip.com/" 
             target="_blank" 
@@ -53,7 +47,6 @@ export default function ProjectsPage() {
                 </p>
             </div>
             
-            {/* Brillo sutil en hover */}
             <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </a>
 
