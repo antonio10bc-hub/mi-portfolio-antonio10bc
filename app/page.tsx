@@ -13,9 +13,9 @@ export default function Home() {
            <h1 className="text-5xl md:text-7xl font-bold tracking-tighter uppercase mb-2">
             ANTONIO
           </h1>
-          <p className="text-softgray text-xl md:text-2xl font-medium">
-            Photography & Creative Game Design
-          </p>
+          <p className="text-softgray text-base md:text-lg font-medium">
+  Photography & Creative Game Design
+</p>
         </div>
 
 
