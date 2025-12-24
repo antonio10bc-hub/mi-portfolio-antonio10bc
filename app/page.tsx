@@ -5,15 +5,16 @@ export default function Home() {
     <main className="min-h-screen p-3 md:p-8 max-w-7xl mx-auto text-offblack bg-bone flex flex-col">
       
       {/* GRID PRINCIPAL */}
-      {/* CAMBIOS CLAVE AQUÍ:
-          - content-start: Pega los bloques arriba del todo (en vez de al centro).
-          - md:content-center: En PC sí los dejamos centrados para que quede elegante.
-          - md:flex-1: En móvil quitamos flex-1 para que la caja no crezca y el footer suba.
+      {/* CAMBIOS PARA PC (md):
+         - md:grid-rows-[auto_380px]: Antes 450px. Reducimos altura para evitar scroll.
+         - md:gap-5: Antes gap-6. Compactamos un poco la separación.
+         - MÓVIL (content-start) se mantiene INTACTO.
       */}
-      <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-[auto_450px] gap-2 md:gap-6 font-sans content-start md:content-center md:flex-1">
+      <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-[auto_380px] gap-2 md:gap-5 font-sans content-start md:content-center md:flex-1">
         
         {/* --- HEADER BLOCK --- */}
-        <div className="md:col-span-3 bg-white rounded-3xl border border-softgray/30 p-4 md:p-12 flex flex-col justify-center h-auto min-h-0">
+        {/* md:p-10 (Antes p-12). Un poco menos de aire en PC */}
+        <div className="md:col-span-3 bg-white rounded-3xl border border-softgray/30 p-4 md:p-10 flex flex-col justify-center h-auto min-h-0">
            <h1 className="text-4xl md:text-7xl font-bold tracking-tighter uppercase mb-0 leading-none">
             ANTONIO
           </h1>
@@ -65,8 +66,7 @@ export default function Home() {
       </div>
       
       {/* FOOTER */}
-      {/* CAMBIO: mt-2 (mínima separación con los bloques de arriba) */}
-      <footer className="mt-2 md:mt-12 flex flex-col md:flex-row justify-between text-[10px] md:text-xs text-softgray font-bold uppercase tracking-widest border-t border-softgray/20 pt-4 gap-4">
+      <footer className="mt-2 md:mt-8 flex flex-col md:flex-row justify-between text-[10px] md:text-xs text-softgray font-bold uppercase tracking-widest border-t border-softgray/20 pt-4 gap-4">
         <div className="flex flex-col md:flex-row gap-2 md:gap-4">
             <span>© 2025 Antonio Asis Bastos de Cordoba</span>
             <span className="hidden md:inline text-softgray/50">|</span>
