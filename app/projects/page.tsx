@@ -2,27 +2,17 @@ import Link from "next/link";
 
 export default function ProjectsPage() {
   return (
-    <main className="relative min-h-screen p-4 md:p-8 max-w-7xl mx-auto text-offblack bg-bone flex flex-col overflow-x-hidden">
+    <main className="relative min-h-screen p-4 md:p-8 max-w-7xl mx-auto text-offblack bg-[#EAE8E0] flex flex-col overflow-x-hidden">
       
-      {/* --- FONDO ABSTRACTO (6 Manchas) --- */}
+      {/* --- FONDO ABSTRACTO --- */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-          {/* 1. Lima Brillante (Arriba Izquierda) */}
+          {/* Manchas distribuidas */}
           <div className="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-r from-lime-300/60 to-green-300/60 rounded-full mix-blend-multiply filter blur-[64px] opacity-70"></div>
-          
-          {/* 2. Rosa/Morado (Arriba Derecha) */}
           <div className="absolute top-0 -right-20 w-96 h-96 bg-gradient-to-r from-purple-300/60 to-pink-300/60 rounded-full mix-blend-multiply filter blur-[80px] opacity-60"></div>
-          
-          {/* 3. Naranja Cálido (Centro Izquierda) */}
           <div className="absolute top-[30%] -left-20 w-72 h-72 bg-gradient-to-r from-orange-300/50 to-amber-300/50 rounded-full mix-blend-multiply filter blur-[64px] opacity-60"></div>
-
-          {/* 4. Azul Cian (Centro Derecha) */}
           <div className="absolute top-[50%] -right-20 w-80 h-80 bg-gradient-to-r from-cyan-300/50 to-blue-300/50 rounded-full mix-blend-multiply filter blur-[70px] opacity-60"></div>
-          
-          {/* 5. Violeta Profundo (Abajo Izquierda) */}
           <div className="absolute -bottom-20 left-10 w-96 h-96 bg-gradient-to-r from-indigo-300/50 to-violet-300/50 rounded-full mix-blend-multiply filter blur-[90px] opacity-50"></div>
-
-           {/* 6. Amarillo Suave (Abajo Derecha) */}
-           <div className="absolute bottom-10 right-10 w-64 h-64 bg-gradient-to-r from-yellow-200/60 to-lime-200/60 rounded-full mix-blend-multiply filter blur-[64px] opacity-60"></div>
+          <div className="absolute bottom-10 right-10 w-64 h-64 bg-gradient-to-r from-yellow-200/60 to-lime-200/60 rounded-full mix-blend-multiply filter blur-[64px] opacity-60"></div>
       </div>
 
       <div className="relative z-10 flex flex-col flex-1">
@@ -36,9 +26,9 @@ export default function ProjectsPage() {
         {/* GRID CONTENEDOR */}
         <div className="grid grid-cols-1 gap-4 flex-1 content-start">
 
-            {/* BLOQUE TÍTULO (Cristal) */}
-            <div className="rounded-3xl border border-white/50 p-6 md:p-10 flex flex-col justify-center h-auto min-h-[150px] bg-white/40 backdrop-blur-md shadow-lg ring-1 ring-white/20">
-                <h1 className="text-4xl md:text-6xl font-bold uppercase tracking-tighter">
+            {/* BLOQUE TÍTULO (Cristal Transparente y Ajustado) */}
+            <div className="rounded-3xl border border-white/40 p-5 pt-4 flex flex-col justify-center h-auto bg-transparent backdrop-blur-md shadow-sm ring-1 ring-white/30">
+                <h1 className="text-4xl md:text-6xl font-bold uppercase tracking-tighter leading-none">
                     Projects
                 </h1>
             </div>

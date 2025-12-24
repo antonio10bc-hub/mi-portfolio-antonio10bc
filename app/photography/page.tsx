@@ -58,7 +58,7 @@ export default function PhotographyPage() {
 
 
   return (
-    <main className="relative min-h-screen p-4 md:p-8 max-w-7xl mx-auto text-offblack bg-bone flex flex-col overflow-x-hidden">
+    <main className="relative min-h-screen p-4 md:p-8 max-w-7xl mx-auto text-offblack bg-[#EAE8E0] flex flex-col overflow-x-hidden">
       
       {/* --- FONDO ABSTRACTO --- */}
       <div className="fixed inset-0 z-0 pointer-events-none">
@@ -78,14 +78,15 @@ export default function PhotographyPage() {
         {/* GRID CONTENEDOR */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-1 content-start">
             
-            {/* BLOQUE TÍTULO (Estilo Cristal) */}
-            <div className="col-span-1 md:col-span-2 lg:col-span-3 rounded-3xl border border-white/50 p-6 md:p-10 flex flex-col justify-center h-auto min-h-[150px] bg-white/40 backdrop-blur-md shadow-lg ring-1 ring-white/20">
-                <h1 className="text-4xl md:text-6xl font-bold uppercase tracking-tighter">
+            {/* BLOQUE TÍTULO (Cristal Transparente y Ajustado) */}
+            {/* p-5 (ajustado) y sin min-h-[150px] para que no sobre espacio */}
+            <div className="col-span-1 md:col-span-2 lg:col-span-3 rounded-3xl border border-white/40 p-5 pt-4 flex flex-col justify-center h-auto bg-transparent backdrop-blur-md shadow-sm ring-1 ring-white/30">
+                <h1 className="text-4xl md:text-6xl font-bold uppercase tracking-tighter leading-none">
                 Photography
                 </h1>
             </div>
 
-            {/* FOTOS (Sin cristal, limpias) */}
+            {/* FOTOS */}
             {photos.map((photo, index) => {
             const isFirst = index === 0;
             const sizesAttr = isFirst 
