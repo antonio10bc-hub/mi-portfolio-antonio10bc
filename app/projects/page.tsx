@@ -2,10 +2,9 @@ import Link from "next/link";
 
 export default function ProjectsPage() {
   return (
-    // 1. CAPA EXTERNA: W-FULL para el fondo
     <div className="relative min-h-screen w-full bg-[#EAE8E0] overflow-x-hidden text-offblack font-sans">
       
-      {/* --- FONDO ANIMADO INTENSO --- */}
+      {/* --- FONDO ANIMADO --- */}
       <div className="fixed inset-0 z-0 pointer-events-none">
           <div className="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-r from-lime-400/80 to-green-500/80 rounded-full mix-blend-multiply filter blur-[64px] opacity-80 animate-blob"></div>
           <div className="absolute top-0 -right-20 w-96 h-96 bg-gradient-to-r from-purple-500/80 to-pink-500/80 rounded-full mix-blend-multiply filter blur-[80px] opacity-80 animate-blob [animation-delay:2s]"></div>
@@ -15,7 +14,6 @@ export default function ProjectsPage() {
           <div className="absolute bottom-10 right-10 w-64 h-64 bg-gradient-to-r from-yellow-400/80 to-lime-500/80 rounded-full mix-blend-multiply filter blur-[64px] opacity-80 animate-blob [animation-delay:5s]"></div>
       </div>
 
-      {/* 2. CAPA INTERNA: Contenido centrado (max-w-7xl) */}
       <div className="relative z-10 w-full min-h-screen max-w-7xl mx-auto p-4 md:p-8 flex flex-col">
         {/* BOTÓN BACK */}
         <div className="mb-6">
@@ -27,14 +25,14 @@ export default function ProjectsPage() {
         {/* GRID CONTENEDOR */}
         <div className="grid grid-cols-1 gap-4 flex-1 content-start">
 
-            {/* BLOQUE TÍTULO */}
+            {/* TÍTULO */}
             <div className="rounded-3xl border border-white/40 p-5 pt-4 flex flex-col justify-center h-auto bg-transparent backdrop-blur-md shadow-sm ring-1 ring-white/30">
                 <h1 className="text-4xl md:text-6xl font-bold uppercase tracking-tighter leading-none">
                     Projects
                 </h1>
             </div>
 
-            {/* CARD COINFLIIP */}
+            {/* PROYECTO 1: COINFLIIP (Lima) */}
             <a 
             href="https://www.coinfliip.com/" 
             target="_blank" 
@@ -42,14 +40,33 @@ export default function ProjectsPage() {
             className="w-full max-w-3xl mx-auto h-[250px] rounded-3xl text-offblack flex flex-col items-center justify-center group hover:bg-lime/60 hover:scale-[1.02] transition-all duration-500 relative overflow-hidden
             bg-lime/40 backdrop-blur-md border border-white/20 shadow-lg ring-1 ring-white/20"
             >
-            <div className="text-center z-10 p-4">
-                <h2 className="text-4xl md:text-6xl font-bold mb-2">COINFLIIP</h2>
-                <p className="uppercase tracking-widest text-xs md:text-sm border-b border-current inline-block pb-1 opacity-70 group-hover:opacity-100">
-                Visit Website ↗
-                </p>
-            </div>
-            
-            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="text-center z-10 p-4">
+                  <h2 className="text-4xl md:text-6xl font-bold mb-2 tracking-tighter">COINFLIIP</h2>
+                  <p className="uppercase tracking-widest text-xs md:text-sm border-b border-current inline-block pb-1 opacity-70 group-hover:opacity-100">
+                  Visit Website ↗
+                  </p>
+              </div>
+              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            </a>
+
+            {/* PROYECTO 2: MAGIC POKER (Morado a Naranja) */}
+            {/* He usado 'text-white' para que el título se lea bien sobre el degradado oscuro */}
+            <a 
+            href="https://magic-poker-kappa.vercel.app/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="w-full max-w-3xl mx-auto h-[250px] rounded-3xl text-white flex flex-col items-center justify-center group hover:scale-[1.02] transition-all duration-500 relative overflow-hidden
+            bg-gradient-to-br from-purple-600/80 via-purple-500/70 to-orange-500/80 backdrop-blur-md border border-white/20 shadow-lg ring-1 ring-white/20"
+            >
+              <div className="text-center z-10 p-4">
+                  <h2 className="text-4xl md:text-6xl font-bold mb-2 tracking-tighter drop-shadow-md">MAGIC POKER</h2>
+                  <p className="uppercase tracking-widest text-xs md:text-sm border-b border-current inline-block pb-1 opacity-80 group-hover:opacity-100">
+                  Visit Website ↗
+                  </p>
+              </div>
+              
+              {/* Overlay de brillo en hover */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </a>
 
         </div>
@@ -66,7 +83,6 @@ export default function ProjectsPage() {
             <span>Madrid, ES</span>
         </footer>
       </div>
-
     </div>
   );
 }

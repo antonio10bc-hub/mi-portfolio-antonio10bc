@@ -3,11 +3,9 @@ import Link from "next/link";
 export default function Home() {
   return (
     // 1. CAPA EXTERNA: Ocupa todo el ancho (w-full) y tiene el color de fondo.
-    // Esto asegura que NO haya márgenes blancos a los lados.
     <div className="relative min-h-screen w-full bg-[#EAE8E0] overflow-hidden text-offblack font-sans">
       
       {/* --- FONDO ANIMADO INTENSO (LÁMPARA DE LAVA) --- */}
-      {/* Está posicionado absoluto respecto a la pantalla completa */}
       <div className="absolute inset-0 z-0 pointer-events-none">
           <div className="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-r from-lime-400/80 to-green-500/80 rounded-full mix-blend-multiply filter blur-[64px] opacity-80 animate-blob"></div>
           <div className="absolute top-0 -right-20 w-96 h-96 bg-gradient-to-r from-purple-500/80 to-pink-500/80 rounded-full mix-blend-multiply filter blur-[80px] opacity-80 animate-blob [animation-delay:2s]"></div>
@@ -17,7 +15,7 @@ export default function Home() {
           <div className="absolute bottom-10 right-10 w-64 h-64 bg-gradient-to-r from-yellow-400/80 to-lime-500/80 rounded-full mix-blend-multiply filter blur-[64px] opacity-80 animate-blob [animation-delay:5s]"></div>
       </div>
 
-      {/* 2. CAPA INTERNA (CONTENIDO): Aquí aplicamos el límite de ancho (max-w-7xl) y el padding. */}
+      {/* 2. CAPA INTERNA (CONTENIDO): Centrado y con padding */}
       <main className="relative z-10 w-full h-screen max-w-7xl mx-auto p-3 md:p-8 flex flex-col">
         
         {/* GRID PRINCIPAL */}
