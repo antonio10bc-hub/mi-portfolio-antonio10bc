@@ -32,7 +32,7 @@ export default function ProjectsPage() {
                 </h1>
             </div>
 
-            {/* PROYECTO 1: COINFLIIP (Lima) */}
+            {/* PROYECTO 1: COINFLIIP */}
             <a 
             href="https://www.coinfliip.com/" 
             target="_blank" 
@@ -49,8 +49,7 @@ export default function ProjectsPage() {
               <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </a>
 
-            {/* PROYECTO 2: MAGIC POKER (Morado a Naranja) */}
-            {/* He usado 'text-white' para que el título se lea bien sobre el degradado oscuro */}
+            {/* PROYECTO 2: MAGIC POKER */}
             <a 
             href="https://magic-poker-kappa.vercel.app/" 
             target="_blank" 
@@ -64,9 +63,28 @@ export default function ProjectsPage() {
                   Visit Website ↗
                   </p>
               </div>
-              
-              {/* Overlay de brillo en hover */}
               <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            </a>
+
+            {/* PROYECTO 3: CHAOTIC GOLF (NUEVO) */}
+            <a 
+            href="https://chaothicgolf.vercel.app/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="w-full max-w-3xl mx-auto h-[250px] rounded-3xl text-white flex flex-col items-center justify-center group hover:scale-[1.02] transition-all duration-500 relative overflow-hidden border border-white/20 shadow-lg ring-1 ring-white/20"
+            style={{ backgroundColor: '#2a4f29' }}
+            >
+              {/* Overlay suave para mantener el efecto glassmorphism sobre el color sólido */}
+              <div className="absolute inset-0 bg-white/5 backdrop-blur-[2px]"></div>
+              
+              <div className="text-center z-10 p-4">
+                  <h2 className="text-4xl md:text-6xl font-bold mb-2 tracking-tighter drop-shadow-md">CHAOTIC GOLF</h2>
+                  <p className="uppercase tracking-widest text-xs md:text-sm border-b border-current inline-block pb-1 opacity-80 group-hover:opacity-100">
+                  Visit Website ↗
+                  </p>
+              </div>
+              
+              <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </a>
 
         </div>
