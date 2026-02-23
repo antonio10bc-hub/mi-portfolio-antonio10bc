@@ -23,7 +23,7 @@ export default function ProjectsPage() {
         </div>
 
         {/* GRID CONTENEDOR */}
-        <div className="grid grid-cols-1 gap-4 flex-1 content-start">
+        <div className="grid grid-cols-1 gap-4 flex-1 content-start pb-10">
 
             {/* TÍTULO */}
             <div className="rounded-3xl border border-white/40 p-5 pt-4 flex flex-col justify-center h-auto bg-transparent backdrop-blur-md shadow-sm ring-1 ring-white/30">
@@ -66,7 +66,7 @@ export default function ProjectsPage() {
               <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </a>
 
-            {/* PROYECTO 3: CHAOTIC GOLF (NUEVO) */}
+            {/* PROYECTO 3: CHAOTIC GOLF */}
             <a 
             href="https://chaothicgolf.vercel.app/" 
             target="_blank" 
@@ -87,12 +87,34 @@ export default function ProjectsPage() {
               <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </a>
 
+            {/* PROYECTO 4: ASCII FOREST (NUEVO) */}
+            <a 
+            href="https://asciiforest-game.vercel.app/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="w-full max-w-3xl mx-auto h-[250px] rounded-3xl flex flex-col items-center justify-center group hover:scale-[1.02] transition-all duration-500 relative overflow-hidden
+            bg-gradient-to-br from-black via-gray-900 to-green-600/80 backdrop-blur-md border border-green-500/30 shadow-[0_0_15px_rgba(34,197,94,0.2)] ring-1 ring-green-500/30"
+            >
+              {/* Overlay suave para unificar el fondo */}
+              <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]"></div>
+              
+              <div className="text-center z-10 p-4 text-green-400 font-mono">
+                  <h2 className="text-4xl md:text-6xl font-bold mb-2 tracking-tight drop-shadow-[0_0_8px_rgba(74,222,128,0.5)]">ASCII FOREST</h2>
+                  <p className="uppercase tracking-widest text-xs md:text-sm border-b border-green-400/50 inline-block pb-1 opacity-80 group-hover:opacity-100 group-hover:text-green-300 transition-colors">
+                  Visit Website ↗
+                  </p>
+              </div>
+              
+              {/* Brillo verde sutil en hover */}
+              <div className="absolute inset-0 bg-green-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            </a>
+
         </div>
 
         {/* FOOTER */}
-        <footer className="mt-8 md:mt-12 flex flex-col md:flex-row justify-between text-[10px] md:text-xs text-softgray font-bold uppercase tracking-widest border-t border-softgray/20 pt-6 gap-4">
+        <footer className="mt-auto flex flex-col md:flex-row justify-between text-[10px] md:text-xs text-softgray font-bold uppercase tracking-widest border-t border-softgray/20 pt-6 gap-4">
             <div className="flex flex-col md:flex-row gap-2 md:gap-4">
-                <span>© 2025 Antonio Asis Bastos de Cordoba</span>
+                <span>© 2026 Antonio Asis Bastos de Cordoba</span>
                 <span className="hidden md:inline text-softgray/50">|</span>
                 <a href="https://www.instagram.com/antonio10bc/" target="_blank" rel="noopener noreferrer" className="hover:text-offblack transition-colors underline decoration-softgray/50 hover:decoration-offblack">
                 Instagram
