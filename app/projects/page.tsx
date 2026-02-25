@@ -22,10 +22,10 @@ export default function ProjectsPage() {
             </Link>
         </div>
 
-        {/* GRID CONTENEDOR: 1 columna en móvil, 2 en ordenador */}
+        {/* GRID CONTENEDOR */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 flex-1 content-start pb-10">
 
-            {/* TÍTULO: Ocupa las 2 columnas enteras (md:col-span-2) */}
+            {/* TÍTULO */}
             <div className="md:col-span-2 rounded-3xl border border-white/40 p-5 pt-4 flex flex-col justify-center h-auto bg-transparent backdrop-blur-md shadow-sm ring-1 ring-white/30">
                 <h1 className="text-4xl md:text-6xl font-bold uppercase tracking-tighter leading-none">
                     Projects
@@ -106,13 +106,35 @@ export default function ProjectsPage() {
               <div className="absolute inset-0 bg-green-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </a>
 
+            {/* PROYECTO 5: QUÉ CENAMOS HOY (NUEVO) */}
+            <a 
+            href="https://quecenamoshoy.vercel.app/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="w-full h-[250px] md:h-[300px] rounded-3xl text-offblack flex flex-col items-center justify-center group hover:scale-[1.02] transition-all duration-500 relative overflow-hidden border border-white/40 shadow-lg ring-1 ring-white/30"
+            style={{ backgroundColor: '#f8c8d8' }} /* Color rosa palo */
+            >
+              {/* Overlay de cristal suave */}
+              <div className="absolute inset-0 bg-white/20 backdrop-blur-[2px]"></div>
+              
+              <div className="text-center z-10 p-4">
+                  <h2 className="text-3xl md:text-5xl font-bold mb-2 tracking-tighter drop-shadow-sm">QUE CENAMOS HOY</h2>
+                  <p className="uppercase tracking-widest text-xs md:text-sm border-b border-current inline-block pb-1 opacity-70 group-hover:opacity-100">
+                  Visit Website ↗
+                  </p>
+              </div>
+              
+              {/* Brillo en hover */}
+              <div className="absolute inset-0 bg-white/30 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            </a>
+
         </div>
 
         {/* FOOTER */}
-        <footer className="mt-auto flex flex-col md:flex-row justify-between text-[10px] md:text-xs text-softblack font-bold uppercase tracking-widest border-t border-softgray/20 pt-6 gap-4">
+        <footer className="mt-auto flex flex-col md:flex-row justify-between text-[10px] md:text-xs text-softgray font-bold uppercase tracking-widest border-t border-softgray/20 pt-6 gap-4">
             <div className="flex flex-col md:flex-row gap-2 md:gap-4">
                 <span>© 2026 Antonio Asis Bastos de Cordoba</span>
-                <span className="hidden md:inline text-softblack/50">|</span>
+                <span className="hidden md:inline text-softgray/50">|</span>
                 <a href="https://www.instagram.com/antonio10bc/" target="_blank" rel="noopener noreferrer" className="hover:text-offblack transition-colors underline decoration-softgray/50 hover:decoration-offblack">
                 Instagram
                 </a>
