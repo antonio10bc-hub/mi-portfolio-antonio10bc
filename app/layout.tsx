@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
-import { Analytics } from "@vercel/analytics/next"; // <-- IMPORTACIÓN AÑADIDA
+import { Analytics } from "@vercel/analytics/next";
+// 1. IMPORTAMOS SPEED INSIGHTS AQUÍ
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,11 +32,6 @@ export default function RootLayout({
       <body className={`${inter.variable} ${robotoMono.variable} antialiased`}>
         
         {/* --- TEXTURA DE RUIDO VISIBLE --- */}
-        {/* CAMBIOS CLAVE:
-            1. opacity-30: Subida al 30% (antes 15%). Es muy alto, se verá seguro.
-            2. mix-blend-soft-light: Se integra mejor con fondos claros sin desaparecer.
-            3. baseFrequency='0.8': Grano más fino y nítido (tipo TV 4K).
-        */}
         <div className="fixed inset-0 z-[1] pointer-events-none opacity-30 mix-blend-soft-light">
           <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <filter id="noiseFilter">
@@ -54,8 +51,9 @@ export default function RootLayout({
             {children}
         </div>
         
-        {/* ANALÍTICAS DE VERCEL AÑADIDAS AQUÍ */}
+        {/* HERRAMIENTAS DE VERCEL AÑADIDAS AQUÍ ABAJO */}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
