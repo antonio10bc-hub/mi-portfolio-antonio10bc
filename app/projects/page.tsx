@@ -109,10 +109,10 @@ export default function ProjectsPage() {
         </div>
 
         {/* FOOTER */}
-        <footer className="mt-auto flex flex-col md:flex-row justify-between text-[10px] md:text-xs text-softgray font-bold uppercase tracking-widest border-t border-softgray/20 pt-6 gap-4">
+        <footer className="mt-auto flex flex-col md:flex-row justify-between text-[10px] md:text-xs text-softblack font-bold uppercase tracking-widest border-t border-softgray/20 pt-6 gap-4">
             <div className="flex flex-col md:flex-row gap-2 md:gap-4">
                 <span>© 2026 Antonio Asis Bastos de Cordoba</span>
-                <span className="hidden md:inline text-softgray/50">|</span>
+                <span className="hidden md:inline text-softblack/50">|</span>
                 <a href="https://www.instagram.com/antonio10bc/" target="_blank" rel="noopener noreferrer" className="hover:text-offblack transition-colors underline decoration-softgray/50 hover:decoration-offblack">
                 Instagram
                 </a>

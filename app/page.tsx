@@ -26,7 +26,7 @@ export default function Home() {
             <h1 className="text-4xl md:text-7xl font-bold tracking-tighter uppercase mb-0 leading-none">
               ANTONIO
             </h1>
-            <p className="text-softgray text-sm md:text-lg font-medium leading-tight mt-1">
+            <p className="text-softblack text-sm md:text-lg font-medium leading-tight mt-1">
               Photography & Creative Game Design
             </p>
           </div>
@@ -46,7 +46,7 @@ export default function Home() {
               <h2 className="text-3xl md:text-5xl font-bold uppercase mb-1 tracking-tight leading-none">
                 Photography
               </h2>
-              <p className="text-softgray font-medium group-hover:text-offblack transition-colors text-xs md:text-base">
+              <p className="text-softblack font-medium group-hover:text-offblack transition-colors text-xs md:text-base">
                 Places where I found beauty.
               </p>
             </div>
@@ -65,7 +65,7 @@ export default function Home() {
                 <h2 className="text-3xl md:text-5xl font-bold uppercase mb-1 tracking-tight leading-none">
                   Projects
                 </h2>
-                <p className="text-softgray font-medium group-hover:text-offblack transition-colors text-xs md:text-base leading-tight">
+                <p className="text-softblack font-medium group-hover:text-offblack transition-colors text-xs md:text-base leading-tight">
                   Experiments & Code.
                 </p>
               </div>
@@ -74,10 +74,10 @@ export default function Home() {
         </div>
         
         {/* FOOTER */}
-        <footer className="mt-2 md:mt-4 flex flex-col md:flex-row justify-between text-[10px] md:text-xs text-softgray font-bold uppercase tracking-widest border-t border-softgray/20 pt-4 gap-4 shrink-0">
+        <footer className="mt-2 md:mt-4 flex flex-col md:flex-row justify-between text-[10px] md:text-xs text-softblack font-bold uppercase tracking-widest border-t border-softgray/20 pt-4 gap-4 shrink-0">
           <div className="flex flex-col md:flex-row gap-2 md:gap-4">
               <span>© 2025 Antonio Asis Bastos de Cordoba</span>
-              <span className="hidden md:inline text-softgray/50">|</span>
+              <span className="hidden md:inline text-softblack/50">|</span>
               <a href="https://www.instagram.com/antonio10bc/" target="_blank" rel="noopener noreferrer" className="hover:text-offblack transition-colors underline decoration-softgray/50 hover:decoration-offblack">
                 Instagram
               </a>
