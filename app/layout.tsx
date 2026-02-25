@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next"; // <-- IMPORTACIÓN AÑADIDA
 
 const inter = Inter({
   subsets: ["latin"],
@@ -53,6 +54,8 @@ export default function RootLayout({
             {children}
         </div>
         
+        {/* ANALÍTICAS DE VERCEL AÑADIDAS AQUÍ */}
+        <Analytics />
       </body>
     </html>
   );
