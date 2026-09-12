@@ -17,12 +17,6 @@
     text-size-adjust: 100%;
   }
 
-  /* Red de seguridad: en movil un solo elemento ancho no debe provocar
-     desplazamiento lateral de toda la pagina. */
-  html,
-  body {
-    overflow-x: hidden;
-  }
 
   body {
     background-color: #EBE8E0;
@@ -155,4 +149,10 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(17, 17, 17, 0.3);
   background-clip: content-box;
+}
+
+@media (max-width: 767px) {
+  .reveal {
+    animation: none;
+  }
 }

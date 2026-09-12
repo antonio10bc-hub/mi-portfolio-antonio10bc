@@ -24,7 +24,7 @@ export default function SectionHeader({
         {meta && <span className="label">{meta}</span>}
       </div>
 
-      <h1 className="mt-4 text-5xl md:text-7xl font-semibold uppercase leading-[0.92] tracking-tighter text-offblack">
+      <h1 className="mt-4 text-[clamp(1.75rem,9.5vw,4.5rem)] font-semibold uppercase leading-[0.92] tracking-tighter text-offblack">
         {title}
       </h1>
 

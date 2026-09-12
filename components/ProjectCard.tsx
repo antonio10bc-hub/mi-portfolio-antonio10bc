@@ -1,5 +1,11 @@
 import { CATEGORY_LABEL, type Project } from "@/lib/projects";
 
+/* Degradado radial en lugar de un circulo con `filter: blur()`: mismo aspecto,
+   sin coste de filtro y sin los artefactos de rasterizado de Safari en iOS. */
+const blobStyle = (accent: string) =>
+  `radial-gradient(circle closest-side at 50% 50%, ${accent}f2 0%, ${accent}c4 20%, ${accent}8f 38%, ` +
+  `${accent}5c 54%, ${accent}33 70%, ${accent}14 84%, ${accent}00 100%)`;
+
 function ArrowBadge() {
   return (
     <span
@@ -46,17 +52,17 @@ export default function ProjectCard({
           ratón sube de intensidad y crece, que es todo el efecto de hover. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full opacity-25 blur-[40px] md:blur-[64px]
+        className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full opacity-25
                    transition-[opacity,transform] duration-700 ease-smooth
                    group-hover:scale-125 group-hover:opacity-75 motion-reduce:group-hover:scale-100"
-        style={{ backgroundColor: project.accent }}
+        style={{ backgroundImage: blobStyle(project.accent) }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -bottom-24 -left-12 hidden h-56 w-56 rounded-full opacity-0 blur-[72px] md:block
+        className="pointer-events-none absolute -bottom-28 -left-16 hidden h-64 w-64 rounded-full opacity-0 md:block
                    transition-[opacity,transform] duration-700 ease-smooth
                    group-hover:scale-110 group-hover:opacity-45 motion-reduce:group-hover:scale-100"
-        style={{ backgroundColor: project.accent }}
+        style={{ backgroundImage: blobStyle(project.accent) }}
       />
 
       {/* Cabecera: índice y flecha */}
