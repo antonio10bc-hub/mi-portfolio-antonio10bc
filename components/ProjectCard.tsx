@@ -38,18 +38,25 @@ export default function ProjectCard({
       href={project.href}
       target="_blank"
       rel="noopener noreferrer"
-      className="group glass relative flex h-full flex-col gap-6 overflow-hidden rounded-4xl p-6 md:gap-7 md:p-8
+      className="group glass relative flex h-full flex-col gap-8 overflow-hidden rounded-4xl p-6 md:gap-10 md:p-8
                  transition-[transform,box-shadow] duration-500 ease-smooth
                  hover:-translate-y-1.5 hover:shadow-lift motion-reduce:hover:translate-y-0"
     >
-      {/* Velo de acento: el único sitio donde el color del proyecto invade la
-          tarjeta, y solo al pasar el ratón. */}
+      {/* Blob de acento del proyecto. En reposo apenas se intuye; al pasar el
+          ratón sube de intensidad y crece, que es todo el efecto de hover. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700 ease-smooth group-hover:opacity-100"
-        style={{
-          background: `radial-gradient(120% 120% at 100% 0%, ${project.accent}26 0%, transparent 55%)`,
-        }}
+        className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full opacity-25 blur-[64px]
+                   transition-[opacity,transform] duration-700 ease-smooth
+                   group-hover:scale-125 group-hover:opacity-75 motion-reduce:group-hover:scale-100"
+        style={{ backgroundColor: project.accent }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-24 -left-12 h-56 w-56 rounded-full opacity-0 blur-[72px]
+                   transition-[opacity,transform] duration-700 ease-smooth
+                   group-hover:scale-110 group-hover:opacity-45 motion-reduce:group-hover:scale-100"
+        style={{ backgroundColor: project.accent }}
       />
 
       {/* Cabecera: índice y flecha */}
@@ -76,22 +83,7 @@ export default function ProjectCard({
         </h2>
 
         <p className="mt-2.5 text-sm leading-relaxed text-softblack">{project.tagline}</p>
-
-        <ul className="mt-4 flex flex-wrap gap-2">
-          {project.stack.map((tech) => (
-            <li key={tech} className="chip">
-              {tech}
-            </li>
-          ))}
-        </ul>
       </div>
-
-      {/* Filo de acento que recorre la base al pasar el ratón. */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-px w-0 transition-all duration-700 ease-smooth group-hover:w-full"
-        style={{ backgroundColor: project.accent }}
-      />
     </a>
   );
 }

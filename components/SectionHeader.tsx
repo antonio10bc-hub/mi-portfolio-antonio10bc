@@ -7,7 +7,7 @@ export default function SectionHeader({
 }: {
   eyebrow: string;
   title: string;
-  intro?: string;
+  intro?: React.ReactNode;
   /** Cifra corta a la derecha: nº de piezas, año, etc. */
   meta?: string;
   className?: string;
@@ -29,7 +29,7 @@ export default function SectionHeader({
       </h1>
 
       {intro && (
-        <p className="mt-4 max-w-xl text-sm md:text-base leading-relaxed text-softblack">
+        <p className="mt-4 max-w-3xl text-sm md:text-base leading-relaxed text-softblack">
           {intro}
         </p>
       )}

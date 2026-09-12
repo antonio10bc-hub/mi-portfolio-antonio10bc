@@ -9,7 +9,7 @@ export default function Footer({ className = "" }: { className?: string }) {
                   md:flex-row md:items-center md:justify-between ${className}`}
     >
       <span className="label normal-case tracking-[0.08em]">
-        &copy; {new Date().getFullYear()} Antonio Asis Bastos de Cordoba
+        &copy; Antonio Asis Bastos de Cordoba
       </span>
 
       <div className="flex items-center gap-5">

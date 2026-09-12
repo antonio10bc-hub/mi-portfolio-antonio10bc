@@ -9,7 +9,6 @@ export type Photo = {
 export const PHOTOS: Photo[] = [
   { id: 1, src: "/images/foto3.jpg", alt: "Ciudad de noche", title: "City Nights" },
   { id: 4, src: "/images/foto4.jpg", alt: "Río urbano", title: "Urban River" },
-  { id: 6, src: "/images/foto6.jpg", alt: "Luz oscura", title: "Minimal Light" },
   { id: 7, src: "/images/foto7.jpg", alt: "Lago y montañas", title: "Lake Mirror" },
   { id: 8, src: "/images/foto8.jpg", alt: "Picos rocosos", title: "Rocky Peaks" },
   { id: 9, src: "/images/foto9.jpg", alt: "Árbol solitario", title: "Solitude" },

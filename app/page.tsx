@@ -99,8 +99,6 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-lime" />
             <span className="label">Portfolio</span>
-            <span aria-hidden className="text-softblack/40">/</span>
-            <span className="label">Madrid, ES</span>
           </div>
 
           <h1 className="mt-3 text-[clamp(2.75rem,8.5vw,6.5rem)] font-semibold uppercase leading-[0.86] tracking-tighter text-offblack">

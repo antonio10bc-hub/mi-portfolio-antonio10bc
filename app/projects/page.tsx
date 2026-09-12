@@ -43,7 +43,13 @@ export default function ProjectsPage() {
           eyebrow="Selected work"
           title="Projects"
           meta={`${String(PROJECTS.length).padStart(2, "0")} projects`}
-          intro="Side projects and small experiments, built end to end and shipped. Each one lives on its own domain."
+          intro={
+            <>
+              Side projects and small experiments, built end to end and shipped.
+              <br />
+              Each one lives on its own domain.
+            </>
+          }
         />
 
         {groups.map((group) => (
