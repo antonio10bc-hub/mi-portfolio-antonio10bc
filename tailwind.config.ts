@@ -46,9 +46,10 @@ const config: Config = {
         // Deriva lenta y orgánica: nada de saltos de escala bruscos.
         blob: {
           '0%, 100%': { transform: 'translate3d(0, 0, 0) scale(1)' },
-          '25%': { transform: 'translate3d(5%, -8%, 0) scale(1.12)' },
-          '50%': { transform: 'translate3d(-6%, 6%, 0) scale(0.92)' },
-          '75%': { transform: 'translate3d(7%, 4%, 0) scale(1.06)' },
+          '20%': { transform: 'translate3d(13%, -15%, 0) scale(1.22)' },
+          '45%': { transform: 'translate3d(-15%, 11%, 0) scale(0.86)' },
+          '70%': { transform: 'translate3d(11%, 15%, 0) scale(1.14)' },
+          '85%': { transform: 'translate3d(-8%, -6%, 0) scale(0.96)' },
         },
         'fade-up': {
           from: { opacity: '0', transform: 'translate3d(0, 18px, 0)' },

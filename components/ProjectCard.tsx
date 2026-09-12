@@ -1,10 +1,19 @@
 import { CATEGORY_LABEL, type Project } from "@/lib/projects";
 
-/* Degradado radial en lugar de un circulo con `filter: blur()`: mismo aspecto,
-   sin coste de filtro y sin los artefactos de rasterizado de Safari en iOS. */
+/*
+ * Tres elipses superpuestas en vez de un circulo: la silueta resultante es
+ * irregular y cubre la tarjeta entera, no solo una esquina. Sin `filter: blur()`,
+ * que era el mayor coste de GPU y el origen de los artefactos en Safari iOS.
+ * La elipse inferior izquierda es la mas debil a proposito: es la zona donde
+ * se apoya el texto de la tarjeta.
+ */
 const blobStyle = (accent: string) =>
-  `radial-gradient(circle closest-side at 50% 50%, ${accent}f2 0%, ${accent}c4 20%, ${accent}8f 38%, ` +
-  `${accent}5c 54%, ${accent}33 70%, ${accent}14 84%, ${accent}00 100%)`;
+  [
+    `radial-gradient(ellipse 62% 88% at 88% 6%, ${accent}e0 0%, ${accent}96 30%, ${accent}45 58%, ${accent}00 82%)`,
+    `radial-gradient(ellipse 78% 62% at 52% 52%, ${accent}a8 0%, ${accent}63 34%, ${accent}26 64%, ${accent}00 88%)`,
+    `radial-gradient(ellipse 58% 70% at 12% 96%, ${accent}82 0%, ${accent}47 36%, ${accent}1a 66%, ${accent}00 90%)`,
+    `radial-gradient(ellipse 44% 52% at 30% 18%, ${accent}70 0%, ${accent}33 42%, ${accent}00 78%)`,
+  ].join(", ");
 
 function ArrowBadge() {
   return (
@@ -52,16 +61,9 @@ export default function ProjectCard({
           ratón sube de intensidad y crece, que es todo el efecto de hover. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full opacity-25
+        className="pointer-events-none absolute -inset-8 opacity-25
                    transition-[opacity,transform] duration-700 ease-smooth
-                   group-hover:scale-125 group-hover:opacity-75 motion-reduce:group-hover:scale-100"
-        style={{ backgroundImage: blobStyle(project.accent) }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-28 -left-16 hidden h-64 w-64 rounded-full opacity-0 md:block
-                   transition-[opacity,transform] duration-700 ease-smooth
-                   group-hover:scale-110 group-hover:opacity-45 motion-reduce:group-hover:scale-100"
+                   group-hover:scale-105 group-hover:opacity-80 motion-reduce:group-hover:scale-100"
         style={{ backgroundImage: blobStyle(project.accent) }}
       />
 
