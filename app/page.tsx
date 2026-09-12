@@ -90,11 +90,12 @@ function SectionLink({ section, delay }: { section: Section; delay: number }) {
 
 export default function Home() {
   return (
-    // Altura fija y sin scroll: la home entra entera en pantalla, footer incluido.
-    <div className="relative h-[100svh] w-full overflow-hidden bg-sand font-sans text-offblack">
+    // La home entra entera en pantalla, footer incluido, pero sin recortar:
+    // si en algun dispositivo no cupiese, hace scroll en lugar de cortarse.
+    <div className="relative min-h-screen-safe w-full bg-sand font-sans text-offblack">
       <AnimatedBackground position="absolute" />
 
-      <main className="relative z-10 mx-auto flex h-full w-full max-w-6xl flex-col gap-3 px-4 py-4 md:gap-5 md:px-8 md:py-7">
+      <main className="relative z-10 mx-auto flex min-h-screen-safe w-full max-w-6xl flex-col gap-3 px-4 py-4 md:gap-5 md:px-8 md:py-7">
         <header className="glass-strong reveal shrink-0 rounded-4xl px-5 py-5 md:px-10 md:py-8">
           <div className="flex items-center gap-2">
             <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-lime" />

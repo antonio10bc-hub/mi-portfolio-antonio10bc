@@ -1,6 +1,8 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  // En tactil, `hover:` se quedaba activo despues de tocar una tarjeta.
+  future: { hoverOnlyWhenSupported: true },
   content: [
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",

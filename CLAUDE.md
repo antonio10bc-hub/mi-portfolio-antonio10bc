@@ -43,6 +43,19 @@ The lightbox in `PhotoGallery` renders through `createPortal` to `document.body`
 - Site copy is in English, including project taglines, even though the repo comments are in Spanish.
 - Project taglines and stack tags describe what each site actually is; they were written after visiting the live URLs. Keep them factual rather than decorative.
 
+### Mobile (read before adding blur, glass or hover)
+
+The site looked fine in a narrow desktop window and broke on a real phone. The causes were rendering cost and touch semantics, not layout, so a narrow desktop window will not catch a regression here. Rules:
+
+- **`backdrop-filter` is the most expensive thing on the page.** One per card is fine; one per list item is not. The photo index badges each had `backdrop-blur-md`, which put **19** backdrop layers on `/photography`; they now use a solid tint and the page is down to 2. Count the layers before adding another.
+- **Blur radii are halved below `md`** (`blur-[70px] md:blur-[110px]`), and the decorative blobs marked `soloEscritorio` are `hidden md:block`. Keep that split when adding blobs.
+- **No `mix-blend-mode` anywhere.** Combined with the `backdrop-filter` cards it renders unpredictably in Safari on iOS, and having mobile and desktop compute colour differently is exactly how the two diverge. Colour comes from plain opacity, which every browser paints identically.
+- **`hoverOnlyWhenSupported` is on** in `tailwind.config.ts`, so `hover:`/`group-hover:` compile inside `@media (hover: hover) and (pointer: fine)`. Without it a tap left cards stuck in their hover state. Never make something reachable *only* through hover: on a phone those rules never fire, which is why the project cards show their accent at rest.
+- **Viewport height goes through `.min-h-screen-safe`**, never a bare `h-screen`/`100svh`. It is `100vh` with a `100svh` override inside `@supports`. The override must stay in `@supports`: as two plain declarations the build's minifier drops the `100vh` fallback, which strands browsers without `svh` (iOS < 15.4) with no height at all.
+- **Never pair a fixed viewport height with `overflow-hidden` on a page root.** If anything fails to fit on a real device the content is clipped with no way to scroll to it. The home uses `min-h-screen-safe` and no clipping, so a bad fit degrades into a scroll.
+
+Verified with CDP under iPhone emulation (touch events, DPR 3, iOS user agent): no horizontal overflow on any route, the home fits with its footer from 1920x1080 down to 320x568, and the lightbox opens, locks the background and closes from real `touchStart`/`touchEnd`.
+
 ### Styling
 
 - Theme colors in `tailwind.config.ts`: `bone`, `sand` (page background), `offblack`, `softblack` (secondary text), `lime`, `softgray`. Use the tokens; don't reintroduce hardcoded hex like `bg-[#EAE8E0]`.

@@ -7,10 +7,10 @@ import { PHOTOS } from "@/lib/photos";
 
 export default function PhotographyPage() {
   return (
-    <div className="relative min-h-screen w-full bg-sand font-sans text-offblack">
+    <div className="relative min-h-screen-safe w-full bg-sand font-sans text-offblack">
       <AnimatedBackground variant="minimal" />
 
-      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-6 md:px-8 md:py-10">
+      <div className="relative z-10 mx-auto flex min-h-screen-safe w-full max-w-6xl flex-col px-4 py-6 md:px-8 md:py-10">
         <BackLink className="mb-6 md:mb-8" />
 
         <SectionHeader

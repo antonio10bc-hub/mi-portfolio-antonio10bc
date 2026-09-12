@@ -12,6 +12,16 @@
   html {
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
+    /* iOS infla el texto al girar el telefono si no se fija. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Red de seguridad: en movil un solo elemento ancho no debe provocar
+     desplazamiento lateral de toda la pagina. */
+  html,
+  body {
+    overflow-x: hidden;
   }
 
   body {
@@ -90,9 +100,41 @@
 }
 
 @layer utilities {
+  /*
+   * Alto de viewport con reserva. `svh` descuenta la barra del navegador movil,
+   * pero no existe en iOS < 15.4 ni en Chrome Android < 108: sin el `100vh`
+   * previo, esos navegadores se quedan sin altura y el layout se desmonta.
+   */
+  .min-h-screen-safe {
+    min-height: 100vh;
+  }
+
   /* Rejilla de entrada escalonada: el retraso se pasa por style. */
   .reveal {
     @apply animate-fade-up;
+  }
+}
+
+@supports (min-height: 100svh) {
+  .min-h-screen-safe {
+    min-height: 100svh;
+  }
+}
+
+/*
+ * En movil el desenfoque del cristal se reduce: `backdrop-filter` es de lo mas
+ * caro que hay en GPU de telefono y la pagina apila varias capas.
+ */
+@media (max-width: 767px) {
+  .glass,
+  .glass-strong {
+    -webkit-backdrop-filter: blur(12px) saturate(130%);
+    backdrop-filter: blur(12px) saturate(130%);
+  }
+
+  .glass-dark {
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    backdrop-filter: blur(10px) saturate(120%);
   }
 }
 

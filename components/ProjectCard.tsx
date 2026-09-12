@@ -46,14 +46,14 @@ export default function ProjectCard({
           ratón sube de intensidad y crece, que es todo el efecto de hover. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full opacity-25 blur-[64px]
+        className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full opacity-25 blur-[40px] md:blur-[64px]
                    transition-[opacity,transform] duration-700 ease-smooth
                    group-hover:scale-125 group-hover:opacity-75 motion-reduce:group-hover:scale-100"
         style={{ backgroundColor: project.accent }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -bottom-24 -left-12 h-56 w-56 rounded-full opacity-0 blur-[72px]
+        className="pointer-events-none absolute -bottom-24 -left-12 hidden h-56 w-56 rounded-full opacity-0 blur-[72px] md:block
                    transition-[opacity,transform] duration-700 ease-smooth
                    group-hover:scale-110 group-hover:opacity-45 motion-reduce:group-hover:scale-100"
         style={{ backgroundColor: project.accent }}

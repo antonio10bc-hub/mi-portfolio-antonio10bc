@@ -90,8 +90,8 @@ export default function PhotoGallery() {
             />
 
             {/* Índice: siempre visible, discreto. */}
-            <span className="pointer-events-none absolute left-4 top-4 rounded-full bg-offblack/35 px-2.5 py-1
-                             font-mono text-[10px] tracking-label text-bone backdrop-blur-md">
+            <span className="pointer-events-none absolute left-4 top-4 rounded-full bg-offblack/60 px-2.5 py-1
+                             font-mono text-[10px] tracking-label text-bone">
               {String(index + 1).padStart(2, "0")}
             </span>
 
