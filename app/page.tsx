@@ -1,90 +1,124 @@
 import Link from "next/link";
+import AnimatedBackground from "@/components/AnimatedBackground";
+import Footer from "@/components/Footer";
+import { PHOTOS } from "@/lib/photos";
+import { PROJECTS } from "@/lib/projects";
+
+type Section = {
+  index: string;
+  title: string;
+  description: string;
+  /** Recuento real de la sección, para que la tarjeta diga algo además del título. */
+  meta: string;
+  href: string;
+  span: string;
+};
+
+const SECTIONS: Section[] = [
+  {
+    index: "01",
+    title: "Photography",
+    description: "Places where I found beauty.",
+    meta: `${PHOTOS.length} frames`,
+    href: "/photography",
+    span: "md:col-span-3",
+  },
+  {
+    index: "02",
+    title: "Projects",
+    description: "Experiments & code, shipped.",
+    meta: `${PROJECTS.length} projects`,
+    href: "/projects",
+    span: "md:col-span-2",
+  },
+];
+
+function SectionLink({ section, delay }: { section: Section; delay: number }) {
+  return (
+    <div className={`reveal min-h-0 ${section.span}`} style={{ animationDelay: `${delay}ms` }}>
+      <Link
+        href={section.href}
+        className="group glass relative flex h-full min-h-0 flex-col justify-between overflow-hidden
+                   rounded-4xl p-5 md:p-8 transition-[transform,box-shadow] duration-500 ease-smooth
+                   hover:-translate-y-1.5 hover:shadow-lift motion-reduce:hover:translate-y-0"
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_120%_at_100%_0%,rgba(212,255,0,0.22)_0%,transparent_55%)]
+                     opacity-0 transition-opacity duration-700 ease-smooth group-hover:opacity-100"
+        />
+
+        <div className="relative flex items-start justify-between gap-3">
+          <span className="flex items-center gap-2">
+            <span className="font-mono text-[11px] tracking-label text-softblack">{section.index}</span>
+            <span aria-hidden className="text-softblack/40">/</span>
+            <span className="label">{section.meta}</span>
+          </span>
+          <span
+            aria-hidden
+            className="flex h-8 w-8 md:h-11 md:w-11 shrink-0 items-center justify-center rounded-full
+                       border border-offblack/10 bg-white/50 text-offblack transition-all duration-500 ease-smooth
+                       group-hover:border-offblack group-hover:bg-offblack group-hover:text-bone"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.6}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-4 w-4 transition-transform duration-500 ease-smooth group-hover:translate-x-[3px]"
+            >
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          </span>
+        </div>
+
+        <div className="relative">
+          <h2 className="text-[clamp(1.625rem,4.4vw,3.25rem)] font-semibold uppercase leading-[0.95] tracking-tighter text-offblack">
+            {section.title}
+          </h2>
+          <p className="mt-1.5 text-[clamp(0.75rem,1.35vw,1rem)] leading-snug text-softblack">
+            {section.description}
+          </p>
+        </div>
+      </Link>
+    </div>
+  );
+}
 
 export default function Home() {
   return (
-    // 1. CAPA EXTERNA: Ocupa todo el ancho (w-full) y tiene el color de fondo.
-    <div className="relative min-h-screen w-full bg-[#EAE8E0] overflow-hidden text-offblack font-sans">
-      
-      {/* --- FONDO ANIMADO INTENSO (LÁMPARA DE LAVA) --- */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-r from-lime-400/80 to-green-500/80 rounded-full mix-blend-multiply filter blur-[64px] opacity-80 animate-blob"></div>
-          <div className="absolute top-0 -right-20 w-96 h-96 bg-gradient-to-r from-purple-500/80 to-pink-500/80 rounded-full mix-blend-multiply filter blur-[80px] opacity-80 animate-blob [animation-delay:2s]"></div>
-          <div className="absolute top-[30%] -left-20 w-72 h-72 bg-gradient-to-r from-orange-400/80 to-amber-500/80 rounded-full mix-blend-multiply filter blur-[64px] opacity-80 animate-blob [animation-delay:4s]"></div>
-          <div className="absolute top-[50%] -right-20 w-80 h-80 bg-gradient-to-r from-cyan-400/80 to-blue-500/80 rounded-full mix-blend-multiply filter blur-[70px] opacity-80 animate-blob [animation-delay:6s]"></div>
-          <div className="absolute -bottom-20 left-10 w-96 h-96 bg-gradient-to-r from-indigo-500/80 to-violet-500/80 rounded-full mix-blend-multiply filter blur-[90px] opacity-80 animate-blob [animation-delay:3s]"></div>
-          <div className="absolute bottom-10 right-10 w-64 h-64 bg-gradient-to-r from-yellow-400/80 to-lime-500/80 rounded-full mix-blend-multiply filter blur-[64px] opacity-80 animate-blob [animation-delay:5s]"></div>
-      </div>
+    // Altura fija y sin scroll: la home entra entera en pantalla, footer incluido.
+    <div className="relative h-[100svh] w-full overflow-hidden bg-sand font-sans text-offblack">
+      <AnimatedBackground position="absolute" />
 
-      {/* 2. CAPA INTERNA (CONTENIDO): Centrado y con padding */}
-      <main className="relative z-10 w-full h-screen max-w-7xl mx-auto p-3 md:p-8 flex flex-col">
-        
-        {/* GRID PRINCIPAL */}
-        <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-[auto_1fr] gap-2 md:gap-5 flex-1 content-start md:content-stretch">
-          
-          {/* HEADER BLOCK */}
-          <div className="md:col-span-3 rounded-3xl p-4 md:p-10 flex flex-col justify-center h-auto min-h-0 bg-transparent backdrop-blur-md border border-white/40 shadow-sm ring-1 ring-white/30">
-            <h1 className="text-4xl md:text-7xl font-bold tracking-tighter uppercase mb-0 leading-none">
-              ANTONIO
-            </h1>
-            <p className="text-softblack text-sm md:text-lg font-medium leading-tight mt-1">
-              Photography & Creative Game Design
-            </p>
+      <main className="relative z-10 mx-auto flex h-full w-full max-w-6xl flex-col gap-3 px-4 py-4 md:gap-5 md:px-8 md:py-7">
+        <header className="glass-strong reveal shrink-0 rounded-4xl px-5 py-5 md:px-10 md:py-8">
+          <div className="flex items-center gap-2">
+            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-lime" />
+            <span className="label">Portfolio</span>
+            <span aria-hidden className="text-softblack/40">/</span>
+            <span className="label">Madrid, ES</span>
           </div>
 
-          {/* FILA INFERIOR */}
-          
-          {/* PHOTOGRAPHY */}
-          <Link href="/photography" className="md:col-span-2 relative h-[250px] md:h-full group overflow-hidden rounded-3xl cursor-pointer block transition-all duration-500
-              bg-transparent backdrop-blur-md border border-white/40 shadow-sm ring-1 ring-white/30 text-offblack
-              hover:bg-white/20 hover:border-lime/50 hover:shadow-lime/10">
-            
-            <div className="absolute top-4 right-4 border border-current w-8 h-8 rounded-full flex items-center justify-center z-20">
-              <span className="font-mono text-xs font-medium">01</span>
-            </div>
-            
-            <div className="absolute bottom-0 left-0 p-4 md:p-8 z-20 w-full">
-              <h2 className="text-3xl md:text-5xl font-bold uppercase mb-1 tracking-tight leading-none">
-                Photography
-              </h2>
-              <p className="text-softblack font-medium group-hover:text-offblack transition-colors text-xs md:text-base">
-                Places where I found beauty.
-              </p>
-            </div>
-          </Link>
+          <h1 className="mt-3 text-[clamp(2.75rem,8.5vw,6.5rem)] font-semibold uppercase leading-[0.86] tracking-tighter text-offblack">
+            Antonio
+          </h1>
 
-          {/* PROJECTS */}
-          <Link href="/projects" className="md:col-span-1 relative h-[250px] md:h-full group overflow-hidden rounded-3xl cursor-pointer block transition-all duration-500
-              bg-transparent backdrop-blur-md border border-white/40 shadow-sm ring-1 ring-white/30 text-offblack
-              hover:bg-white/20 hover:border-lime/50 hover:shadow-lime/10">
-              
-              <div className="absolute top-4 right-4 border border-current w-8 h-8 rounded-full flex items-center justify-center z-20">
-                 <span className="font-mono text-xs font-medium">02</span>
-              </div>
-              
-              <div className="absolute bottom-0 left-0 p-4 md:p-8 z-20 w-full">
-                <h2 className="text-3xl md:text-5xl font-bold uppercase mb-1 tracking-tight leading-none">
-                  Projects
-                </h2>
-                <p className="text-softblack font-medium group-hover:text-offblack transition-colors text-xs md:text-base leading-tight">
-                  Experiments & Code.
-                </p>
-              </div>
-          </Link>
+          <p className="mt-2 max-w-xl text-[clamp(0.875rem,1.6vw,1.25rem)] leading-snug text-softblack">
+            Photography &amp; Creative Game Design.
+          </p>
+        </header>
 
+        <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 md:max-h-[26rem] md:grid-cols-5 md:gap-5">
+          {SECTIONS.map((section, index) => (
+            <SectionLink key={section.href} section={section} delay={140 + index * 90} />
+          ))}
         </div>
-        
-        {/* FOOTER */}
-        <footer className="mt-2 md:mt-4 flex flex-col md:flex-row justify-between text-[10px] md:text-xs text-softblack font-bold uppercase tracking-widest border-t border-softgray/20 pt-4 gap-4 shrink-0">
-          <div className="flex flex-col md:flex-row gap-2 md:gap-4">
-              <span>© 2025 Antonio Asis Bastos de Cordoba</span>
-              <span className="hidden md:inline text-softblack/50">|</span>
-              <a href="https://www.instagram.com/antonio10bc/" target="_blank" rel="noopener noreferrer" className="hover:text-offblack transition-colors underline decoration-softgray/50 hover:decoration-offblack">
-                Instagram
-              </a>
-          </div>
-          <span>Madrid, ES</span>
-        </footer>
 
+        <Footer className="mt-auto shrink-0" />
       </main>
     </div>
   );

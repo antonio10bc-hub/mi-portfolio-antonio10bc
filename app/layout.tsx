@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
-// 1. IMPORTAMOS SPEED INSIGHTS AQUÍ
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import PageTransition from "@/components/PageTransition";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -17,9 +17,14 @@ const robotoMono = Roboto_Mono({
   display: "swap",
 });
 
+const title = "Antonio Asis Portfolio";
+const description = "Photography & Creative Game Design";
+
 export const metadata: Metadata = {
-  title: "Antonio Asis - Portfolio",
-  description: "Photography & Creative Game Design",
+  title,
+  description,
+  openGraph: { title, description, type: "website", locale: "en_US" },
+  twitter: { card: "summary_large_image", title, description },
 };
 
 export default function RootLayout({
@@ -30,28 +35,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${robotoMono.variable} antialiased`}>
-        
-        {/* --- TEXTURA DE RUIDO VISIBLE --- */}
-        <div className="fixed inset-0 z-[1] pointer-events-none opacity-30 mix-blend-soft-light">
-          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-            <filter id="noiseFilter">
-              <feTurbulence 
-                type="fractalNoise" 
-                baseFrequency="0.8" 
-                numOctaves="3" 
-                stitchTiles="stitch"
-              />
-            </filter>
-            <rect width="100%" height="100%" filter="url(#noiseFilter)"/>
-          </svg>
+        <div className="relative z-10">
+          <PageTransition>{children}</PageTransition>
         </div>
 
-        {/* CONTENIDO DE LAS PÁGINAS */}
-        <div className="relative z-10">
-            {children}
-        </div>
-        
-        {/* HERRAMIENTAS DE VERCEL AÑADIDAS AQUÍ ABAJO */}
         <Analytics />
         <SpeedInsights />
       </body>

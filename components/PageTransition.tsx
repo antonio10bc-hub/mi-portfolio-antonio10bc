@@ -1,23 +1,19 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 
+/**
+ * Fundido entre rutas hecho con una animación CSS y no con JS: el HTML que
+ * llega del servidor ya es visible. Con Framer Motion el contenido salía con
+ * `opacity: 0` en línea y la página quedaba en blanco hasta la hidratación.
+ * La clave por ruta reinicia la animación en cada navegación.
+ */
 export default function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={pathname} // La clave es la ruta, para que detecte el cambio
-        initial={{ opacity: 0, y: 20 }} // Empieza invisible y un poco abajo
-        animate={{ opacity: 1, y: 0 }}  // Se anima a visible y su posición original
-        exit={{ opacity: 0, y: -20 }}   // Sale desvaneciéndose hacia arriba
-        transition={{ duration: 0.4, ease: "easeInOut" }} // Duración y suavidad
-        className="w-full h-full flex-1 flex flex-col"
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
+    <div key={pathname} className="flex w-full flex-1 flex-col animate-fade-in">
+      {children}
+    </div>
   );
 }
