@@ -43,14 +43,14 @@ export const PROJECTS: Project[] = [
     href: "https://asciiforest-game.vercel.app/",
     category: "game",
     tagline: "A narrative forest sim drawn in text: tend flora and fauna, one day at a time.",
-    accent: "#3FBF6F",
+    accent: "#1A2F70",
   },
   {
     name: "Chaotic Golf Game",
     href: "https://chaoticgolfweb.vercel.app/",
     category: "game",
     tagline: "Playable prototype of the card game: configurable matches against the AI, plus a level creator.",
-    accent: "#E2703A",
+    accent: "#1F5E38",
   },
   {
     name: "Chaotic Golf",

@@ -61,7 +61,7 @@ export default function ProjectCard({
 
       {/* Cabecera: índice y flecha */}
       <div className="relative flex items-start justify-between gap-4">
-        <span className="font-mono text-[11px] tracking-label text-softblack">
+        <span className="font-mono text-[11px] tracking-label text-softblack transition-colors duration-500 ease-smooth group-hover:text-offblack">
           {String(index + 1).padStart(2, "0")}
         </span>
         <ArrowBadge />
@@ -75,14 +75,18 @@ export default function ProjectCard({
             className="h-1.5 w-1.5 rounded-full"
             style={{ backgroundColor: project.accent }}
           />
-          <span className="label">{CATEGORY_LABEL[project.category]}</span>
+          <span className="label transition-colors duration-500 ease-smooth group-hover:text-offblack">
+            {CATEGORY_LABEL[project.category]}
+          </span>
         </div>
 
         <h2 className="mt-2.5 text-3xl md:text-[2.375rem] font-semibold leading-[1.02] tracking-tight text-offblack">
           {project.name}
         </h2>
 
-        <p className="mt-2.5 text-sm leading-relaxed text-softblack">{project.tagline}</p>
+        <p className="mt-2.5 text-sm leading-relaxed text-softblack transition-colors duration-500 ease-smooth group-hover:text-offblack">
+          {project.tagline}
+        </p>
       </div>
     </a>
   );
