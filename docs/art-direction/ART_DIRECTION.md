@@ -110,9 +110,9 @@ Se sirven con `unoptimized`: la optimización de `next/image` reescala con suavi
 
 ### Páginas
 
-- **Home (índice del archivo).** Fila superior de tres titulares. En el centro el árbol tramado; superpuestos, el nombre con línea de referencia hacia el árbol, el panel gris con marco de visor que lleva a Fotografía y el panel grafito que lleva a Proyectos. Fila inferior de pie. Cabe en una pantalla sin scroll, como antes.
+- **Home (índice del archivo).** Sin fila superior de titulares: en la web sobraba y se quitó. En el centro el árbol tramado; superpuestos, el nombre con línea de referencia hacia el árbol, el panel gris con marco de visor que lleva a Fotografía y el panel grafito que lleva a Proyectos. Fila inferior de pie. Cabe en una pantalla sin scroll, como antes.
 - **Proyectos.** Cabecera de expediente (titular gigante, código, intro, tabla de datos y código de barras). Cada juego es una ficha: código de proyecto, captura dentro de un panel gris con marco de visor, nombre como titular, regla de tinta, tagline en monoespaciada y acción.
-- **Fotografía.** Cabecera de expediente con el pico tramado. Rejilla de fotos de esquinas rectas con código de fotograma (`FR-01`) en una pestaña de tinta. El visor a pantalla completa es tinta sólida, sin blur.
+- **Fotografía.** Cabecera de expediente con el pico tramado. Rejilla de fotos de esquinas rectas; cada foto lleva el marco de visor en papel (las cuatro esquinas, como una cámara enfocando) y su código de fotograma (`FR-01`) en una pestaña de tinta junto a la esquina superior izquierda. El visor a pantalla completa es tinta sólida, sin blur.
 
 ### Reglas de implementación
 

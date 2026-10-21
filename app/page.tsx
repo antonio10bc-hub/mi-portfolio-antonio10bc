@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import Footer from "@/components/Footer";
 import { Arrow, Barcode, Brackets, CornerMark, DataBars, Diamonds, Dots, Leader, XStack } from "@/components/Hud";
-import TopBar from "@/components/TopBar";
 import { PHOTOS } from "@/lib/photos";
 import { PROJECTS } from "@/lib/projects";
 
@@ -61,7 +60,6 @@ export default function Home() {
     // si en algun dispositivo no cupiese, hace scroll en lugar de cortarse.
     <div className="min-h-screen-safe w-full bg-paper font-sans text-ink">
       <main className="mx-auto flex min-h-screen-safe w-full max-w-6xl flex-col gap-3 px-4 py-4 md:gap-4 md:px-8 md:py-5">
-        <TopBar left={{ label: "photography." }} center={{ label: "portfolio." }} right={{ label: "game design." }} />
 
         <div
           className="relative flex min-h-0 flex-1 flex-col gap-3

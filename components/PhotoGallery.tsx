@@ -89,11 +89,21 @@ export default function PhotoGallery() {
               className="object-cover transition-transform duration-[900ms] ease-smooth group-hover:scale-[1.03]"
             />
 
-            {/* La destacada lleva el marco de visor, en papel sobre la foto. */}
-            {isFirst && <Brackets size={28} weight={3} inset={16} className="text-paper" />}
+            {/* Marco de visor en papel sobre cada foto, como una cámara enfocando. La
+                sombra dura en tinta lo mantiene visible sobre cielos claros. */}
+            <Brackets
+              size={isFirst ? 28 : 22}
+              weight={3}
+              inset={isFirst ? 16 : 12}
+              className="text-paper [filter:drop-shadow(1px_1px_0_rgba(32,30,32,0.45))]"
+            />
 
-            {/* Código de fotograma: siempre visible, en una pestaña de tinta. */}
-            <span className="code pointer-events-none absolute left-0 top-0 bg-ink px-2.5 py-1.5 text-[10px] text-paper">
+            {/* Código de fotograma: siempre visible, junto a la esquina superior
+                izquierda del marco y alineado con su línea, sin taparla. */}
+            <span
+              className={`code pointer-events-none absolute bg-ink px-2 py-1 text-[10px] text-paper
+                          ${isFirst ? "left-[52px] top-4" : "left-[42px] top-3"}`}
+            >
               FR-{String(index + 1).padStart(2, "0")}
             </span>
 

@@ -3,7 +3,6 @@ import Footer from "@/components/Footer";
 import { Barcode, DataBars, Diamonds, PixelGlyph, Slashes } from "@/components/Hud";
 import ProjectCard from "@/components/ProjectCard";
 import SectionHeader from "@/components/SectionHeader";
-import TopBar from "@/components/TopBar";
 import { PROJECTS } from "@/lib/projects";
 
 const count = String(PROJECTS.length).padStart(2, "0");
@@ -29,8 +28,7 @@ export default function ProjectsPage() {
   return (
     <div className="min-h-screen-safe w-full bg-paper font-sans text-ink">
       <div className="mx-auto flex min-h-screen-safe w-full max-w-6xl flex-col px-4 py-5 md:px-8 md:py-8">
-        <TopBar left={{ label: "antonio.", href: "/" }} center={{ label: "projects." }} right={{ label: `${count} games.` }} />
-        <BackLink className="mt-6 md:mt-10" />
+        <BackLink />
 
         <SectionHeader
           className="reveal mt-6 md:mt-8"
