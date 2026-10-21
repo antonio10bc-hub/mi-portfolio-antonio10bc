@@ -1,5 +1,4 @@
 import Link from "next/link";
-import PageBackground from "@/components/PageBackground";
 import Footer from "@/components/Footer";
 import { PHOTOS } from "@/lib/photos";
 import { PROJECTS } from "@/lib/projects";
@@ -93,8 +92,6 @@ export default function Home() {
     // La home entra entera en pantalla, footer incluido, pero sin recortar:
     // si en algun dispositivo no cupiese, hace scroll en lugar de cortarse.
     <div className="relative min-h-screen-safe w-full bg-sand font-sans text-offblack">
-      <PageBackground position="absolute" />
-
       <main className="relative z-10 mx-auto flex min-h-screen-safe w-full max-w-6xl flex-col gap-3 px-4 py-4 md:gap-5 md:px-8 md:py-7">
         <header className="surface reveal shrink-0 rounded-4xl px-5 py-5 md:px-10 md:py-8">
           <div className="flex items-center gap-2">
