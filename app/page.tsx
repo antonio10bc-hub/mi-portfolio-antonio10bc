@@ -60,18 +60,19 @@ export default function Home() {
     // La home entra entera en pantalla, footer incluido, pero sin recortar:
     // si en algun dispositivo no cupiese, hace scroll en lugar de cortarse.
     <div className="min-h-screen-safe w-full bg-paper font-sans text-ink">
-      <main className="mx-auto flex min-h-screen-safe w-full max-w-6xl flex-col gap-3 px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:gap-4 md:px-8 md:py-5">
+      <main className="mx-auto flex min-h-screen-safe h-screen-safe-mobile w-full max-w-6xl flex-col gap-3 px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:gap-4 md:px-8 md:py-5">
 
         <div
           className="relative flex min-h-0 flex-1 flex-col gap-3
                      md:grid md:grid-cols-12 md:grid-rows-[auto_minmax(0,1fr)_auto] md:gap-x-6 md:gap-y-4"
         >
-          {/* Espécimen. En móvil crece con el espacio libre solo hasta 34svh: sin ese
-              tope se lo comía entero y dejaba un hueco blanco enorme alrededor de los
-              puntos. Base 0, así que en pantallas bajas cede todo lo que haga falta. */}
+          {/* Espécimen. En móvil parte de su alto natural (ancho x 812/1148) y
+              reparte el espacio sobrante a medias con el separador de debajo de las
+              tarjetas: el árbol, centrado, gana el mismo aire arriba que abajo y las
+              tarjetas bajan, pero sin llegar al fondo. Si falta sitio, se encoge. */}
           <div
-            className="reveal relative min-h-0 flex-1 max-h-[34svh]
-                       md:col-start-3 md:col-end-12 md:row-start-1 md:row-end-4 md:max-h-none"
+            className="reveal relative h-[calc((100vw-2rem)*0.707)] min-h-0 grow shrink
+                       md:col-start-3 md:col-end-12 md:row-start-1 md:row-end-4 md:h-auto"
           >
             <Image
               src="/images/dither/tree.png"
@@ -119,6 +120,9 @@ export default function Home() {
             tone="dark"
             className="reveal md:col-start-1 md:col-end-6 md:row-start-3 md:self-end"
           />
+
+          {/* Separador móvil: se lleva la otra mitad del espacio sobrante. */}
+          <div aria-hidden className="grow md:hidden" />
 
           <div aria-hidden className="hidden md:col-start-10 md:col-end-13 md:row-start-3 md:block md:self-end">
             <DataBars seed="index" rows={8} />

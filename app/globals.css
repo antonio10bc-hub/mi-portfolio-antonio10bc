@@ -96,6 +96,27 @@
   }
 }
 
+/*
+ * Alto exacto de pantalla, solo en móvil, para la home: hace falta un alto
+ * definido para que el árbol pueda encogerse. Va fuera de @layer y con su propia
+ * media query porque una variante de Tailwind (`max-md:`) copiaría solo la regla
+ * de 100vh y no la de 100svh, y en Safari 100vh es más alto que lo visible.
+ * Nunca con overflow-hidden: si algo no cupiera, la página hace scroll.
+ */
+@media (max-width: 767px) {
+  .h-screen-safe-mobile {
+    height: 100vh;
+  }
+}
+
+@supports (height: 100svh) {
+  @media (max-width: 767px) {
+    .h-screen-safe-mobile {
+      height: 100svh;
+    }
+  }
+}
+
 /* Barra de scroll discreta, a juego con la paleta. */
 ::-webkit-scrollbar {
   width: 10px;
