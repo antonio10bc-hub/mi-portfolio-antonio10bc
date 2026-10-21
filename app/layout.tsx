@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
@@ -25,6 +25,12 @@ export const metadata: Metadata = {
   description,
   openGraph: { title, description, type: "website", locale: "en_US" },
   twitter: { card: "summary_large_image", title, description },
+  // Nombre bajo el icono al añadir a la pantalla de inicio en iOS.
+  appleWebApp: { title: "Antonio", statusBarStyle: "default" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#EBE8E0",
 };
 
 export default function RootLayout({

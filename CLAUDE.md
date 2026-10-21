@@ -78,6 +78,10 @@ Source photos in `public/images/` are capped at 2560px wide, quality 80. Keep ne
 
 `next.config.ts` pins `turbopack.root` to this directory — there is a stray `package-lock.json` in the user's home folder that Next would otherwise infer as the workspace root.
 
+### App icon
+
+The mark is a bone "A" in Inter 650 with the lime dot as its full stop, on `offblack`. `app/icon.png` (256, rounded corners, transparent outside) is the favicon; `app/apple-icon.png` (180) and `public/icons/icon-192.png` / `icon-512.png` are full-bleed squares because iOS and Android apply their own mask; `icon-maskable-512.png` shrinks the mark to 78% so it stays inside the 80% safe circle. `app/manifest.ts` and the `appleWebApp` / `viewport.themeColor` exports in `app/layout.tsx` make "Add to Home Screen" show it with the short name "Antonio". They were rendered with Playwright from HTML using the Inter woff2 that `next/font` bundles; regenerate all five together if the mark changes.
+
 ### Misc
 
 `gemini.sh` is a local dev helper (not part of the app): it dumps the repo file tree plus any files passed as arguments to the macOS clipboard.
