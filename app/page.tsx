@@ -27,7 +27,7 @@ const SECTIONS: Section[] = [
     index: "02",
     title: "Projects",
     description: "Experiments & code, shipped.",
-    meta: `${PROJECTS.length} projects`,
+    meta: `${PROJECTS.length} games`,
     href: "/projects",
     span: "md:col-span-2",
   },
