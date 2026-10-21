@@ -4,9 +4,9 @@ export default function BackLink({ className = "" }: { className?: string }) {
   return (
     <Link
       href="/"
-      className={`group inline-flex w-fit items-center gap-2.5 rounded-full border border-offblack/10 bg-white/40
+      className={`group inline-flex w-fit items-center gap-2.5 rounded-full border border-offblack/10 bg-bone
                   px-4 py-2 font-mono text-[10px] md:text-[11px] uppercase tracking-label text-softblack
-                  backdrop-blur-md transition-colors duration-300 ease-smooth
+                  transition-colors duration-300 ease-smooth
                   hover:border-offblack/25 hover:text-offblack ${className}`}
     >
       <svg

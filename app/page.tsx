@@ -1,5 +1,5 @@
 import Link from "next/link";
-import AnimatedBackground from "@/components/AnimatedBackground";
+import PageBackground from "@/components/PageBackground";
 import Footer from "@/components/Footer";
 import { PHOTOS } from "@/lib/photos";
 import { PROJECTS } from "@/lib/projects";
@@ -38,7 +38,7 @@ function SectionLink({ section, delay }: { section: Section; delay: number }) {
     <div className={`reveal min-h-0 ${section.span}`} style={{ animationDelay: `${delay}ms` }}>
       <Link
         href={section.href}
-        className="group glass relative flex h-full min-h-0 flex-col justify-between overflow-hidden
+        className="group surface relative flex h-full min-h-0 flex-col justify-between overflow-hidden
                    rounded-4xl p-5 md:p-8 transition-[transform,box-shadow] duration-500 ease-smooth
                    hover:-translate-y-1.5 hover:shadow-lift motion-reduce:hover:translate-y-0"
       >
@@ -93,10 +93,10 @@ export default function Home() {
     // La home entra entera en pantalla, footer incluido, pero sin recortar:
     // si en algun dispositivo no cupiese, hace scroll en lugar de cortarse.
     <div className="relative min-h-screen-safe w-full bg-sand font-sans text-offblack">
-      <AnimatedBackground position="absolute" />
+      <PageBackground position="absolute" />
 
       <main className="relative z-10 mx-auto flex min-h-screen-safe w-full max-w-6xl flex-col gap-3 px-4 py-4 md:gap-5 md:px-8 md:py-7">
-        <header className="glass-strong reveal shrink-0 rounded-4xl px-5 py-5 md:px-10 md:py-8">
+        <header className="surface reveal shrink-0 rounded-4xl px-5 py-5 md:px-10 md:py-8">
           <div className="flex items-center gap-2">
             <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-lime" />
             <span className="label">Portfolio</span>

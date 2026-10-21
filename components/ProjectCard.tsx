@@ -1,4 +1,4 @@
-import ProjectPreview from "@/components/ProjectPreview";
+import Image from "next/image";
 import type { Project } from "@/lib/projects";
 
 function ArrowBadge() {
@@ -39,19 +39,25 @@ export default function ProjectCard({
       href={project.href}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative flex h-full flex-col overflow-hidden rounded-4xl border border-offblack/10 bg-bone p-2 shadow-soft
+      className="group surface relative flex h-full flex-col overflow-hidden rounded-4xl p-2
                  transition-[transform,box-shadow] duration-500 ease-smooth
                  hover:-translate-y-1.5 hover:shadow-lift motion-reduce:hover:translate-y-0"
     >
-      {/* Preview del juego: fondo liso en el acento del proyecto. El radio es
-          el de la tarjeta menos su padding, para que las esquinas sean concéntricas. */}
+      {/* Captura real del juego. El radio es el de la tarjeta menos su padding,
+          para que las esquinas sean concéntricas; el filo interior la separa del
+          papel cuando la captura es clara. */}
       <div
         className="relative aspect-[16/10] overflow-hidden rounded-3xl"
-        style={{ backgroundColor: project.accent }}
+        style={{ backgroundColor: project.tint }}
       >
-        <div className="absolute inset-0 transition-transform duration-700 ease-smooth group-hover:scale-[1.04] motion-reduce:group-hover:scale-100">
-          <ProjectPreview project={project} />
-        </div>
+        <Image
+          src={project.screenshot}
+          alt={`${project.name} screenshot`}
+          fill
+          sizes="(min-width: 1152px) 540px, (min-width: 768px) 46vw, 100vw"
+          className="object-cover transition-transform duration-700 ease-smooth group-hover:scale-[1.04] motion-reduce:group-hover:scale-100"
+        />
+        <div aria-hidden className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-inset ring-offblack/10" />
       </div>
 
       <div className="flex flex-1 flex-col px-4 pb-4 pt-5 md:px-6 md:pb-6 md:pt-6">

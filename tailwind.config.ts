@@ -38,19 +38,10 @@ const config: Config = {
         smooth: 'cubic-bezier(0.22, 1, 0.36, 1)',
       },
       animation: {
-        blob: 'blob 26s ease-in-out infinite',
         'fade-up': 'fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both',
         'fade-in': 'fade-in 0.6s ease-out both',
       },
       keyframes: {
-        // Deriva lenta y orgánica: nada de saltos de escala bruscos.
-        blob: {
-          '0%, 100%': { transform: 'translate3d(0, 0, 0) scale(1)' },
-          '20%': { transform: 'translate3d(13%, -15%, 0) scale(1.22)' },
-          '45%': { transform: 'translate3d(-15%, 11%, 0) scale(0.86)' },
-          '70%': { transform: 'translate3d(11%, 15%, 0) scale(1.14)' },
-          '85%': { transform: 'translate3d(-8%, -6%, 0) scale(0.96)' },
-        },
         'fade-up': {
           from: { opacity: '0', transform: 'translate3d(0, 18px, 0)' },
           to: { opacity: '1', transform: 'translate3d(0, 0, 0)' },

@@ -1,19 +1,15 @@
-/** Ilustración vectorial de la tarjeta, una por juego (components/ProjectPreview.tsx). */
-export type PreviewKind = "coin" | "poker" | "forest" | "golf";
-
 export type Project = {
   name: string;
   href: string;
   /** Una frase. Es el único texto largo de la tarjeta: mantenerlo breve. */
   tagline: string;
-  /** Hex. Fondo liso de la preview y punto junto a la etiqueta. */
-  accent: string;
-  preview: PreviewKind;
   /**
-   * Captura real del juego en public/images/projects/, ej. "/images/projects/coinfliip.webp".
-   * Si existe sustituye a la ilustración. Formato 16:10, unos 1280px de ancho.
+   * Captura real del juego, 16:10 (1280x800, WebP, calidad 80), en public/images/projects/.
+   * Se hacen en local desde el repo de cada juego: la tarjeta tiene que parecerse al juego.
    */
-  screenshot?: string;
+  screenshot: string;
+  /** Hex. Color dominante de la captura: se pinta detrás mientras la imagen carga. */
+  tint: string;
 };
 
 export const PROJECTS: Project[] = [
@@ -21,28 +17,28 @@ export const PROJECTS: Project[] = [
     name: "Coinfliip",
     href: "https://www.coinfliip.com/",
     tagline: "Flip a coin to settle anything, or chase a run of heads up the global leaderboard.",
-    accent: "#B8D900",
-    preview: "coin",
+    screenshot: "/images/projects/coinfliip.webp",
+    tint: "#CCFF33",
   },
   {
     name: "Magic Poker",
     href: "https://magic-poker-kappa.vercel.app/",
     tagline: "A poker table in the browser, across three difficulty levels.",
-    accent: "#7C5CFF",
-    preview: "poker",
+    screenshot: "/images/projects/magic-poker.webp",
+    tint: "#0B0D0C",
   },
   {
     name: "ASCII Forest",
     href: "https://asciiforest-game.vercel.app/",
     tagline: "A narrative forest sim drawn in text: tend flora and fauna, one day at a time.",
-    accent: "#1A2F70",
-    preview: "forest",
+    screenshot: "/images/projects/ascii-forest.webp",
+    tint: "#0D140B",
   },
   {
     name: "Chaotic Golf Game",
     href: "https://chaoticgolfweb.vercel.app/",
     tagline: "Playable prototype of the card game: configurable matches against the AI, plus a level creator.",
-    accent: "#1F5E38",
-    preview: "golf",
+    screenshot: "/images/projects/chaotic-golf.webp",
+    tint: "#3E6B45",
   },
 ];

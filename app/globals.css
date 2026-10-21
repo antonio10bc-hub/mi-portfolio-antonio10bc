@@ -48,31 +48,25 @@
 
 @layer components {
   /*
-   * Liquid glass: tinte blanco muy bajo + desenfoque saturado + un filo de luz
-   * interior arriba. El filo interior es lo que da la sensación de cristal
-   * real en lugar de "caja translúcida".
+   * Superficie de tarjeta: sólida, con un filete fino y una sombra apenas
+   * insinuada. Sustituye al cristal: sobre un fondo liso, `backdrop-filter`
+   * no tiene nada que desenfocar y solo se leía como un gris sucio.
    */
-  .glass {
-    background-color: rgba(255, 255, 255, 0.28);
-    -webkit-backdrop-filter: blur(22px) saturate(150%);
-    backdrop-filter: blur(22px) saturate(150%);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow:
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.65),
-      inset 0 -1px 0 0 rgba(255, 255, 255, 0.18),
-      0 10px 30px -18px rgba(17, 17, 17, 0.22);
+  .surface {
+    background-color: #F6F4EE;
+    border: 1px solid rgba(17, 17, 17, 0.08);
+    box-shadow: 0 1px 2px rgba(17, 17, 17, 0.04), 0 10px 30px -18px rgba(17, 17, 17, 0.18);
   }
 
-  /* Variante con algo más de cuerpo, para tarjetas que llevan contenido denso. */
-  .glass-strong {
-    background-color: rgba(255, 255, 255, 0.42);
-    -webkit-backdrop-filter: blur(26px) saturate(160%);
-    backdrop-filter: blur(26px) saturate(160%);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow:
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.8),
-      inset 0 -1px 0 0 rgba(255, 255, 255, 0.22),
-      0 14px 40px -22px rgba(17, 17, 17, 0.28);
+  /*
+   * Retícula de puntos del fondo. Se desvanece desde arriba hacia el centro
+   * con una máscara, para que la textura acompañe sin competir con el contenido.
+   */
+  .dot-grid {
+    background-image: radial-gradient(rgba(17, 17, 17, 0.16) 1px, rgba(17, 17, 17, 0) 1.5px);
+    background-size: 22px 22px;
+    background-position: center top;
+    mask-image: radial-gradient(ellipse 90% 75% at 50% 0%, #000 35%, rgba(0, 0, 0, 0) 100%);
   }
 
   /* Glass oscuro, para los controles sobre el visor de fotos. */
@@ -117,15 +111,9 @@
 
 /*
  * En movil el desenfoque del cristal se reduce: `backdrop-filter` es de lo mas
- * caro que hay en GPU de telefono y la pagina apila varias capas.
+ * caro que hay en GPU de telefono.
  */
 @media (max-width: 767px) {
-  .glass,
-  .glass-strong {
-    -webkit-backdrop-filter: blur(12px) saturate(130%);
-    backdrop-filter: blur(12px) saturate(130%);
-  }
-
   .glass-dark {
     -webkit-backdrop-filter: blur(10px) saturate(120%);
     backdrop-filter: blur(10px) saturate(120%);

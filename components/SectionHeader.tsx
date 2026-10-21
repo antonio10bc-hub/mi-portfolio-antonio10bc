@@ -14,7 +14,7 @@ export default function SectionHeader({
 }) {
   return (
     <header
-      className={`glass-strong rounded-4xl px-6 py-7 md:px-10 md:py-9 ${className}`}
+      className={`surface rounded-4xl px-6 py-7 md:px-10 md:py-9 ${className}`}
     >
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">

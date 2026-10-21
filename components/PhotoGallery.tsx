@@ -76,8 +76,8 @@ export default function PhotoGallery() {
             onClick={() => setSelectedIndex(index)}
             aria-label={`Open photo: ${photo.title}`}
             style={{ animationDelay: `${120 + Math.min(index, 8) * 60}ms` }}
-            className={`reveal group relative w-full overflow-hidden rounded-3xl border border-white/40
-                        bg-white/20 shadow-soft transition-shadow duration-500 ease-smooth hover:shadow-lift
+            className={`reveal group relative w-full overflow-hidden rounded-3xl border border-offblack/10
+                        bg-bone shadow-soft transition-shadow duration-500 ease-smooth hover:shadow-lift
                         ${isFirst ? "md:col-span-2 aspect-[16/10]" : "aspect-[4/5]"}`}
           >
             <Image
