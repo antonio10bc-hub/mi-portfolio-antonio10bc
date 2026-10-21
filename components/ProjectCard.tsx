@@ -33,11 +33,15 @@ export default function ProjectCard({
       <div className="relative mt-3 bg-panel p-4 md:p-6">
         <Brackets size={22} weight={2} inset={8} className="z-10 text-ink" />
         <div className="relative aspect-[16/10] overflow-hidden" style={{ backgroundColor: project.tint }}>
+          {/* Las capturas ya son WebP de 1280px optimizados: se sirven tal cual desde
+              el CDN, sin pasar por el optimizador (que en la primera visita las
+              generaba al vuelo y tardaban en aparecer). Las dos primeras se piden ya. */}
           <Image
             src={project.screenshot}
             alt={`${project.name} screenshot`}
             fill
-            sizes="(min-width: 1152px) 500px, (min-width: 768px) 42vw, 90vw"
+            unoptimized
+            priority={index < 2}
             className="object-cover transition-transform duration-700 ease-smooth group-hover:scale-[1.03] motion-reduce:group-hover:scale-100"
           />
         </div>

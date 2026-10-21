@@ -33,8 +33,8 @@ export default function ProjectsPage() {
         <SectionHeader
           className="reveal mt-6 md:mt-8"
           eyebrow="Selected work"
-          title="Projects"
-          code="File 02 // Games"
+          title="Games"
+          code="File 02 // Browser games"
           meta={`${count} games`}
           intro={
             <>

@@ -11,7 +11,8 @@ import { PROJECTS } from "@/lib/projects";
  * y los dos expedientes. En escritorio es una rejilla de 12 columnas y 3 filas
  * (auto, flexible, auto: con filas iguales, la más alta fijaba el alto de las
  * tres y la home dejaba de caber) donde todo se superpone al árbol; en móvil, una columna donde el árbol es el
- * único elemento flexible y se encoge para que la página quepa sin scroll.
+ * de tamaño acotado: el espacio sobrante queda bajo los paneles y el pie se
+ * queda abajo, encuadrado, sin scroll.
  */
 
 function SectionPanel({
@@ -35,7 +36,7 @@ function SectionPanel({
   return (
     <Link
       href={href}
-      className={`group relative z-10 block shrink-0 px-7 py-5 transition-colors duration-500 ease-smooth md:p-8
+      className={`group relative z-10 block shrink-0 px-7 py-4 transition-colors duration-500 ease-smooth md:p-8
                   ${dark ? "bg-graphite text-paper hover:bg-ink" : "bg-panel/85 text-ink hover:bg-panel"} ${className}`}
     >
       {!dark && <Brackets size={18} weight={2} inset={8} />}
@@ -59,14 +60,19 @@ export default function Home() {
     // La home entra entera en pantalla, footer incluido, pero sin recortar:
     // si en algun dispositivo no cupiese, hace scroll en lugar de cortarse.
     <div className="min-h-screen-safe w-full bg-paper font-sans text-ink">
-      <main className="mx-auto flex min-h-screen-safe w-full max-w-6xl flex-col gap-3 px-4 py-4 md:gap-4 md:px-8 md:py-5">
+      <main className="mx-auto flex min-h-screen-safe w-full max-w-6xl flex-col gap-3 px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:gap-4 md:px-8 md:py-5">
 
         <div
           className="relative flex min-h-0 flex-1 flex-col gap-3
                      md:grid md:grid-cols-12 md:grid-rows-[auto_minmax(0,1fr)_auto] md:gap-x-6 md:gap-y-4"
         >
-          {/* Espécimen */}
-          <div className="reveal relative min-h-0 flex-1 md:col-start-3 md:col-end-12 md:row-start-1 md:row-end-4">
+          {/* Espécimen. En móvil crece con el espacio libre solo hasta 34svh: sin ese
+              tope se lo comía entero y dejaba un hueco blanco enorme alrededor de los
+              puntos. Base 0, así que en pantallas bajas cede todo lo que haga falta. */}
+          <div
+            className="reveal relative min-h-0 flex-1 max-h-[34svh]
+                       md:col-start-3 md:col-end-12 md:row-start-1 md:row-end-4 md:max-h-none"
+          >
             <Image
               src="/images/dither/tree.png"
               alt="Solitude, a lone tree, printed as a halftone"
@@ -108,7 +114,7 @@ export default function Home() {
             href="/projects"
             number="02"
             meta={`${PROJECTS.length} games`}
-            title="projects."
+            title="games."
             description="Experiments & code, shipped."
             tone="dark"
             className="reveal md:col-start-1 md:col-end-6 md:row-start-3 md:self-end"
