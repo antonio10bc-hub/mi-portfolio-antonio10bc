@@ -41,4 +41,11 @@ export const PROJECTS: Project[] = [
     screenshot: "/images/projects/chaotic-golf.webp",
     tint: "#3E6B45",
   },
+  {
+    name: "Tanques",
+    href: "https://tanquesweb.vercel.app/",
+    tagline: "A voxel tank duel against the AI: keep moving to stay hidden, stop to fire, and every shot gives you away.",
+    screenshot: "/images/projects/tanques.webp",
+    tint: "#1FB6FF",
+  },
 ];
