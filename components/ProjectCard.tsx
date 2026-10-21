@@ -1,32 +1,13 @@
 import Image from "next/image";
+import { Arrow, Barcode, Brackets, Dots } from "@/components/Hud";
 import type { Project } from "@/lib/projects";
 
-function ArrowBadge() {
-  return (
-    <span
-      aria-hidden
-      className="relative flex h-9 w-9 md:h-10 md:w-10 shrink-0 items-center justify-center rounded-full
-                 border border-offblack/10 text-offblack
-                 transition-all duration-500 ease-smooth
-                 group-hover:border-offblack group-hover:bg-offblack group-hover:text-bone"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={1.6}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="h-4 w-4 transition-transform duration-500 ease-smooth
-                   group-hover:translate-x-[3px] group-hover:-translate-y-[3px]"
-      >
-        <path d="M7 17 17 7" />
-        <path d="M9 7h8v8" />
-      </svg>
-    </span>
-  );
-}
-
+/**
+ * Ficha de un juego: código de proyecto, la captura real dentro de un panel
+ * gris con marco de visor, el nombre como titular, una regla de tinta, la
+ * tagline en texto de datos y la acción. La captura va a todo color: es el
+ * contenido, y la regla monocroma es solo para la interfaz.
+ */
 export default function ProjectCard({
   project,
   index,
@@ -34,49 +15,50 @@ export default function ProjectCard({
   project: Project;
   index: number;
 }) {
+  const number = String(index + 1).padStart(2, "0");
+
   return (
     <a
       href={project.href}
       target="_blank"
       rel="noopener noreferrer"
-      className="group surface relative flex h-full flex-col overflow-hidden rounded-4xl p-2
-                 transition-[transform,box-shadow] duration-500 ease-smooth
-                 hover:-translate-y-1.5 hover:shadow-lift motion-reduce:hover:translate-y-0"
+      className="group flex h-full flex-col text-ink"
     >
-      {/* Captura real del juego. El radio es el de la tarjeta menos su padding,
-          para que las esquinas sean concéntricas; el filo interior la separa del
-          papel cuando la captura es clara. */}
-      <div
-        className="relative aspect-[16/10] overflow-hidden rounded-3xl"
-        style={{ backgroundColor: project.tint }}
-      >
-        <Image
-          src={project.screenshot}
-          alt={`${project.name} screenshot`}
-          fill
-          sizes="(min-width: 1152px) 540px, (min-width: 768px) 46vw, 100vw"
-          className="object-cover transition-transform duration-700 ease-smooth group-hover:scale-[1.04] motion-reduce:group-hover:scale-100"
-        />
-        <div aria-hidden className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-inset ring-offblack/10" />
+      <div className="flex items-center gap-3">
+        <Dots />
+        <span className="code text-[11px] md:text-xs">Project code: G-{number}</span>
+        <span className="label ml-auto text-ink">Game</span>
       </div>
 
-      <div className="flex flex-1 flex-col px-4 pb-4 pt-5 md:px-6 md:pb-6 md:pt-6">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[11px] tracking-label text-softblack">
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          <span aria-hidden className="text-softblack/40">/</span>
-          <span className="label">Game</span>
+      <div className="relative mt-3 bg-panel p-4 md:p-6">
+        <Brackets size={22} weight={2} inset={8} className="z-10 text-ink" />
+        <div className="relative aspect-[16/10] overflow-hidden" style={{ backgroundColor: project.tint }}>
+          <Image
+            src={project.screenshot}
+            alt={`${project.name} screenshot`}
+            fill
+            sizes="(min-width: 1152px) 500px, (min-width: 768px) 42vw, 90vw"
+            className="object-cover transition-transform duration-700 ease-smooth group-hover:scale-[1.03] motion-reduce:group-hover:scale-100"
+          />
         </div>
+      </div>
 
-        <div className="mt-2 flex items-center justify-between gap-4">
-          <h2 className="text-2xl md:text-3xl font-semibold leading-tight tracking-tight text-offblack">
-            {project.name}
-          </h2>
-          <ArrowBadge />
-        </div>
+      <div className="mt-4 flex items-end justify-between gap-4 border-b-2 border-ink pb-3">
+        <h2 className="display text-[clamp(2.5rem,7vw,4.5rem)]">{project.name}.</h2>
+        <span className="code shrink-0 text-xs text-mute">#{number}</span>
+      </div>
 
-        <p className="mt-2 text-sm leading-relaxed text-softblack">{project.tagline}</p>
+      <p className="datatext mt-3 flex-1">{project.tagline}</p>
+
+      <div className="mt-5 flex items-center gap-4">
+        <span
+          className="code inline-flex items-center gap-2 border-2 border-ink px-3 py-1.5 text-[11px]
+                     transition-colors duration-300 group-hover:bg-ink group-hover:text-paper"
+        >
+          Play
+          <Arrow className="h-3.5 w-3.5" />
+        </span>
+        <Barcode seed={project.name} className="hidden h-8 flex-1 md:block" />
       </div>
     </a>
   );

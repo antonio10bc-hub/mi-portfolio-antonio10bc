@@ -1,89 +1,57 @@
+import Image from "next/image";
 import Link from "next/link";
 import Footer from "@/components/Footer";
+import { Arrow, Barcode, Brackets, CornerMark, DataBars, Diamonds, Dots, Leader, XStack } from "@/components/Hud";
+import TopBar from "@/components/TopBar";
 import { PHOTOS } from "@/lib/photos";
 import { PROJECTS } from "@/lib/projects";
 
-type Section = {
-  index: string;
+/*
+ * La home es el índice del archivo: el árbol tramado ("Solitude") como
+ * espécimen central y, montados encima, el nombre con su línea de referencia
+ * y los dos expedientes. En escritorio es una rejilla de 12 columnas y 3 filas
+ * (auto, flexible, auto: con filas iguales, la más alta fijaba el alto de las
+ * tres y la home dejaba de caber) donde todo se superpone al árbol; en móvil, una columna donde el árbol es el
+ * único elemento flexible y se encoge para que la página quepa sin scroll.
+ */
+
+function SectionPanel({
+  href,
+  number,
+  meta,
+  title,
+  description,
+  tone,
+  className,
+}: {
+  href: string;
+  number: string;
+  meta: string;
   title: string;
   description: string;
-  /** Recuento real de la sección, para que la tarjeta diga algo además del título. */
-  meta: string;
-  href: string;
-  span: string;
-};
-
-const SECTIONS: Section[] = [
-  {
-    index: "01",
-    title: "Photography",
-    description: "Places where I found beauty.",
-    meta: `${PHOTOS.length} frames`,
-    href: "/photography",
-    span: "md:col-span-3",
-  },
-  {
-    index: "02",
-    title: "Projects",
-    description: "Experiments & code, shipped.",
-    meta: `${PROJECTS.length} games`,
-    href: "/projects",
-    span: "md:col-span-2",
-  },
-];
-
-function SectionLink({ section, delay }: { section: Section; delay: number }) {
+  tone: "light" | "dark";
+  className: string;
+}) {
+  const dark = tone === "dark";
   return (
-    <div className={`reveal min-h-0 ${section.span}`} style={{ animationDelay: `${delay}ms` }}>
-      <Link
-        href={section.href}
-        className="group surface relative flex h-full min-h-0 flex-col justify-between overflow-hidden
-                   rounded-4xl p-5 md:p-8 transition-[transform,box-shadow] duration-500 ease-smooth
-                   hover:-translate-y-1.5 hover:shadow-lift motion-reduce:hover:translate-y-0"
-      >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_120%_at_100%_0%,rgba(212,255,0,0.22)_0%,transparent_55%)]
-                     opacity-0 transition-opacity duration-700 ease-smooth group-hover:opacity-100"
-        />
-
-        <div className="relative flex items-start justify-between gap-3">
-          <span className="flex items-center gap-2">
-            <span className="font-mono text-[11px] tracking-label text-softblack">{section.index}</span>
-            <span aria-hidden className="text-softblack/40">/</span>
-            <span className="label">{section.meta}</span>
-          </span>
-          <span
-            aria-hidden
-            className="flex h-8 w-8 md:h-11 md:w-11 shrink-0 items-center justify-center rounded-full
-                       border border-offblack/10 bg-white/50 text-offblack transition-all duration-500 ease-smooth
-                       group-hover:border-offblack group-hover:bg-offblack group-hover:text-bone"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={1.6}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-4 w-4 transition-transform duration-500 ease-smooth group-hover:translate-x-[3px]"
-            >
-              <path d="M5 12h14" />
-              <path d="m12 5 7 7-7 7" />
-            </svg>
-          </span>
-        </div>
-
-        <div className="relative">
-          <h2 className="text-[clamp(1.625rem,4.4vw,3.25rem)] font-semibold uppercase leading-[0.95] tracking-tighter text-offblack">
-            {section.title}
-          </h2>
-          <p className="mt-1.5 text-[clamp(0.75rem,1.35vw,1rem)] leading-snug text-softblack">
-            {section.description}
-          </p>
-        </div>
-      </Link>
-    </div>
+    <Link
+      href={href}
+      className={`group relative z-10 block shrink-0 px-7 py-5 transition-colors duration-500 ease-smooth md:p-8
+                  ${dark ? "bg-graphite text-paper hover:bg-ink" : "bg-panel/85 text-ink hover:bg-panel"} ${className}`}
+    >
+      {!dark && <Brackets size={18} weight={2} inset={8} />}
+      <div className="flex items-center justify-between gap-3">
+        <span className="code text-[11px] md:text-xs">
+          {number} <span aria-hidden>{"//"}</span> {meta}
+        </span>
+        {dark ? <Dots /> : <Arrow direction="right" className="transition-transform duration-500 ease-smooth group-hover:translate-x-1" />}
+      </div>
+      <h2 className="display mt-2 text-[clamp(2rem,min(5vw,7vh),4.25rem)] md:mt-4">{title}</h2>
+      <div className="mt-1.5 flex items-end justify-between gap-3 md:mt-2">
+        <p className="font-mono text-[11px] leading-snug md:text-xs">{description}</p>
+        {dark && <Arrow direction="right" className="shrink-0 transition-transform duration-500 ease-smooth group-hover:translate-x-1" />}
+      </div>
+    </Link>
   );
 }
 
@@ -91,30 +59,70 @@ export default function Home() {
   return (
     // La home entra entera en pantalla, footer incluido, pero sin recortar:
     // si en algun dispositivo no cupiese, hace scroll en lugar de cortarse.
-    <div className="relative min-h-screen-safe w-full bg-sand font-sans text-offblack">
-      <main className="relative z-10 mx-auto flex min-h-screen-safe w-full max-w-6xl flex-col gap-3 px-4 py-4 md:gap-5 md:px-8 md:py-7">
-        <header className="surface reveal shrink-0 rounded-4xl px-5 py-5 md:px-10 md:py-8">
-          <div className="flex items-center gap-2">
-            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-lime" />
-            <span className="label">Portfolio</span>
+    <div className="min-h-screen-safe w-full bg-paper font-sans text-ink">
+      <main className="mx-auto flex min-h-screen-safe w-full max-w-6xl flex-col gap-3 px-4 py-4 md:gap-4 md:px-8 md:py-5">
+        <TopBar left={{ label: "photography." }} center={{ label: "portfolio." }} right={{ label: "game design." }} />
+
+        <div
+          className="relative flex min-h-0 flex-1 flex-col gap-3
+                     md:grid md:grid-cols-12 md:grid-rows-[auto_minmax(0,1fr)_auto] md:gap-x-6 md:gap-y-4"
+        >
+          {/* Espécimen */}
+          <div className="reveal relative min-h-0 flex-1 md:col-start-3 md:col-end-12 md:row-start-1 md:row-end-4">
+            <Image
+              src="/images/dither/tree.png"
+              alt="Solitude, a lone tree, printed as a halftone"
+              fill
+              priority
+              unoptimized
+              className="object-contain"
+            />
           </div>
 
-          <h1 className="mt-3 text-[clamp(2.75rem,8.5vw,6.5rem)] font-semibold uppercase leading-[0.86] tracking-tighter text-offblack">
-            Antonio
-          </h1>
+          {/* Nombre */}
+          <div className="reveal relative z-10 order-first shrink-0 md:order-none md:col-start-1 md:col-end-8 md:row-start-1">
+            <div className="flex items-center gap-3">
+              <Dots />
+              <span className="code text-[11px] md:text-xs">File 00 // Index</span>
+            </div>
+            <h1 className="display mt-2 text-[clamp(3.5rem,min(13vw,15vh),10rem)] md:mt-3">antonio.</h1>
+            <div className="mt-2 flex items-start gap-4 md:mt-3">
+              <p className="font-mono text-xs md:text-sm">Photography &amp; Creative Game Design.</p>
+              <Leader length={170} drop={44} className="mt-2 hidden shrink-0 lg:block" />
+            </div>
+          </div>
 
-          <p className="mt-2 max-w-xl text-[clamp(0.875rem,1.6vw,1.25rem)] leading-snug text-softblack">
-            Photography &amp; Creative Game Design.
-          </p>
-        </header>
+          <CornerMark corner="tr" className="absolute right-0 top-0 hidden md:block" />
+          <XStack className="hidden md:col-start-1 md:row-start-2 md:flex md:self-center" />
+          <Diamonds className="hidden md:col-start-7 md:row-start-2 md:block md:self-start md:justify-self-end" />
 
-        <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 md:max-h-[26rem] md:grid-cols-5 md:gap-5">
-          {SECTIONS.map((section, index) => (
-            <SectionLink key={section.href} section={section} delay={140 + index * 90} />
-          ))}
+          <SectionPanel
+            href="/photography"
+            number="01"
+            meta={`${PHOTOS.length} frames`}
+            title="photography."
+            description="Places where I found beauty."
+            tone="light"
+            className="reveal md:col-start-8 md:col-end-13 md:row-start-2 md:self-center"
+          />
+
+          <SectionPanel
+            href="/projects"
+            number="02"
+            meta={`${PROJECTS.length} games`}
+            title="projects."
+            description="Experiments & code, shipped."
+            tone="dark"
+            className="reveal md:col-start-1 md:col-end-6 md:row-start-3 md:self-end"
+          />
+
+          <div aria-hidden className="hidden md:col-start-10 md:col-end-13 md:row-start-3 md:block md:self-end">
+            <DataBars seed="index" rows={8} />
+            <Barcode seed="antonio-index" className="mt-3 h-10 w-full" />
+          </div>
         </div>
 
-        <Footer className="mt-auto shrink-0" />
+        <Footer className="mt-1" />
       </main>
     </div>
   );

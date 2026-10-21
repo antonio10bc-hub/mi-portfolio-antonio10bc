@@ -5,8 +5,8 @@
 @layer base {
   :root {
     color-scheme: light;
-    background-color: #EBE8E0;
-    color: #111111;
+    background-color: #FFFFFF;
+    color: #201E20;
   }
 
   html {
@@ -19,21 +19,20 @@
 
 
   body {
-    background-color: #EBE8E0;
-    color: #111111;
+    background-color: #FFFFFF;
+    color: #201E20;
     text-rendering: optimizeLegibility;
   }
 
   ::selection {
-    background-color: #D4FF00;
-    color: #111111;
+    background-color: #201E20;
+    color: #FFFFFF;
   }
 
-  /* Foco visible y coherente con el acento, sin el halo azul del navegador. */
+  /* Foco visible en tinta y en ángulo recto, como el resto de la interfaz. */
   :focus-visible {
-    outline: 2px solid #111111;
+    outline: 2px solid #201E20;
     outline-offset: 3px;
-    border-radius: 4px;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -48,31 +47,30 @@
 
 @layer components {
   /*
-   * Superficie de tarjeta: sólida, con un filete fino y una sombra apenas
-   * insinuada. Sustituye al cristal: sobre un fondo liso, `backdrop-filter`
-   * no tiene nada que desenfocar y solo se leía como un gris sucio.
+   * Titular: grotesca muy condensada, negra y en minúsculas, siempre con punto
+   * final en el texto ("projects."). El ancho va por `font-variation-settings`
+   * y no por `font-stretch`, que depende de cómo declare la fuente @font-face.
    */
-  .surface {
-    background-color: #F6F4EE;
-    border: 1px solid rgba(17, 17, 17, 0.08);
-    box-shadow: 0 1px 2px rgba(17, 17, 17, 0.04), 0 10px 30px -18px rgba(17, 17, 17, 0.18);
+  .display {
+    @apply font-sans font-extrabold lowercase leading-[0.82] tracking-[-0.035em];
+    font-variation-settings: "wdth" 62;
   }
 
-  /* Glass oscuro, para los controles sobre el visor de fotos. */
-  .glass-dark {
-    background-color: rgba(17, 17, 17, 0.42);
-    -webkit-backdrop-filter: blur(18px) saturate(140%);
-    backdrop-filter: blur(18px) saturate(140%);
-    border: 1px solid rgba(255, 255, 255, 0.16);
+  /* Identificadores de expediente: "PROJECT #0653", "FR-01". */
+  .code {
+    @apply font-mono font-bold uppercase tracking-[0.02em];
   }
 
+  /* Microtipografía de datos en mayúsculas. */
   .label {
-    @apply font-mono text-[10px] md:text-[11px] uppercase tracking-label text-softblack;
+    @apply font-mono text-[10px] md:text-[11px] uppercase tracking-label text-mute;
   }
 
-  .chip {
-    @apply inline-flex items-center rounded-full border border-offblack/10 bg-white/45 px-2.5 py-1
-           font-mono text-[10px] uppercase tracking-[0.12em] text-softblack;
+  /* Texto de expediente: monoespaciada pequeña y justificada, como en la referencia. */
+  .datatext {
+    @apply font-mono text-[11px] md:text-xs leading-[1.45] text-ink;
+    text-align: justify;
+    hyphens: none;
   }
 }
 
@@ -98,17 +96,6 @@
   }
 }
 
-/*
- * En movil el desenfoque del cristal se reduce: `backdrop-filter` es de lo mas
- * caro que hay en GPU de telefono.
- */
-@media (max-width: 767px) {
-  .glass-dark {
-    -webkit-backdrop-filter: blur(10px) saturate(120%);
-    backdrop-filter: blur(10px) saturate(120%);
-  }
-}
-
 /* Barra de scroll discreta, a juego con la paleta. */
 ::-webkit-scrollbar {
   width: 10px;
@@ -118,13 +105,13 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(17, 17, 17, 0.16);
-  border-radius: 999px;
+  background-color: rgba(32, 30, 32, 0.25);
+  border-radius: 0;
   border: 3px solid transparent;
   background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(17, 17, 17, 0.3);
+  background-color: rgba(32, 30, 32, 0.5);
   background-clip: content-box;
 }
 

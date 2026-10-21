@@ -1,19 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Roboto_Mono } from "next/font/google";
+import { Archivo, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import PageTransition from "@/components/PageTransition";
 
-const inter = Inter({
+// Archivo con el eje de ancho: los titulares van a wdth 62 (ver .display).
+const archivo = Archivo({
   subsets: ["latin"],
-  variable: "--font-inter",
+  axes: ["wdth"],
+  variable: "--font-archivo",
   display: "swap",
 });
 
-const robotoMono = Roboto_Mono({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-roboto-mono",
+  variable: "--font-jetbrains-mono",
   display: "swap",
 });
 
@@ -30,7 +32,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#EBE8E0",
+  themeColor: "#FFFFFF",
 };
 
 export default function RootLayout({
@@ -40,7 +42,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${robotoMono.variable} antialiased`}>
+      <body className={`${archivo.variable} ${jetbrainsMono.variable} antialiased`}>
         <div className="relative z-10">
           <PageTransition>{children}</PageTransition>
         </div>

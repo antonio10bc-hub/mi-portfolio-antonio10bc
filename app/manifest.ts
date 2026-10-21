@@ -12,8 +12,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Photography & Creative Game Design",
     start_url: "/",
     display: "standalone",
-    background_color: "#EBE8E0",
-    theme_color: "#EBE8E0",
+    background_color: "#FFFFFF",
+    theme_color: "#FFFFFF",
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
       { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },

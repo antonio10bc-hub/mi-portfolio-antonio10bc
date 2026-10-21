@@ -10,29 +10,21 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      // Dirección de arte "Specimen File": interfaz estrictamente monocroma.
+      // El color solo entra con el contenido (fotos y capturas). Ver docs/art-direction.
       colors: {
-        bone: '#F6F4EE',      // Blanco hueso
-        sand: '#EBE8E0',      // Fondo de página
-        offblack: '#111111',  // Negro casi puro
-        softblack: '#5A5A55', // Gris apagado para texto secundario
-        lime: '#D4FF00',      // Lima (acento único)
-        softgray: '#B0B0B0',  // Gris
+        paper: '#FFFFFF',     // Fondo de página, siempre plano
+        panel: '#DEDEDC',     // Paneles grises y marco de las capturas
+        ink: '#201E20',       // Texto, líneas, bordes y puntos
+        graphite: '#48444A',  // Panel de acción oscuro
+        mute: '#6B676E',      // Texto secundario: 5.5:1 sobre papel, solo sobre papel
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        mono: ['var(--font-roboto-mono)', 'ui-monospace', 'monospace'],
-      },
-      borderRadius: {
-        '4xl': '2rem',
-        '5xl': '2.5rem',
+        sans: ['var(--font-archivo)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-jetbrains-mono)', 'ui-monospace', 'monospace'],
       },
       letterSpacing: {
-        label: '0.18em',
-      },
-      boxShadow: {
-        // Elevación suave, nunca un drop-shadow duro.
-        soft: '0 10px 30px -14px rgba(17,17,17,0.18)',
-        lift: '0 26px 60px -28px rgba(17,17,17,0.35)',
+        label: '0.14em',
       },
       transitionTimingFunction: {
         smooth: 'cubic-bezier(0.22, 1, 0.36, 1)',
