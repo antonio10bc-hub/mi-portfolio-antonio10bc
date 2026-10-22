@@ -36,6 +36,8 @@ function SectionPanel({
   return (
     <Link
       href={href}
+      data-track="section_clicked"
+      data-track-section={title.replace(".", "")}
       className={`group relative z-10 block shrink-0 px-7 py-4 transition-colors duration-500 ease-smooth md:p-8
                   ${dark ? "bg-graphite text-paper hover:bg-ink" : "bg-panel/85 text-ink hover:bg-panel"} ${className}`}
     >

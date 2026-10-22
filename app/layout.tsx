@@ -4,6 +4,7 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import PageTransition from "@/components/PageTransition";
+import AnalyticsTracker from "@/components/AnalyticsTracker";
 
 // Archivo con el eje de ancho: los titulares van a wdth 62 (ver .display).
 const archivo = Archivo({
@@ -49,6 +50,7 @@ export default function RootLayout({
 
         <Analytics />
         <SpeedInsights />
+        <AnalyticsTracker />
       </body>
     </html>
   );

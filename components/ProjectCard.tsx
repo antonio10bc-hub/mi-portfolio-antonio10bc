@@ -22,6 +22,9 @@ export default function ProjectCard({
       href={project.href}
       target="_blank"
       rel="noopener noreferrer"
+      data-track="game_clicked"
+      data-track-game={project.name}
+      data-track-position={index + 1}
       className="group flex h-full flex-col text-ink"
     >
       <div className="flex items-center gap-3">

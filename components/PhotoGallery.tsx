@@ -4,6 +4,7 @@ import Image from "next/image";
 import { createPortal } from "react-dom";
 import { useCallback, useEffect, useState } from "react";
 import { Brackets } from "@/components/Hud";
+import { track } from "@/lib/analytics";
 import { PHOTOS } from "@/lib/photos";
 
 const FEATURED_SIZES = "(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 66vw";
@@ -45,6 +46,13 @@ export default function PhotoGallery() {
     );
   }, []);
 
+  // Analíticas: cada foto que se ve en el visor (al abrirlo y al pasar con las flechas).
+  useEffect(() => {
+    if (selectedIndex === null) return;
+    const photo = PHOTOS[selectedIndex];
+    track("photo_viewed", { photo: photo.title, frame: selectedIndex + 1 });
+  }, [selectedIndex]);
+
   useEffect(() => {
     if (selectedIndex === null) return;
 
@@ -74,7 +82,10 @@ export default function PhotoGallery() {
           <button
             key={photo.id}
             type="button"
-            onClick={() => setSelectedIndex(index)}
+            onClick={() => {
+              track("photo_opened", { photo: photo.title, frame: index + 1 });
+              setSelectedIndex(index);
+            }}
             aria-label={`Open photo: ${photo.title}`}
             style={{ animationDelay: `${120 + Math.min(index, 8) * 60}ms` }}
             className={`reveal group relative w-full overflow-hidden bg-panel

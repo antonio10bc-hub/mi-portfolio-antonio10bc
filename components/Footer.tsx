@@ -33,6 +33,7 @@ export default function Footer({ className = "" }: { className?: string }) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Instagram"
+          data-track="instagram_clicked"
           className="display text-[clamp(1.25rem,3vw,2.25rem)] transition-opacity duration-300 hover:opacity-60"
         >
           {INSTAGRAM.handle}
