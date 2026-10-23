@@ -20,7 +20,7 @@ export default function SectionHeader({
   code: string;
   intro?: React.ReactNode;
   /** Cifra corta: nº de piezas. */
-  meta?: string;
+  meta?: React.ReactNode;
   aside?: React.ReactNode;
   className?: string;
 }) {

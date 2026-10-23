@@ -4,10 +4,7 @@ import Footer from "@/components/Footer";
 import { Brackets, XStack } from "@/components/Hud";
 import PhotoGallery from "@/components/PhotoGallery";
 import SectionHeader from "@/components/SectionHeader";
-import { PHOTOS } from "@/lib/photos";
 import { dictFor, isLang } from "@/lib/i18n";
-
-const count = String(PHOTOS.length).padStart(2, "0");
 
 /** Espécimen de la cabecera: "Snow Peak" tramado, dentro de un marco de visor. */
 function HeaderSpecimen() {
@@ -42,7 +39,18 @@ export default async function PhotographyPage({ params }: { params: Promise<{ la
           eyebrow={t.photoEyebrow}
           title={t.photoTitle}
           code={t.photoCode}
-          meta={t.frames(count)}
+          meta={
+            <a
+              href="https://www.instagram.com/antonio10bc/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram @antonio10bc"
+              data-track="instagram_clicked"
+              className="normal-case tracking-normal underline decoration-1 underline-offset-4 transition-opacity duration-300 hover:opacity-60"
+            >
+              @antonio10bc
+            </a>
+          }
           intro={t.photoIntro}
           aside={<HeaderSpecimen />}
         />
