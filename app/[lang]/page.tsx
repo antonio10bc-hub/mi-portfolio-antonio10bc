@@ -89,7 +89,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
                   "try{if(sessionStorage.getItem('treeIntro')!=='1'&&!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.dataset.treeIntro='1'}catch(e){}",
               }}
             />
-            <TreeSpecimen alt={t.treeAlt} scanLabel={t.treeScan} />
+            <TreeSpecimen alt={t.treeAlt} />
           </div>
 
           {/* Nombre */}
