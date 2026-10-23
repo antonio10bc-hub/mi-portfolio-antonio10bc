@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import Footer from "@/components/Footer";
+import TreeSpecimen from "@/components/TreeSpecimen";
 import { Arrow, Barcode, Brackets, CornerMark, DataBars, Diamonds, Dots, Leader, XStack } from "@/components/Hud";
 import { PHOTOS } from "@/lib/photos";
 import { PROJECTS } from "@/lib/projects";
@@ -81,14 +81,15 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
             className="reveal relative h-[calc((100vw-2rem)*0.707)] min-h-0 grow shrink
                        md:col-start-3 md:col-end-12 md:row-start-1 md:row-end-4 md:h-auto"
           >
-            <Image
-              src="/images/dither/tree.png"
-              alt={t.treeAlt}
-              fill
-              priority
-              unoptimized
-              className="object-contain"
+            {/* Antes de pintar nada: si en esta sesión toca la impresión del árbol,
+                se marca para que tree.png no asome antes de que el canvas tome el relevo. */}
+            <script
+              dangerouslySetInnerHTML={{
+                __html:
+                  "try{if(sessionStorage.getItem('treeIntro')!=='1'&&!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.dataset.treeIntro='1'}catch(e){}",
+              }}
             />
+            <TreeSpecimen alt={t.treeAlt} scanLabel={t.treeScan} />
           </div>
 
           {/* Nombre */}

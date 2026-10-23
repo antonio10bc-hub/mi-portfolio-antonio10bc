@@ -141,3 +141,19 @@
     animation: none;
   }
 }
+
+/*
+ * Impresión del árbol de la home: el script de arranque marca <html data-tree-intro>
+ * en la primera visita de la sesión, y tree.png no se pinta hasta que el canvas
+ * (TreeSpecimen) lo sustituye. Si el JavaScript fallara, aparece igualmente a los 3 s.
+ */
+[data-tree-intro] .tree-png {
+  opacity: 0;
+  animation: tree-fallback 0s linear 3s forwards;
+}
+
+@keyframes tree-fallback {
+  to {
+    opacity: 1;
+  }
+}
