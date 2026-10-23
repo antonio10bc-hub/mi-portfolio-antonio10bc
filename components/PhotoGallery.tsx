@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Brackets } from "@/components/Hud";
 import { track } from "@/lib/analytics";
 import { PHOTOS } from "@/lib/photos";
+import { DICTS, type Lang } from "@/lib/i18n";
 
 const FEATURED_SIZES = "(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 66vw";
 const GRID_SIZES = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw";
@@ -27,7 +28,9 @@ function Chevron({ direction }: { direction: "left" | "right" }) {
   );
 }
 
-export default function PhotoGallery() {
+export default function PhotoGallery({ lang }: { lang: Lang }) {
+  const t = DICTS[lang];
+  const altOf = (p: (typeof PHOTOS)[number]) => (lang === "es" ? p.altEs : p.alt);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const selectedPhoto = selectedIndex !== null ? PHOTOS[selectedIndex] : null;
   const closeModal = useCallback(() => setSelectedIndex(null), []);
@@ -86,14 +89,14 @@ export default function PhotoGallery() {
               track("photo_opened", { photo: photo.title, frame: index + 1 });
               setSelectedIndex(index);
             }}
-            aria-label={`Open photo: ${photo.title}`}
+            aria-label={t.openPhoto(photo.title)}
             style={{ animationDelay: `${120 + Math.min(index, 8) * 60}ms` }}
             className={`reveal group relative w-full overflow-hidden bg-panel
                         ${isFirst ? "md:col-span-2 aspect-[16/10]" : "aspect-[4/5]"}`}
           >
             <Image
               src={photo.src}
-              alt={photo.alt}
+              alt={altOf(photo)}
               fill
               priority={isFirst}
               sizes={isFirst ? FEATURED_SIZES : GRID_SIZES}
@@ -143,7 +146,7 @@ export default function PhotoGallery() {
           >
             <button
               onClick={handlePrevious}
-              aria-label="Previous photo"
+              aria-label={t.previousPhoto}
               className="absolute left-3 top-1/2 z-10 -translate-y-1/2 p-3 md:left-8 md:p-4
                          border border-paper/30 bg-ink text-paper transition-colors duration-300 hover:bg-paper hover:text-ink"
             >
@@ -152,7 +155,7 @@ export default function PhotoGallery() {
 
             <button
               onClick={handleNext}
-              aria-label="Next photo"
+              aria-label={t.nextPhoto}
               className="absolute right-3 top-1/2 z-10 -translate-y-1/2 p-3 md:right-8 md:p-4
                          border border-paper/30 bg-ink text-paper transition-colors duration-300 hover:bg-paper hover:text-ink"
             >
@@ -161,7 +164,7 @@ export default function PhotoGallery() {
 
             <button
               onClick={closeModal}
-              aria-label="Close"
+              aria-label={t.close}
               className="absolute right-4 top-4 z-10 p-2.5 md:right-8 md:top-8
                          border border-paper/30 bg-ink text-paper transition-colors duration-300 hover:bg-paper hover:text-ink"
             >
@@ -178,7 +181,7 @@ export default function PhotoGallery() {
               <div className="relative h-full max-h-[78vh] w-full overflow-hidden">
                 <Image
                   src={selectedPhoto.src}
-                  alt={selectedPhoto.alt}
+                  alt={altOf(selectedPhoto)}
                   fill
                   priority
                   sizes="100vw"

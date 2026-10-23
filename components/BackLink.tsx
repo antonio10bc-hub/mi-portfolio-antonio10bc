@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Arrow } from "@/components/Hud";
 
-export default function BackLink({ className = "" }: { className?: string }) {
+export default function BackLink({ label, className = "" }: { label: string; className?: string }) {
   return (
     <Link
       href="/"
@@ -9,7 +9,7 @@ export default function BackLink({ className = "" }: { className?: string }) {
                   transition-colors duration-300 hover:bg-ink hover:text-paper ${className}`}
     >
       <Arrow direction="left" className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-x-0.5" />
-      Back
+      {label}
     </Link>
   );
 }

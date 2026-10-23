@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { Arrow, Barcode, Brackets, CornerMark, DataBars, Diamonds, Dots, Leader, XStack } from "@/components/Hud";
 import { PHOTOS } from "@/lib/photos";
 import { PROJECTS } from "@/lib/projects";
+import { dictFor } from "@/lib/i18n";
 
 /*
  * La home es el índice del archivo: el árbol tramado ("Solitude") como
@@ -17,6 +18,7 @@ import { PROJECTS } from "@/lib/projects";
 
 function SectionPanel({
   href,
+  section,
   number,
   meta,
   title,
@@ -25,6 +27,8 @@ function SectionPanel({
   className,
 }: {
   href: string;
+  /** Nombre fijo para las analíticas (no cambia con el idioma) */
+  section: string;
   number: string;
   meta: string;
   title: string;
@@ -37,7 +41,7 @@ function SectionPanel({
     <Link
       href={href}
       data-track="section_clicked"
-      data-track-section={title.replace(".", "")}
+      data-track-section={section}
       className={`group relative z-10 block shrink-0 px-7 py-4 transition-colors duration-500 ease-smooth md:p-8
                   ${dark ? "bg-graphite text-paper hover:bg-ink" : "bg-panel/85 text-ink hover:bg-panel"} ${className}`}
     >
@@ -57,7 +61,8 @@ function SectionPanel({
   );
 }
 
-export default function Home() {
+export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
+  const t = dictFor((await params).lang);
   return (
     // La home entra entera en pantalla, footer incluido, pero sin recortar:
     // si en algun dispositivo no cupiese, hace scroll en lugar de cortarse.
@@ -78,7 +83,7 @@ export default function Home() {
           >
             <Image
               src="/images/dither/tree.png"
-              alt="Solitude, a lone tree, printed as a halftone"
+              alt={t.treeAlt}
               fill
               priority
               unoptimized
@@ -90,11 +95,11 @@ export default function Home() {
           <div className="reveal relative z-10 order-first shrink-0 md:order-none md:col-start-1 md:col-end-8 md:row-start-1">
             <div className="flex items-center gap-3">
               <Dots />
-              <span className="code text-[11px] md:text-xs">File 00 // Index</span>
+              <span className="code text-[11px] md:text-xs">{t.homeCode}</span>
             </div>
             <h1 className="display mt-2 text-[clamp(3.5rem,min(13vw,15vh),10rem)] md:mt-3">antonio.</h1>
             <div className="mt-2 flex items-start gap-4 md:mt-3">
-              <p className="font-mono text-xs md:text-sm">Photography &amp; Creative Game Design.</p>
+              <p className="font-mono text-xs md:text-sm">{t.homeTagline}</p>
               <Leader length={170} drop={44} className="mt-2 hidden shrink-0 lg:block" />
             </div>
           </div>
@@ -105,20 +110,22 @@ export default function Home() {
 
           <SectionPanel
             href="/photography"
+            section="photography"
             number="01"
-            meta={`${PHOTOS.length} frames`}
-            title="photography."
-            description="Places where I found beauty."
+            meta={t.frames(PHOTOS.length)}
+            title={t.photoPanelTitle}
+            description={t.photoPanelText}
             tone="light"
             className="reveal md:col-start-8 md:col-end-13 md:row-start-2 md:self-center"
           />
 
           <SectionPanel
             href="/projects"
+            section="games"
             number="02"
-            meta={`${PROJECTS.length} games`}
-            title="games."
-            description="Experiments & code, shipped."
+            meta={t.games(PROJECTS.length)}
+            title={t.gamesPanelTitle}
+            description={t.gamesPanelText}
             tone="dark"
             className="reveal md:col-start-1 md:col-end-6 md:row-start-3 md:self-end"
           />

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Arrow, Barcode, Brackets, Dots } from "@/components/Hud";
 import type { Project } from "@/lib/projects";
+import type { Dict } from "@/lib/i18n";
 
 /**
  * Ficha de un juego: código de proyecto, la captura real dentro de un panel
@@ -11,9 +12,13 @@ import type { Project } from "@/lib/projects";
 export default function ProjectCard({
   project,
   index,
+  t,
+  lang,
 }: {
   project: Project;
   index: number;
+  t: Dict;
+  lang: string;
 }) {
   const number = String(index + 1).padStart(2, "0");
 
@@ -29,8 +34,8 @@ export default function ProjectCard({
     >
       <div className="flex items-center gap-3">
         <Dots />
-        <span className="code text-[11px] md:text-xs">Project code: G-{number}</span>
-        <span className="label ml-auto text-ink">Game</span>
+        <span className="code text-[11px] md:text-xs">{t.projectCode}: G-{number}</span>
+        <span className="label ml-auto text-ink">{t.game}</span>
       </div>
 
       <div className="relative mt-3 bg-panel p-4 md:p-6">
@@ -41,7 +46,7 @@ export default function ProjectCard({
               generaba al vuelo y tardaban en aparecer). Las dos primeras se piden ya. */}
           <Image
             src={project.screenshot}
-            alt={`${project.name} screenshot`}
+            alt={t.screenshot(project.name)}
             fill
             unoptimized
             priority={index < 2}
@@ -55,14 +60,14 @@ export default function ProjectCard({
         <span className="code shrink-0 text-xs text-mute">#{number}</span>
       </div>
 
-      <p className="datatext mt-3 flex-1">{project.tagline}</p>
+      <p className="datatext mt-3 flex-1">{lang === "es" ? project.taglineEs : project.tagline}</p>
 
       <div className="mt-5 flex items-center gap-4">
         <span
           className="code inline-flex items-center gap-2 border-2 border-ink px-3 py-1.5 text-[11px]
                      transition-colors duration-300 group-hover:bg-ink group-hover:text-paper"
         >
-          Play
+          {t.play}
           <Arrow className="h-3.5 w-3.5" />
         </span>
         <Barcode seed={project.name} className="hidden h-8 flex-1 md:block" />

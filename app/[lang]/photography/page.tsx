@@ -5,6 +5,7 @@ import { Brackets, XStack } from "@/components/Hud";
 import PhotoGallery from "@/components/PhotoGallery";
 import SectionHeader from "@/components/SectionHeader";
 import { PHOTOS } from "@/lib/photos";
+import { dictFor, isLang } from "@/lib/i18n";
 
 const count = String(PHOTOS.length).padStart(2, "0");
 
@@ -28,24 +29,26 @@ function HeaderSpecimen() {
   );
 }
 
-export default function PhotographyPage() {
+export default async function PhotographyPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+  const t = dictFor(lang);
   return (
     <div className="min-h-screen-safe w-full bg-paper font-sans text-ink">
       <div className="mx-auto flex min-h-screen-safe w-full max-w-6xl flex-col px-4 py-5 md:px-8 md:py-8">
-        <BackLink />
+        <BackLink label={t.back} />
 
         <SectionHeader
           className="reveal mt-6 md:mt-8"
-          eyebrow="Gallery"
-          title="Photography"
-          code="File 01 // Frames"
-          meta={`${count} frames`}
-          intro="Landscapes, cities and the odd quiet corner. Click any frame to open it full screen."
+          eyebrow={t.photoEyebrow}
+          title={t.photoTitle}
+          code={t.photoCode}
+          meta={t.frames(count)}
+          intro={t.photoIntro}
           aside={<HeaderSpecimen />}
         />
 
         <div className="mt-8 grid grid-cols-1 gap-4 md:mt-12 md:grid-cols-2 md:gap-5 lg:grid-cols-3">
-          <PhotoGallery />
+          <PhotoGallery lang={isLang(lang) ? lang : "en"} />
         </div>
 
         <Footer className="mt-16 md:mt-24" />

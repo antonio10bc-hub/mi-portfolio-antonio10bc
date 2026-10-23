@@ -4,15 +4,16 @@ import { Barcode, DataBars, Diamonds, PixelGlyph, Slashes } from "@/components/H
 import ProjectCard from "@/components/ProjectCard";
 import SectionHeader from "@/components/SectionHeader";
 import { PROJECTS } from "@/lib/projects";
+import { dictFor, type Dict } from "@/lib/i18n";
 
 const count = String(PROJECTS.length).padStart(2, "0");
 
 /** Columna de datos de la cabecera: textura, no información. */
-function HeaderData() {
+function HeaderData({ t }: { t: Dict }) {
   return (
     <div aria-hidden className="hidden text-ink md:block">
       <div className="flex items-center justify-between">
-        <Slashes className="text-sm">Index</Slashes>
+        <Slashes className="text-sm">{t.index}</Slashes>
         <div className="flex items-center gap-3">
           <Diamonds />
           <PixelGlyph mask={0b110011101} />
@@ -24,32 +25,34 @@ function HeaderData() {
   );
 }
 
-export default function ProjectsPage() {
+export default async function ProjectsPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+  const t = dictFor(lang);
   return (
     <div className="min-h-screen-safe w-full bg-paper font-sans text-ink">
       <div className="mx-auto flex min-h-screen-safe w-full max-w-6xl flex-col px-4 py-5 md:px-8 md:py-8">
-        <BackLink />
+        <BackLink label={t.back} />
 
         <SectionHeader
           className="reveal mt-6 md:mt-8"
-          eyebrow="Selected work"
-          title="Games"
-          code="File 02 // Browser games"
-          meta={`${count} games`}
+          eyebrow={t.gamesEyebrow}
+          title={t.gamesTitle}
+          code={t.gamesCode}
+          meta={t.games(count)}
           intro={
             <>
-              Small games, built end to end and shipped.
+              {t.gamesIntro1}
               <br />
-              Each one runs in the browser, no install needed.
+              {t.gamesIntro2}
             </>
           }
-          aside={<HeaderData />}
+          aside={<HeaderData t={t} />}
         />
 
         <div className="mt-10 grid grid-cols-1 gap-x-10 gap-y-14 md:mt-14 md:grid-cols-2 md:gap-y-20">
           {PROJECTS.map((project, index) => (
             <div key={project.name} className="reveal" style={{ animationDelay: `${80 + index * 70}ms` }}>
-              <ProjectCard project={project} index={index} />
+              <ProjectCard project={project} index={index} t={t} lang={lang} />
             </div>
           ))}
         </div>
