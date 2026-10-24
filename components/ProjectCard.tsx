@@ -1,4 +1,4 @@
-import Image from "next/image";
+import GameMedia from "@/components/GameMedia";
 import { Arrow, Barcode, Brackets, Dots } from "@/components/Hud";
 import type { Project } from "@/lib/projects";
 import type { Dict } from "@/lib/i18n";
@@ -43,15 +43,16 @@ export default function ProjectCard({
         <div className="relative aspect-[16/10] overflow-hidden" style={{ backgroundColor: project.tint }}>
           {/* Las capturas ya son WebP de 1280px optimizados: se sirven tal cual desde
               el CDN, sin pasar por el optimizador (que en la primera visita las
-              generaba al vuelo y tardaban en aparecer). Las dos primeras se piden ya. */}
-          <Image
-            src={project.screenshot}
-            alt={t.screenshot(project.name)}
-            fill
-            unoptimized
-            priority={index < 2}
-            className="object-cover transition-transform duration-700 ease-smooth group-hover:scale-[1.03] motion-reduce:group-hover:scale-100"
-          />
+              generaba al vuelo y tardaban en aparecer). Las dos primeras se piden ya.
+              Encima, el vídeo del juego en bucle (GameMedia). */}
+          <div className="absolute inset-0 transition-transform duration-700 ease-smooth group-hover:scale-[1.03] motion-reduce:group-hover:scale-100">
+            <GameMedia
+              screenshot={project.screenshot}
+              video={project.video}
+              alt={t.screenshot(project.name)}
+              priority={index < 2}
+            />
+          </div>
         </div>
       </div>
 
