@@ -42,6 +42,23 @@ const en = {
   previousPhoto: "Previous photo",
   nextPhoto: "Next photo",
   close: "Close",
+  // Metadatos por página (título de pestaña, buscadores y enlaces compartidos)
+  homeTitle: "Antonio Asis: Photography & Creative Game Design",
+  homeDescription: "Portfolio of Antonio Asis Bastos de Cordoba, from Madrid: landscape and city photography, and small browser games built end to end.",
+  photoMetaTitle: "Photography",
+  photoMetaDescription: "Landscapes, cities and quiet corners photographed by Antonio Asis, frame by frame from the archive.",
+  gamesMetaTitle: "Games",
+  gamesMetaDescription: (names: string) => `Browser games designed and built by Antonio Asis: ${names}. Free to play, no install.`,
+  and: "and",
+  ogAlt: "A halftone tree and the words antonio., photography and creative game design",
+  // Idioma
+  langLabel: "Language",
+  // 404
+  notFoundMetaTitle: "Not found",
+  notFoundCode: "Error 404 // File missing",
+  notFoundTitle: "lost",
+  notFoundText: "This specimen is not in the archive. It may have moved, or it never existed.",
+  notFoundBack: "Back to the index",
 };
 
 export type Dict = typeof en;
@@ -79,6 +96,20 @@ const es: Dict = {
   previousPhoto: "Foto anterior",
   nextPhoto: "Foto siguiente",
   close: "Cerrar",
+  homeTitle: "Antonio Asis: fotografía y diseño creativo de juegos",
+  homeDescription: "Portfolio de Antonio Asis Bastos de Cordoba, desde Madrid: fotografía de paisajes y ciudades, y pequeños juegos de navegador hechos de principio a fin.",
+  photoMetaTitle: "Fotografía",
+  photoMetaDescription: "Paisajes, ciudades y rincones tranquilos fotografiados por Antonio Asis, fotograma a fotograma desde el archivo.",
+  gamesMetaTitle: "Juegos",
+  gamesMetaDescription: (names) => `Juegos de navegador diseñados y programados por Antonio Asis: ${names}. Gratis y sin instalar nada.`,
+  and: "y",
+  ogAlt: "Un árbol en semitono y las palabras antonio., fotografía y diseño creativo de juegos",
+  langLabel: "Idioma",
+  notFoundMetaTitle: "No encontrado",
+  notFoundCode: "Error 404 // Expediente perdido",
+  notFoundTitle: "perdido",
+  notFoundText: "Este espécimen no está en el archivo. Puede que se haya movido, o que nunca existiera.",
+  notFoundBack: "Volver al índice",
 };
 
 export const DICTS: Record<Lang, Dict> = { en, es };

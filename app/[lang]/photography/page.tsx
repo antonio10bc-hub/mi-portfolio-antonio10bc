@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Image from "next/image";
 import BackLink from "@/components/BackLink";
 import Footer from "@/components/Footer";
@@ -24,6 +26,12 @@ function HeaderSpecimen() {
       </div>
     </div>
   );
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params;
+  const t = dictFor(lang);
+  return pageMetadata(lang, { title: t.photoMetaTitle, description: t.photoMetaDescription, path: "/photography" });
 }
 
 export default async function PhotographyPage({ params }: { params: Promise<{ lang: string }> }) {
@@ -59,7 +67,7 @@ export default async function PhotographyPage({ params }: { params: Promise<{ la
           <PhotoGallery lang={isLang(lang) ? lang : "en"} />
         </div>
 
-        <Footer className="mt-16 md:mt-24" />
+        <Footer lang={lang} className="mt-16 md:mt-24" />
       </div>
     </div>
   );

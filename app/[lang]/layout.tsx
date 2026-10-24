@@ -6,6 +6,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import PageTransition from "@/components/PageTransition";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
 import { LANGS, dictFor } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
+import { PERSON, SITE_URL } from "@/lib/site";
 
 // Archivo con el eje de ancho: los titulares van a wdth 62 (ver .display).
 const archivo = Archivo({
@@ -26,14 +28,16 @@ export const dynamicParams = false;
 export const generateStaticParams = () => LANGS.map((lang) => ({ lang }));
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
-  const t = dictFor((await params).lang);
-  const title = t.siteTitle;
-  const description = t.siteDescription;
+  const { lang } = await params;
+  const t = dictFor(lang);
   return {
-    title,
-    description,
-    openGraph: { title, description, type: "website", locale: t.ogLocale },
-    twitter: { card: "summary_large_image", title, description },
+    metadataBase: new URL(SITE_URL),
+    // Las páginas dan su título ("Games") y la plantilla añade el nombre.
+    title: { default: t.homeTitle, template: "%s | Antonio Asis" },
+    applicationName: "Antonio Asis",
+    authors: [{ name: PERSON.name, url: SITE_URL }],
+    creator: PERSON.name,
+    ...pageMetadata(lang, { description: t.homeDescription, path: "/" }),
     // Nombre bajo el icono al añadir a la pantalla de inicio en iOS.
     appleWebApp: { title: "Antonio", statusBarStyle: "default" },
   };

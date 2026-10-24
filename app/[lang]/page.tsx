@@ -5,6 +5,8 @@ import { Arrow, Barcode, Brackets, CornerMark, DataBars, Diamonds, Dots, Leader,
 import { PHOTOS } from "@/lib/photos";
 import { PROJECTS } from "@/lib/projects";
 import { dictFor } from "@/lib/i18n";
+import JsonLd from "@/components/JsonLd";
+import { PERSON, SITE_URL } from "@/lib/site";
 
 /*
  * La home es el índice del archivo: el árbol tramado ("Solitude") como
@@ -62,12 +64,39 @@ function SectionPanel({
 }
 
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
-  const t = dictFor((await params).lang);
+  const { lang } = await params;
+  const t = dictFor(lang);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": `${SITE_URL}/#person`,
+        name: PERSON.name,
+        alternateName: PERSON.shortName,
+        url: SITE_URL,
+        image: `${SITE_URL}/icons/icon-512.png`,
+        jobTitle: t.homeTagline.replace(/\.$/, ""),
+        address: { "@type": "PostalAddress", addressLocality: PERSON.city, addressCountry: PERSON.country },
+        sameAs: [PERSON.instagram, PERSON.github],
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
+        url: SITE_URL,
+        name: "Antonio Asis",
+        description: t.homeDescription,
+        inLanguage: ["en", "es"],
+        publisher: { "@id": `${SITE_URL}/#person` },
+      },
+    ],
+  };
   return (
     // La home entra entera en pantalla, footer incluido, pero sin recortar:
     // si en algun dispositivo no cupiese, hace scroll en lugar de cortarse.
     <div className="min-h-screen-safe w-full bg-paper font-sans text-ink">
       <main className="mx-auto flex min-h-screen-safe h-screen-safe-mobile w-full max-w-6xl flex-col gap-3 px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:gap-4 md:px-8 md:py-5">
+        <JsonLd data={jsonLd} />
 
         <div
           className="relative flex min-h-0 flex-1 flex-col gap-3
@@ -140,7 +169,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
           </div>
         </div>
 
-        <Footer className="mt-1" />
+        <Footer lang={lang} className="mt-1" />
       </main>
     </div>
   );
