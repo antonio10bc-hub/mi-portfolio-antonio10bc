@@ -34,7 +34,7 @@ export default function SectionHeader({
         <span className="label text-ink">{eyebrow}</span>
       </div>
 
-      <h1 className="display mt-4 text-[clamp(3.25rem,16vw,12rem)] text-ink">{title}.</h1>
+      <h1 className="display halftone-title mt-4 text-[clamp(3.25rem,16vw,12rem)] text-ink">{title}.</h1>
 
       <div className="mt-6 grid grid-cols-1 gap-8 md:mt-8 md:grid-cols-12 md:gap-6">
         <div className="md:col-span-5">

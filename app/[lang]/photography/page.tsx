@@ -3,8 +3,8 @@ import { pageMetadata } from "@/lib/seo";
 import Image from "next/image";
 import FileNav from "@/components/FileNav";
 import { PHOTOS } from "@/lib/photos";
-import { PROJECTS } from "@/lib/projects";
 import NextFile from "@/components/NextFile";
+import SpecList from "@/components/SpecList";
 import Footer from "@/components/Footer";
 import { Brackets, XStack } from "@/components/Hud";
 import PhotoGallery from "@/components/PhotoGallery";
@@ -13,24 +13,16 @@ import { dictFor, isLang, type Dict } from "@/lib/i18n";
 
 /** Ficha del visor, bajo la intro: cuántos fotogramas hay y cómo se recorren. */
 function ViewerSpec({ t }: { t: Dict }) {
-  const rows = [
-    [t.framesLabel, String(PHOTOS.length).padStart(2, "0")],
-    [t.browse, "\u2190 \u2192"],
-    [t.close, "Esc"],
-  ];
   return (
-    <div className="mt-8 hidden max-w-md md:block">
-      <span className="label text-ink">{t.viewer}</span>
-      <dl className="mt-2 border-t-2 border-ink">
-        {rows.map(([term, value]) => (
-          <div key={term} className="flex items-baseline gap-3 border-b border-ink/15 py-2 text-ink">
-            <dt className="font-mono text-xs">{term}</dt>
-            <span aria-hidden className="min-w-4 flex-1 -translate-y-1 border-b border-dotted border-ink/40" />
-            <dd className="code pr-1 text-[11px]">{value}</dd>
-          </div>
-        ))}
-      </dl>
-    </div>
+    <SpecList
+      title={t.viewer}
+      className="mt-8 hidden max-w-md md:block"
+      rows={[
+        [t.framesLabel, String(PHOTOS.length).padStart(2, "0")],
+        [t.browse, "\u2190 \u2192"],
+        [t.close, "Esc"],
+      ]}
+    />
   );
 }
 
@@ -101,9 +93,6 @@ export default async function PhotographyPage({ params }: { params: Promise<{ la
           code={t.gamesCode}
           title={t.gamesPanelTitle}
           text={t.gamesPanelText}
-          // Las capturas ya son WebP de 1280px: tal cual, como en las fichas.
-          previews={PROJECTS.map((project) => ({ src: project.screenshot, unoptimized: true }))}
-          previewClassName="grid-cols-3 md:grid-cols-5 [&>*]:aspect-[16/10] [&>*:nth-child(n+4)]:hidden md:[&>*:nth-child(n+4)]:block"
           className="mt-14 md:mt-20"
         />
 

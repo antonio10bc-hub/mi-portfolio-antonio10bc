@@ -3,13 +3,13 @@ import { pageMetadata } from "@/lib/seo";
 import { PERSON, SITE_URL, listJoin } from "@/lib/site";
 import JsonLd from "@/components/JsonLd";
 import FileNav from "@/components/FileNav";
-import NextFile from "@/components/NextFile";
+import Link from "next/link";
+import SpecList from "@/components/SpecList";
 import Footer from "@/components/Footer";
-import { Barcode, DataBars, Diamonds, PixelGlyph, Slashes } from "@/components/Hud";
+import { Arrow, Barcode, DataBars, Diamonds, Dots, PixelGlyph, Slashes } from "@/components/Hud";
 import ProjectCard from "@/components/ProjectCard";
 import SectionHeader from "@/components/SectionHeader";
 import { PROJECTS } from "@/lib/projects";
-import { PHOTOS } from "@/lib/photos";
 import { dictFor, type Dict } from "@/lib/i18n";
 
 const count = String(PROJECTS.length).padStart(2, "0");
@@ -43,6 +43,56 @@ function Contents({ t }: { t: Dict }) {
         ))}
       </ol>
     </nav>
+  );
+}
+
+/**
+ * Cierre del expediente: un panel secundario (borde discontinuo, como pide la
+ * dirección de arte) con la ficha común a todos los juegos y la salida al otro
+ * expediente. Va dentro de la rejilla: con un número impar de juegos ocupa la
+ * celda libre de la última fila. No lleva imágenes: es el final de los juegos,
+ * no un adelanto de Fotografía.
+ */
+function EndOfFile({ t, className = "" }: { t: Dict; className?: string }) {
+  return (
+    <div className={`flex min-h-[18rem] flex-col justify-between gap-10 border-2 border-dashed border-ink p-6 text-ink md:p-8 ${className}`}>
+      <div>
+        <div className="flex items-center gap-3">
+          <Dots />
+          <span className="code whitespace-nowrap text-[11px] md:text-xs">{t.endOfFile}</span>
+          <span className="code ml-auto text-[11px] text-mute md:text-xs">{count} / {count}</span>
+        </div>
+        <p className="display mt-6 text-[clamp(4rem,9vw,8rem)]">{t.endTitle}.</p>
+      </div>
+
+      <SpecList
+        title={t.specs}
+        rows={[
+          [t.gamesTitle, count],
+          [t.platform, t.browser],
+          [t.install, t.none],
+          [t.price, t.free],
+        ]}
+      />
+
+      <div className="flex items-center gap-4">
+        <Link
+          href="/photography"
+          data-track="next_file_clicked"
+          data-track-section="photography"
+          className="group code inline-flex items-center gap-2 whitespace-nowrap border-2 border-ink px-3 py-1.5 text-[11px]
+                     transition-colors duration-300 hover:bg-ink hover:text-paper"
+        >
+          {/* "Siguiente expediente //" solo desde xl: en media celda a 768 partía el botón. */}
+          <span className="hidden xl:inline">
+            {t.nextFile} <span aria-hidden>{"//"}</span>
+          </span>
+          {t.photoTitle}
+          <Arrow direction="right" className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+        </Link>
+        <Barcode seed="end-of-file" className="hidden h-8 flex-1 xl:block" />
+      </div>
+    </div>
   );
 }
 
@@ -130,16 +180,7 @@ export default async function ProjectsPage({ params }: { params: Promise<{ lang:
 
           {/* Con un número impar de juegos ocupa la celda libre de la última fila;
               con uno par, va a todo el ancho. */}
-          <NextFile
-            href="/photography"
-            section="photography"
-            label={t.nextFile}
-            code={t.photoCode}
-            title={t.photoPanelTitle}
-            text={t.photoPanelText}
-            previews={[0, 2, 4, 6, 8, 12].map((i) => ({ src: PHOTOS[i].src }))}
-            className={`reveal ${PROJECTS.length % 2 === 0 ? "md:col-span-2" : ""}`}
-          />
+          <EndOfFile t={t} className={`reveal ${PROJECTS.length % 2 === 0 ? "md:col-span-2" : ""}`} />
         </div>
 
         <Footer lang={lang} className="mt-16 md:mt-24" />

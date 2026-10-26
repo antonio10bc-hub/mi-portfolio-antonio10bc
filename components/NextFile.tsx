@@ -1,12 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Arrow, Barcode, Dots } from "@/components/Hud";
 
 /**
  * Cierre de una página interior: el panel grafito que lleva al otro expediente,
- * el mismo lenguaje que el panel "games." de la home. En /projects ocupa la
- * celda que deja libre un número impar de juegos; en /photography va a todo el
- * ancho antes del pie.
+ * el mismo lenguaje que el panel "games." de la home. Va a todo el ancho antes
+ * del pie de /photography. Sin imágenes del otro expediente: no es un adelanto.
  */
 export default function NextFile({
   href,
@@ -15,8 +13,6 @@ export default function NextFile({
   code,
   title,
   text,
-  previews = [],
-  previewClassName = "grid-cols-3 [&>*]:aspect-[4/3]",
   className = "",
 }: {
   href: string;
@@ -27,10 +23,6 @@ export default function NextFile({
   code: string;
   title: string;
   text: string;
-  /** Hoja de contactos del expediente de destino: el color lo pone el contenido. */
-  previews?: { src: string; unoptimized?: boolean }[];
-  /** Columnas y proporción de la hoja de contactos. */
-  previewClassName?: string;
   className?: string;
 }) {
   return (
@@ -48,24 +40,6 @@ export default function NextFile({
             el español ("Siguiente expediente", "Expediente 01 // ...") no cabe. */}
         <span className="code ml-auto hidden whitespace-nowrap text-[11px] md:text-xs xl:inline">{code}</span>
       </div>
-
-      {previews.length > 0 && (
-        <div aria-hidden className={`grid gap-2 ${previewClassName}`}>
-          {previews.map((preview) => (
-            <div key={preview.src} className="relative overflow-hidden bg-ink">
-              <Image
-                src={preview.src}
-                alt=""
-                fill
-                unoptimized={preview.unoptimized}
-                sizes="(max-width: 768px) 33vw, 16vw"
-                className="object-cover opacity-90 transition-[opacity,transform] duration-700 ease-smooth
-                           group-hover:scale-[1.04] group-hover:opacity-100 motion-reduce:group-hover:scale-100"
-              />
-            </div>
-          ))}
-        </div>
-      )}
 
       <div>
         <div className="flex items-end justify-between gap-4 border-b-2 border-paper pb-3">

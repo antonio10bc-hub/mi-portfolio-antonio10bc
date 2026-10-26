@@ -38,9 +38,9 @@ export default function ProjectCard({
         <span className="label ml-auto text-ink">{t.game}</span>
       </div>
 
-      <div className="relative mt-3 bg-panel p-4 md:p-6">
-        <Brackets size={22} weight={2} inset={8} className="z-10 text-ink" />
-        <div className="relative aspect-[16/10] overflow-hidden" style={{ backgroundColor: project.tint }}>
+      <div className="halftone-host relative mt-3 bg-panel p-4 md:p-6">
+        <Brackets size={22} weight={2} inset={8} className="z-10 text-ink transition-[inset] duration-500 ease-smooth group-hover:!inset-[3px]" />
+        <div className="halftone-in relative aspect-[16/10] overflow-hidden" style={{ backgroundColor: project.tint }}>
           {/* Las capturas ya son WebP de 1280px optimizados: se sirven tal cual desde
               el CDN, sin pasar por el optimizador (que en la primera visita las
               generaba al vuelo y tardaban en aparecer). Las dos primeras se piden ya.

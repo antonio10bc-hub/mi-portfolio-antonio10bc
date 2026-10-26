@@ -166,3 +166,61 @@
     opacity: 1;
   }
 }
+
+/*
+ * Impresión en semitono: fotos, capturas y titulares aparecen como una trama de
+ * puntos que crecen hasta cerrar la imagen, como el árbol de la home. Es una
+ * máscara de puntos (radial-gradient con borde duro, no un degradado visible) cuyo
+ * radio se anima: con celdas de 10px, a 7.5px los puntos ya se solapan y la imagen
+ * queda entera. Las imágenes van con el scroll; los titulares, al cargar.
+ * La línea de tiempo es una `view-timeline` con nombre en `.halftone-host`, no
+ * `view()` en la propia imagen: el botón de cada foto lleva `overflow: hidden`, eso
+ * lo convierte en contenedor de scroll, y `view()` mediría la imagen contra él (la
+ * llena entera, así que siempre "ya ha entrado") en vez de contra la página. Solo en escritorio y sin movimiento reducido; donde no hay
+ * soporte la imagen se ve sin más, que es el estado de reposo.
+ */
+@property --dot {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 7.5px;
+}
+
+@keyframes halftone-print {
+  0% { --dot: 0px; }
+  45% { --dot: 3.5px; }
+  100% { --dot: 7.5px; }
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .halftone-in,
+  .halftone-title,
+  .halftone-flash {
+    -webkit-mask-image: radial-gradient(circle, #000 var(--dot), transparent calc(var(--dot) + 0.5px));
+    mask-image: radial-gradient(circle, #000 var(--dot), transparent calc(var(--dot) + 0.5px));
+    -webkit-mask-size: 10px 10px;
+    mask-size: 10px 10px;
+    -webkit-mask-position: center;
+    mask-position: center;
+  }
+
+  .halftone-title {
+    animation: halftone-print 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+  }
+
+  /* Visor a pantalla completa: cada foto se imprime rápido al abrirla o al pasar. */
+  .halftone-flash {
+    animation: halftone-print 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @supports (animation-timeline: view()) {
+    .halftone-host {
+      view-timeline-name: --print;
+    }
+
+    .halftone-in {
+      animation: halftone-print linear both;
+      animation-timeline: --print;
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}

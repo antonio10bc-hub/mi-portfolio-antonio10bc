@@ -94,32 +94,41 @@ export default function PhotoGallery({ lang }: { lang: Lang }) {
             // En 3 columnas la destacada no lleva proporción propia: toma el alto de
             // la fila, que marca la foto 4:5 de al lado, y las dos cuadran al píxel
             // (con 16:10 fija quedaba unos 12px más alta que su vecina).
-            className={`reveal group relative w-full overflow-hidden bg-panel
+            className={`reveal halftone-host group relative w-full overflow-hidden bg-panel
                         ${isFirst ? "md:col-span-2 aspect-[16/10] lg:aspect-auto" : "aspect-[4/5]"}`}
           >
-            <Image
-              src={photo.src}
-              alt={altOf(photo)}
-              fill
-              priority={isFirst}
-              sizes={isFirst ? FEATURED_SIZES : GRID_SIZES}
-              className="object-cover transition-transform duration-[900ms] ease-smooth group-hover:scale-[1.03]"
-            />
+            {/* La foto se imprime en semitono al entrar en pantalla (globals.css). */}
+            <div className="halftone-in absolute inset-0">
+              <Image
+                src={photo.src}
+                alt={altOf(photo)}
+                fill
+                priority={isFirst}
+                sizes={isFirst ? FEATURED_SIZES : GRID_SIZES}
+                className="object-cover transition-transform duration-[900ms] ease-smooth group-hover:scale-[1.03]"
+              />
+            </div>
 
             {/* Marco de visor en papel sobre cada foto, como una cámara enfocando. La
                 sombra dura en tinta lo mantiene visible sobre cielos claros. */}
+            {/* Al pasar el ratón el visor se cierra sobre la foto, como al enfocar. */}
             <Brackets
               size={isFirst ? 28 : 22}
               weight={3}
               inset={isFirst ? 16 : 12}
-              className="text-paper [filter:drop-shadow(1px_1px_0_rgba(32,30,32,0.45))]"
+              className={`text-paper transition-[inset] duration-500 ease-smooth [filter:drop-shadow(1px_1px_0_rgba(32,30,32,0.45))]
+                          ${isFirst ? "group-hover:!inset-[30px]" : "group-hover:!inset-[22px]"}`}
             />
 
             {/* Código de fotograma: siempre visible, junto a la esquina superior
-                izquierda del marco y alineado con su línea, sin taparla. */}
+                izquierda del marco y alineado con su línea, sin taparla. Se mueve con
+                el marco al enfocar: la misma distancia que gana el `inset`. */}
             <span
               className={`code pointer-events-none absolute bg-ink px-2 py-1 text-[10px] text-paper
-                          ${isFirst ? "left-[52px] top-4" : "left-[42px] top-3"}`}
+                          transition-[left,top] duration-500 ease-smooth
+                          ${isFirst
+                            ? "left-[52px] top-4 group-hover:left-[66px] group-hover:top-[30px]"
+                            : "left-[42px] top-3 group-hover:left-[52px] group-hover:top-[22px]"}`}
             >
               FR-{String(index + 1).padStart(2, "0")}
             </span>
@@ -181,7 +190,8 @@ export default function PhotoGallery({ lang }: { lang: Lang }) {
               className="relative flex h-full w-full max-w-[90rem] flex-col items-center justify-center gap-5 cursor-default"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative h-full max-h-[78vh] w-full overflow-hidden">
+              {/* La clave reinicia la impresión en semitono con cada foto. */}
+              <div key={selectedPhoto.id} className="halftone-flash relative h-full max-h-[78vh] w-full overflow-hidden">
                 <Image
                   src={selectedPhoto.src}
                   alt={altOf(selectedPhoto)}
