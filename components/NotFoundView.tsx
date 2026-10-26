@@ -27,7 +27,7 @@ export default function NotFoundView() {
 
   return (
     <div className="min-h-screen-safe w-full bg-paper font-sans text-ink">
-      <main className="mx-auto flex min-h-screen-safe w-full max-w-6xl flex-col px-4 py-5 md:px-8 md:py-8">
+      <main className="page flex min-h-screen-safe flex-col py-5 md:py-8">
         <header className="border-b-2 border-ink pb-8 md:pb-10">
           <div className="flex items-center gap-3">
             <Dots />

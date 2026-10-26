@@ -1,12 +1,38 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import Image from "next/image";
-import BackLink from "@/components/BackLink";
+import FileNav from "@/components/FileNav";
+import { PHOTOS } from "@/lib/photos";
+import { PROJECTS } from "@/lib/projects";
+import NextFile from "@/components/NextFile";
 import Footer from "@/components/Footer";
 import { Brackets, XStack } from "@/components/Hud";
 import PhotoGallery from "@/components/PhotoGallery";
 import SectionHeader from "@/components/SectionHeader";
-import { dictFor, isLang } from "@/lib/i18n";
+import { dictFor, isLang, type Dict } from "@/lib/i18n";
+
+/** Ficha del visor, bajo la intro: cuántos fotogramas hay y cómo se recorren. */
+function ViewerSpec({ t }: { t: Dict }) {
+  const rows = [
+    [t.framesLabel, String(PHOTOS.length).padStart(2, "0")],
+    [t.browse, "\u2190 \u2192"],
+    [t.close, "Esc"],
+  ];
+  return (
+    <div className="mt-8 hidden max-w-md md:block">
+      <span className="label text-ink">{t.viewer}</span>
+      <dl className="mt-2 border-t-2 border-ink">
+        {rows.map(([term, value]) => (
+          <div key={term} className="flex items-baseline gap-3 border-b border-ink/15 py-2 text-ink">
+            <dt className="font-mono text-xs">{term}</dt>
+            <span aria-hidden className="min-w-4 flex-1 -translate-y-1 border-b border-dotted border-ink/40" />
+            <dd className="code pr-1 text-[11px]">{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
 
 /** Espécimen de la cabecera: "Snow Peak" tramado, dentro de un marco de visor. */
 function HeaderSpecimen() {
@@ -39,8 +65,8 @@ export default async function PhotographyPage({ params }: { params: Promise<{ la
   const t = dictFor(lang);
   return (
     <div className="min-h-screen-safe w-full bg-paper font-sans text-ink">
-      <div className="mx-auto flex min-h-screen-safe w-full max-w-6xl flex-col px-4 py-5 md:px-8 md:py-8">
-        <BackLink label={t.back} />
+      <div className="page flex min-h-screen-safe flex-col py-5 md:py-8">
+        <FileNav t={t} current="photography" />
 
         <SectionHeader
           className="reveal mt-6 md:mt-8"
@@ -61,11 +87,25 @@ export default async function PhotographyPage({ params }: { params: Promise<{ la
           }
           intro={t.photoIntro}
           aside={<HeaderSpecimen />}
+          contents={<ViewerSpec t={t} />}
         />
 
         <div className="mt-8 grid grid-cols-1 gap-4 md:mt-12 md:grid-cols-2 md:gap-5 lg:grid-cols-3">
           <PhotoGallery lang={isLang(lang) ? lang : "en"} />
         </div>
+
+        <NextFile
+          href="/projects"
+          section="games"
+          label={t.nextFile}
+          code={t.gamesCode}
+          title={t.gamesPanelTitle}
+          text={t.gamesPanelText}
+          // Las capturas ya son WebP de 1280px: tal cual, como en las fichas.
+          previews={PROJECTS.map((project) => ({ src: project.screenshot, unoptimized: true }))}
+          previewClassName="grid-cols-3 md:grid-cols-5 [&>*]:aspect-[16/10] [&>*:nth-child(n+4)]:hidden md:[&>*:nth-child(n+4)]:block"
+          className="mt-14 md:mt-20"
+        />
 
         <Footer lang={lang} className="mt-16 md:mt-24" />
       </div>

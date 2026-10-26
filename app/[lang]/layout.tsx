@@ -56,7 +56,9 @@ export default async function RootLayout({
 }>) {
   const t = dictFor((await params).lang);
   return (
-    <html lang={t.htmlLang}>
+    // suppressHydrationWarning: el script de arranque de la home marca
+    // data-tree-intro en <html> antes de hidratar. Solo afecta a los atributos de <html>.
+    <html lang={t.htmlLang} suppressHydrationWarning>
       <body className={`${archivo.variable} ${jetbrainsMono.variable} antialiased`}>
         <div className="relative z-10">
           <PageTransition>{children}</PageTransition>

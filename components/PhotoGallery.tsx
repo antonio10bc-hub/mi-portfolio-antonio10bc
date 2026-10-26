@@ -91,8 +91,11 @@ export default function PhotoGallery({ lang }: { lang: Lang }) {
             }}
             aria-label={t.openPhoto(photo.title)}
             style={{ animationDelay: `${120 + Math.min(index, 8) * 60}ms` }}
+            // En 3 columnas la destacada no lleva proporción propia: toma el alto de
+            // la fila, que marca la foto 4:5 de al lado, y las dos cuadran al píxel
+            // (con 16:10 fija quedaba unos 12px más alta que su vecina).
             className={`reveal group relative w-full overflow-hidden bg-panel
-                        ${isFirst ? "md:col-span-2 aspect-[16/10]" : "aspect-[4/5]"}`}
+                        ${isFirst ? "md:col-span-2 aspect-[16/10] lg:aspect-auto" : "aspect-[4/5]"}`}
           >
             <Image
               src={photo.src}
@@ -175,7 +178,7 @@ export default function PhotoGallery({ lang }: { lang: Lang }) {
             </button>
 
             <figure
-              className="relative flex h-full w-full max-w-6xl flex-col items-center justify-center gap-5 cursor-default"
+              className="relative flex h-full w-full max-w-[90rem] flex-col items-center justify-center gap-5 cursor-default"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="relative h-full max-h-[78vh] w-full overflow-hidden">

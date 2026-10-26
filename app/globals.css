@@ -56,6 +56,15 @@
     font-variation-settings: "wdth" 62;
   }
 
+  /*
+   * Contenedor de todas las páginas. En escritorio grande se abre hasta 92rem y
+   * el margen crece con la ventana: con el antiguo max-w-6xl, a 1920 un tercio
+   * de la pantalla era blanco muerto a los lados.
+   */
+  .page {
+    @apply mx-auto w-full max-w-[92rem] px-4 md:px-[clamp(2rem,4vw,4.5rem)];
+  }
+
   /* Identificadores de expediente: "PROJECT #0653", "FR-01". */
   .code {
     @apply font-mono font-bold uppercase tracking-[0.02em];

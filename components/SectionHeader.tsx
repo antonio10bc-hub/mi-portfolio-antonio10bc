@@ -12,6 +12,7 @@ export default function SectionHeader({
   intro,
   meta,
   aside,
+  contents,
   className = "",
 }: {
   eyebrow: string;
@@ -22,6 +23,8 @@ export default function SectionHeader({
   /** Cifra corta: nº de piezas. */
   meta?: React.ReactNode;
   aside?: React.ReactNode;
+  /** Bajo la intro, en la columna izquierda: el índice real del expediente. */
+  contents?: React.ReactNode;
   className?: string;
 }) {
   return (
@@ -41,6 +44,7 @@ export default function SectionHeader({
             {meta && <span className="label ml-auto text-ink">{meta}</span>}
           </div>
           {intro && <p className="datatext mt-3 max-w-md">{intro}</p>}
+          {contents}
         </div>
 
         {aside && <div className="relative md:col-span-6 md:col-start-7">{aside}</div>}

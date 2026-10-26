@@ -45,7 +45,7 @@ function SectionPanel({
       data-track="section_clicked"
       data-track-section={section}
       className={`group relative z-10 block shrink-0 px-7 py-4 transition-colors duration-500 ease-smooth md:p-8
-                  ${dark ? "bg-graphite text-paper hover:bg-ink" : "bg-panel/85 text-ink hover:bg-panel"} ${className}`}
+                  ${dark ? "bg-graphite text-paper hover:bg-ink" : "bg-panel text-ink hover:bg-ink hover:text-paper"} ${className}`}
     >
       {!dark && <Brackets size={18} weight={2} inset={8} />}
       <div className="flex items-center justify-between gap-3">
@@ -95,7 +95,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
     // La home entra entera en pantalla, footer incluido, pero sin recortar:
     // si en algun dispositivo no cupiese, hace scroll en lugar de cortarse.
     <div className="min-h-screen-safe w-full bg-paper font-sans text-ink">
-      <main className="mx-auto flex min-h-screen-safe h-screen-safe-mobile w-full max-w-6xl flex-col gap-3 px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:gap-4 md:px-8 md:py-5">
+      <main className="page flex min-h-screen-safe h-screen-safe-mobile flex-col gap-3 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:gap-4 md:py-5">
         <JsonLd data={jsonLd} />
 
         <div
@@ -108,7 +108,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
               tarjetas bajan, pero sin llegar al fondo. Si falta sitio, se encoge. */}
           <div
             className="reveal relative h-[calc((100vw-2rem)*0.707)] min-h-0 grow shrink
-                       md:col-start-3 md:col-end-12 md:row-start-1 md:row-end-4 md:h-auto"
+                       md:col-start-3 md:col-end-12 lg:col-start-4 md:row-start-1 md:row-end-4 md:h-auto"
           >
             {/* Antes de pintar nada: si en esta sesión toca la impresión del árbol,
                 se marca para que tree.png no asome antes de que el canvas tome el relevo. */}
