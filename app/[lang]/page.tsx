@@ -2,6 +2,7 @@ import Link from "next/link";
 import Footer from "@/components/Footer";
 import { Cross, InkArrow } from "@/components/Ink";
 import WizardButton from "@/components/WizardButton";
+import { SpellName, SpellProvider, SpellTagline } from "@/components/SpellProvider";
 import { Scribble } from "@/components/InkBox";
 import { PHOTOS } from "@/lib/photos";
 import { PROJECTS } from "@/lib/projects";
@@ -99,49 +100,53 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       <main className="page flex min-h-screen-safe h-screen-safe-mobile flex-col gap-2 pt-5 pb-[max(1rem,env(safe-area-inset-bottom))] md:gap-4 md:py-6">
         <JsonLd data={jsonLd} />
 
-        <div className="relative flex min-h-0 flex-1 flex-col gap-3 md:grid md:grid-cols-12 md:gap-x-8">
-          {STARS.map((star, i) => (
-            <Cross
-              key={i}
-              className={`absolute hidden animate-twinkle text-ink md:block ${star.className}`}
-              style={{ animationDelay: star.delay }}
-            />
-          ))}
+        <SpellProvider lang={isLang(lang) ? lang : "en"}>
+          <div className="relative flex min-h-0 flex-1 flex-col gap-3 md:grid md:grid-cols-12 md:gap-x-8">
+            {STARS.map((star, i) => (
+              <Cross
+                key={i}
+                className={`absolute hidden animate-twinkle text-ink md:block ${star.className}`}
+                style={{ animationDelay: star.delay }}
+              />
+            ))}
 
-          {/* Nombre y hechizos */}
-          <div className="relative z-10 flex shrink-0 flex-col justify-center md:col-span-7 md:min-h-0">
-            <div className="reveal flex items-end gap-2">
-              <span className="note -rotate-3 text-[15px] text-ink md:text-lg">{t.homeHello}</span>
-              <InkArrow seed="hello" direction="down" curl className="mb-1 h-5 w-10 md:h-6 md:w-12" draw delay={0.3} />
+            {/* Nombre y hechizos */}
+            <div className="relative z-10 flex shrink-0 flex-col justify-center md:col-span-7 md:min-h-0">
+              <div className="reveal flex items-end gap-2">
+                <span className="note -rotate-3 text-[15px] text-ink md:text-lg">{t.homeHello}</span>
+                <InkArrow seed="hello" direction="down" curl className="mb-1 h-5 w-10 md:h-6 md:w-12" draw delay={0.3} />
+              </div>
+
+              {/* En modo hechizo, el título es el marcador del juego. */}
+              <SpellName className="mt-1 text-[clamp(4rem,min(17vw,21vh),12.5rem)]" />
+              <Scribble seed="name" draw delay={0.5} className="mt-1 h-3 w-[min(70vw,38rem)] md:mt-2 md:h-5" />
+
+              {/* En modo hechizo, el lema da paso a los mensajes del juego. */}
+              <div className="reveal" style={{ animationDelay: "250ms" }}>
+                <SpellTagline text={t.homeTagline} className="hand mt-3 min-h-[1.5em] max-w-md text-mute md:mt-5 md:text-lg" />
+              </div>
+
+              <nav aria-label={t.sections} className="mt-4 hidden flex-col gap-3 md:mt-[clamp(1rem,5vh,3.5rem)] md:flex md:gap-[clamp(0.5rem,2.5vh,1.5rem)]">
+                <Spell href="/photography" section="photography" title={t.photoPanelTitle} note={t.frames(PHOTOS.length)} seed="spell-photo" delay={350} />
+                <Spell href="/projects" section="games" title={t.gamesPanelTitle} note={t.games(PROJECTS.length)} seed="spell-games" delay={450} />
+              </nav>
             </div>
 
-            <h1 className="hand-display wiggle mt-1 text-[clamp(4rem,min(17vw,21vh),12.5rem)]">antonio</h1>
-            <Scribble seed="name" draw delay={0.5} className="mt-1 h-3 w-[min(70vw,38rem)] md:mt-2 md:h-5" />
+            {/* El mago, a la mitad del alto de su sitio (en móvil se encoge primero).
+                Pulsarlo abre el minijuego secreto. */}
+            <div className="relative min-h-[7rem] flex-1 md:col-span-5 md:col-start-8 md:min-h-0">
+              <div className="absolute inset-x-0 inset-y-1/4">
+                <WizardButton />
+              </div>
+            </div>
 
-            <p className="hand reveal mt-3 max-w-md text-mute md:mt-5 md:text-lg" style={{ animationDelay: "250ms" }}>
-              {t.homeTagline}
-            </p>
-
-            <nav aria-label={t.sections} className="mt-4 hidden flex-col gap-3 md:mt-[clamp(1rem,5vh,3.5rem)] md:flex md:gap-[clamp(0.5rem,2.5vh,1.5rem)]">
-              <Spell href="/photography" section="photography" title={t.photoPanelTitle} note={t.frames(PHOTOS.length)} seed="spell-photo" delay={350} />
-              <Spell href="/projects" section="games" title={t.gamesPanelTitle} note={t.games(PROJECTS.length)} seed="spell-games" delay={450} />
+            {/* En móvil los hechizos van bajo el mago. */}
+            <nav aria-label={t.sections} className="mb-2 flex shrink-0 flex-col gap-1 md:hidden">
+              <Spell href="/photography" section="photography" title={t.photoPanelTitle} note={t.frames(PHOTOS.length)} seed="spell-photo" delay={0} />
+              <Spell href="/projects" section="games" title={t.gamesPanelTitle} note={t.games(PROJECTS.length)} seed="spell-games" delay={0} />
             </nav>
           </div>
-
-          {/* El mago, a la mitad del alto de su sitio (en móvil se encoge primero).
-              Pulsarlo abre el minijuego secreto. */}
-          <div className="relative min-h-[7rem] flex-1 md:col-span-5 md:col-start-8 md:min-h-0">
-            <div className="absolute inset-x-0 inset-y-1/4">
-              <WizardButton lang={isLang(lang) ? lang : "en"} />
-            </div>
-          </div>
-
-          {/* En móvil los hechizos van bajo el mago. */}
-          <nav aria-label={t.sections} className="mb-2 flex shrink-0 flex-col gap-1 md:hidden">
-            <Spell href="/photography" section="photography" title={t.photoPanelTitle} note={t.frames(PHOTOS.length)} seed="spell-photo" delay={0} />
-            <Spell href="/projects" section="games" title={t.gamesPanelTitle} note={t.games(PROJECTS.length)} seed="spell-games" delay={0} />
-          </nav>
-        </div>
+        </SpellProvider>
 
         <Footer lang={lang} />
       </main>

@@ -142,53 +142,86 @@ export function Sparkles({
  * al cargar; el filtro de tinta solo ondula los bordes, sin desenfoque. La punta
  * de la varita está en (8, 180) de un viewBox de 240x290: ahí van las chispas.
  */
+/*
+ * Tipos de trazo. El mago es "el sello": silueta maciza de tinta con las cruces y
+ * las manchas del sombrero en blanco, y a sus pies dos gatos, uno gris y otro de
+ * manchas (variante 10 de las propuestas, con los gatos pedidos aparte).
+ */
 const W = "f"; // relleno de papel con contorno
 const S = "s"; // solo contorno
-const K = "k"; // mancha maciza
+const K = "k"; // mancha maciza, sin contorno
+const KK = "kk"; // macizo con contorno: se dibuja el contorno y luego se rellena
+const WS = "ws"; // trazo blanco (las cruces sobre la túnica negra)
+const WP = "w"; // punto blanco, sin contorno
+const G = "g"; // relleno gris con contorno (el gato gris)
+type Kind = typeof W | typeof S | typeof K | typeof KK | typeof WS | typeof WP | typeof G;
+
+/** El gris del gato: el único gris del dibujo, más claro que el lápiz de las notas. */
+const CAT_GREY = "#A9A5AA";
 
 /** `arm`: parte del brazo de la varita, que va en su propio grupo para poder girar desde el hombro. */
-type Part = { d: string; kind: typeof W | typeof S | typeof K; t: number; w?: number; arm?: boolean };
+type Part = { d: string; kind: Kind; t: number; w?: number; arm?: boolean };
+
+/** Elipse como trazado, para meter los puntos del sombrero y de los gatos en la misma lista. */
+const dot = (cx: number, cy: number, rx: number, ry = rx) =>
+  `M${cx - rx} ${cy}a${rx} ${ry} 0 1 0 ${2 * rx} 0a${rx} ${ry} 0 1 0 ${-2 * rx} 0Z`;
+
+/** Un gato sentado, de cara (el de la variante "Michi"); `mirror` lo pone al otro lado, mirando al mago. */
+const CAT_BODY = "M170 278 C162 266 164 250 172 242 C176 238 177 232 176 226 L184 233 C190 231 196 231 201 233 L208 225 C209 232 209 240 205 246 C211 256 210 270 203 278 Z";
+const CAT_TAIL = "M200 276 C214 274 224 262 218 248 C216 244 212 244 212 248";
+const CAT_NOSE = "M191 250 l1.5 2 l1.5 -2";
+const mirror = (d: string) =>
+  // Refleja en x (x' = 238 - x) las coordenadas absolutas; las relativas (l, a) cambian de signo en x.
+  d.replace(/([MLCQ])([^MLCQlaZ]+)/g, (_, cmd: string, nums: string) => {
+    const v = nums.trim().split(/[ ,]+/).map(Number);
+    return cmd + v.map((n, i) => (i % 2 === 0 ? 238 - n : n)).join(" ") + " ";
+  }).replace(/l(-?[\d.]+) (-?[\d.]+)/g, (_, x: string, y: string) => `l${-Number(x)} ${y}`);
 
 const WIZARD: Part[] = [
   // piernas y pies
   { d: "M114 246 L112 264 M132 246 L133 264", kind: S, t: 0.1 },
-  { d: "M112 264 C100 266 90 270 88 276 C98 278 108 278 116 276 C116 272 114 267 112 264 Z", kind: W, t: 0.2 },
-  { d: "M133 264 C144 266 154 270 158 276 C148 278 138 278 130 276 C130 272 131 267 133 264 Z", kind: W, t: 0.25 },
-  { d: "M96 276 v-3 M103 277 v-3 M143 277 v-3 M150 276 v-3", kind: S, t: 0.35, w: 2.4 },
-  // túnica
-  { d: "M108 122 C100 140 92 158 82 180 C74 198 66 216 56 238 C66 244 76 240 86 245 C98 249 108 242 120 247 C134 251 146 243 158 248 C168 250 176 244 184 240 C178 222 174 204 170 186 C164 162 160 142 154 122 C140 114 120 114 108 122 Z", kind: W, t: 0.3 },
-  { d: "M56 238 C52 228 60 214 72 216 C82 220 80 234 88 244 C78 248 64 246 56 238 Z", kind: K, t: 1.0 },
-  { d: "M160 247 C164 240 176 236 184 240 C180 246 170 250 160 247 Z", kind: K, t: 1.05 },
-  // cruces de la túnica
-  { d: "M93 176 h15 M100.5 168.5 v15", kind: S, t: 0.9, w: 4.4 },
-  { d: "M140 166 h15 M147.5 158.5 v15", kind: S, t: 0.97, w: 4.4 },
-  { d: "M112 216 h15 M119.5 208.5 v15", kind: S, t: 1.04, w: 4.4 },
-  { d: "M152 206 h14 M159 199 v14", kind: S, t: 1.11, w: 4.4 },
-  { d: "M84 222 h12 M90 216 v12", kind: S, t: 1.18, w: 4.4 },
+  { d: "M112 264 C100 266 90 270 88 276 C98 278 108 278 116 276 C116 272 114 267 112 264 Z", kind: KK, t: 0.2 },
+  { d: "M133 264 C144 266 154 270 158 276 C148 278 138 278 130 276 C130 272 131 267 133 264 Z", kind: KK, t: 0.25 },
+  // túnica maciza
+  { d: "M108 122 C100 140 92 158 82 180 C74 198 66 216 56 238 C66 244 76 240 86 245 C98 249 108 242 120 247 C134 251 146 243 158 248 C168 250 176 244 184 240 C178 222 174 204 170 186 C164 162 160 142 154 122 C140 114 120 114 108 122 Z", kind: KK, t: 0.3 },
   // brazo, mano y varita
-  { d: "M112 134 C98 138 82 144 66 152 C66 162 74 168 86 164 C96 158 104 154 114 152 Z", kind: W, t: 0.55, arm: true },
+  { d: "M112 134 C98 138 82 144 66 152 C66 162 74 168 86 164 C96 158 104 154 114 152 Z", kind: KK, t: 0.55, arm: true },
   { d: "M68 148 C60 145 52 150 53 158 C56 165 66 165 70 159 Z", kind: W, t: 0.7, arm: true },
-  { d: "M57 153 h7 M56 158 h7", kind: S, t: 0.8, w: 2.6, arm: true },
   { d: "M55 158 L8 180", kind: S, t: 0.85, w: 4.8, arm: true },
+  // cruces y motas blancas sobre la tinta
+  { d: "M93 176 h15 M100.5 168.5 v15", kind: WS, t: 0.9, w: 4.4 },
+  { d: "M140 166 h15 M147.5 158.5 v15", kind: WS, t: 0.97, w: 4.4 },
+  { d: "M112 216 h15 M119.5 208.5 v15", kind: WS, t: 1.04, w: 4.4 },
+  { d: "M152 206 h14 M159 199 v14", kind: WS, t: 1.11, w: 4.4 },
+  { d: "M84 222 h12 M90 216 v12", kind: WS, t: 1.18, w: 4.4 },
+  { d: dot(78, 232, 1.6) + dot(170, 238, 1.4) + dot(132, 236, 1.2) + dot(108, 150, 1.3), kind: WP, t: 1.25 },
   // la otra mano
   { d: "M158 160 C168 154 180 158 182 168 C178 174 170 174 164 170", kind: W, t: 0.65 },
-  { d: "M172 158 c2 -5 7 -6 9 -2", kind: S, t: 0.75, w: 2.6 },
   // barba
   { d: "M118 114 C112 126 116 140 110 154 C106 166 108 176 102 188 C110 182 114 180 116 192 C120 182 122 176 128 186 C128 176 132 168 136 176 C136 162 140 150 138 138 C138 128 142 120 144 112 Z", kind: W, t: 0.95 },
   { d: "M124 128 C122 144 120 158 116 176 M132 128 C131 142 130 152 128 168", kind: S, t: 1.15, w: 2.6 },
-  // cara: ojo bajo el ala y nariz larga hacia la varita
+  // nariz larga hacia la varita
   { d: "M126 104 C110 104 92 106 72 112 C88 118 108 120 128 117 Z", kind: W, t: 1.1 },
-  // sombrero con la punta vencida
-  { d: "M118 96 C124 72 136 46 150 22 C154 14 160 10 166 12 C160 16 158 22 158 32 C158 56 160 76 166 97 C150 102 132 101 118 96 Z", kind: W, t: 1.2 },
-  { d: "M112 96 C128 103 150 104 172 96", kind: S, t: 1.45 },
+  // sombrero macizo con la punta vencida y manchas blancas
+  { d: "M118 96 C124 72 136 46 150 22 C154 14 160 10 166 12 C160 16 158 22 158 32 C158 56 160 76 166 97 C150 102 132 101 118 96 Z", kind: KK, t: 1.2 },
+  { d: dot(142, 58, 2.6, 3.2) + dot(153, 38, 2, 2.6) + dot(136, 82, 2.8, 2.4) + dot(155, 76, 2.2, 2.8), kind: WP, t: 1.55 },
+  { d: "M110 97 C128 104 150 105 174 96", kind: S, t: 1.45, w: 5 },
+  // el gato gris, a la derecha
+  { d: CAT_TAIL, kind: S, t: 1.6, w: 4 },
+  { d: CAT_BODY, kind: G, t: 1.65, w: 3 },
+  { d: dot(186, 243, 2.4, 2.8) + dot(199, 243, 2.4, 2.8), kind: K, t: 2.0 },
+  { d: CAT_NOSE, kind: S, t: 2.05, w: 1.8 },
+  // el gato de manchas, a la izquierda, mirando al mago
+  { d: mirror(CAT_TAIL), kind: S, t: 1.7, w: 4 },
+  { d: mirror(CAT_BODY), kind: W, t: 1.75, w: 3 },
+  { d: dot(238 - 180, 264, 6, 5) + dot(238 - 196, 270, 4.5, 3.5) + dot(238 - 199, 255, 3.5, 3) + dot(238 - 203, 236, 3.4, 4), kind: K, t: 2.05 },
+  { d: dot(238 - 186, 243, 2.4, 2.8) + dot(238 - 199, 243, 2.4, 2.8), kind: K, t: 2.1 },
+  { d: mirror(CAT_NOSE), kind: S, t: 2.15, w: 1.8 },
 ];
 
+/** El ojo, aparte: es el que parpadea. */
 const WIZARD_DOTS: { cx: number; cy: number; rx: number; ry: number; t: number }[] = [
-  { cx: 136, cy: 108, rx: 2.8, ry: 2.8, t: 1.5 }, // ojo
-  { cx: 142, cy: 58, rx: 2.8, ry: 3.6, t: 1.55 },
-  { cx: 153, cy: 38, rx: 2.2, ry: 3, t: 1.6 },
-  { cx: 136, cy: 82, rx: 3, ry: 2.6, t: 1.65 },
-  { cx: 155, cy: 76, rx: 2.4, ry: 3.2, t: 1.7 },
+  { cx: 136, cy: 108, rx: 2.8, ry: 2.8, t: 1.5 },
 ];
 
 /** Las partes del brazo (contiguas en el orden de dibujo) juntas en un array, el resto sueltas. */
@@ -203,7 +236,7 @@ function groupArm(parts: Part[]) {
 }
 
 /** Cuánto tarda el mago en quedar dibujado: después empiezan las chispas. */
-export const WIZARD_DRAWN = 1.9;
+export const WIZARD_DRAWN = 2.2;
 
 /*
  * Chispas de la varita, dentro del propio SVG del mago para que sigan a la punta
@@ -243,19 +276,25 @@ export function Wizard({
 }) {
   const filter = `${id}-ink`;
   const renderPart = (part: Part, key: number | string) => {
-    const drawn = animate && part.kind !== K;
-    const popped = animate && part.kind === K;
+    const { kind } = part;
+    // Los macizos y los puntos caen de golpe; lo demás se dibuja trazo a trazo y,
+    // si lleva relleno de color (tinta, gris), se rellena cuando el contorno ya está.
+    const popped = animate && (kind === K || kind === WP);
+    const drawn = animate && !popped;
+    const filled = animate && (kind === KK || kind === G);
+    const fill = kind === W ? "#FFFFFF" : kind === G ? CAT_GREY : kind === K || kind === KK ? "currentColor" : kind === WP ? "#FFFFFF" : "none";
+    const stroke = kind === K || kind === WP ? "none" : kind === WS ? "#FFFFFF" : "currentColor";
     return (
       <path
         key={key}
         d={part.d}
-        pathLength={part.kind === K ? undefined : 1}
-        fill={part.kind === W ? "#FFFFFF" : part.kind === K ? "currentColor" : "none"}
-        stroke={part.kind === K ? "none" : "currentColor"}
+        pathLength={popped ? undefined : 1}
+        fill={fill}
+        stroke={stroke}
         strokeWidth={part.w ?? 3.6}
-        className={`${drawn ? "ink-line ink-draw" : ""} ${popped ? "origin-center animate-pop [transform-box:fill-box]" : ""}`}
+        className={`${drawn ? "ink-line ink-draw" : ""} ${filled ? "ink-fill" : ""} ${popped ? "origin-center animate-pop [transform-box:fill-box]" : ""}`}
         style={
-          (drawn ? { "--d": `${part.t}s` } : popped ? { animationDelay: `${part.t}s` } : undefined) as
+          (drawn ? { "--d": `${part.t}s`, "--f": `${part.t + 0.45}s` } : popped ? { animationDelay: `${part.t}s` } : undefined) as
             | CSSProperties
             | undefined
         }
