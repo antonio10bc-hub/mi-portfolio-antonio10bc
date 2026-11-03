@@ -1,0 +1,731 @@
+/*
+ * Los hechizos del minijuego secreto, dibujados en un <canvas> con el mismo
+ * vocabulario de la web: tinta negra sobre papel, contornos gruesos, cruces "+".
+ * Cada hechizo es un efecto con `update(dt)` (devuelve si sigue vivo) y
+ * `draw(ctx)`. Va en el cliente y es pura animación: aquí sí vale Math.random(),
+ * no hay HTML de servidor que tenga que coincidir.
+ */
+
+import type { Element } from "@/lib/spellbook";
+
+export const INK = "#141214";
+const PAPER = "#FFFFFF";
+
+export type Vec = { x: number; y: number };
+
+export interface Effect {
+  /** Avanza `dt` segundos. Devuelve false cuando el efecto ha terminado. */
+  update(dt: number): boolean;
+  draw(ctx: CanvasRenderingContext2D): void;
+  /** Temblor de pantalla que pide ahora mismo, en px. */
+  shake?: number;
+}
+
+const rand = (a: number, b: number) => a + Math.random() * (b - a);
+const ease = (t: number) => 1 - Math.pow(1 - Math.min(Math.max(t, 0), 1), 3);
+/** Crece rápido, aguanta y se apaga: la vida de casi todas las partículas. */
+const swell = (t: number) => (t < 0.15 ? t / 0.15 : t > 0.7 ? Math.max(0, (1 - t) / 0.3) : 1);
+
+function pen(ctx: CanvasRenderingContext2D, width: number, alpha = 1) {
+  ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+  ctx.strokeStyle = INK;
+  ctx.fillStyle = INK;
+  ctx.lineWidth = width;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+}
+
+/** La cruz de la túnica: la estrella y la chispa de todo el sitio. */
+export function cross(ctx: CanvasRenderingContext2D, x: number, y: number, s: number, rot: number, w: number) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.beginPath();
+  ctx.moveTo(-s, s * 0.06);
+  ctx.lineTo(s, -s * 0.06);
+  ctx.moveTo(-s * 0.05, -s);
+  ctx.lineTo(s * 0.05, s);
+  ctx.lineWidth = w;
+  ctx.stroke();
+  ctx.restore();
+}
+
+/** Llama de dibujo animado: gota invertida con contorno y lengua interior maciza. */
+function flame(ctx: CanvasRenderingContext2D, x: number, y: number, h: number, w: number, sway: number) {
+  ctx.beginPath();
+  ctx.moveTo(x + sway, y - h);
+  ctx.quadraticCurveTo(x + w * 1.1, y - h * 0.35, x, y);
+  ctx.quadraticCurveTo(x - w * 1.1, y - h * 0.35, x + sway, y - h);
+  ctx.fillStyle = PAPER;
+  ctx.fill();
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x + sway * 0.6, y - h * 0.55);
+  ctx.quadraticCurveTo(x + w * 0.5, y - h * 0.18, x, y - h * 0.04);
+  ctx.quadraticCurveTo(x - w * 0.5, y - h * 0.18, x + sway * 0.6, y - h * 0.55);
+  ctx.fillStyle = INK;
+  ctx.fill();
+}
+
+/** Gota orientada según su velocidad. */
+function drop(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, angle: number) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle - Math.PI / 2);
+  ctx.beginPath();
+  ctx.moveTo(0, -r * 2.2);
+  ctx.quadraticCurveTo(r * 1.1, -r * 0.2, 0, r);
+  ctx.quadraticCurveTo(-r * 1.1, -r * 0.2, 0, -r * 2.2);
+  ctx.fillStyle = PAPER;
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+
+function snowflake(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, rot: number) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.beginPath();
+  for (let k = 0; k < 6; k++) {
+    const a = (k * Math.PI) / 3;
+    const cx = Math.cos(a);
+    const cy = Math.sin(a);
+    ctx.moveTo(0, 0);
+    ctx.lineTo(cx * r, cy * r);
+    // ramitas en V a dos tercios del brazo
+    const bx = cx * r * 0.6;
+    const by = cy * r * 0.6;
+    for (const s of [-1, 1]) {
+      const b = a + s * 0.7;
+      ctx.moveTo(bx, by);
+      ctx.lineTo(bx + Math.cos(b) * r * 0.32, by + Math.sin(b) * r * 0.32);
+    }
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+/** Rayo por desplazamiento del punto medio: zigzag con algún brote. */
+function boltPath(from: Vec, to: Vec, spread: number, depth: number): Vec[] {
+  if (depth === 0) return [from, to];
+  const mid = { x: (from.x + to.x) / 2 + rand(-spread, spread), y: (from.y + to.y) / 2 + rand(-spread * 0.3, spread * 0.3) };
+  return [...boltPath(from, mid, spread / 2, depth - 1), ...boltPath(mid, to, spread / 2, depth - 1).slice(1)];
+}
+
+function polyline(ctx: CanvasRenderingContext2D, pts: Vec[]) {
+  ctx.beginPath();
+  pts.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
+  ctx.stroke();
+}
+
+// --- El viaje: de la punta de la varita al sitio de la letra -------------------
+
+export function projectile(from: Vec, to: Vec, onArrive: () => void): Effect {
+  let t = 0;
+  let arrived = false;
+  const control = { x: (from.x + to.x) / 2, y: Math.min(from.y, to.y) - 160 };
+  const trail: (Vec & { life: number; rot: number })[] = [];
+  const duration = 0.42;
+  const at = (k: number): Vec => ({
+    x: (1 - k) * (1 - k) * from.x + 2 * (1 - k) * k * control.x + k * k * to.x,
+    y: (1 - k) * (1 - k) * from.y + 2 * (1 - k) * k * control.y + k * k * to.y,
+  });
+  return {
+    update(dt) {
+      t += dt;
+      const k = Math.min(t / duration, 1);
+      const p = at(ease(k));
+      if (!arrived) trail.push({ ...p, life: 1, rot: rand(0, Math.PI) });
+      trail.forEach((c) => (c.life -= dt * 2.6));
+      if (k >= 1 && !arrived) {
+        arrived = true;
+        onArrive();
+      }
+      return trail.some((c) => c.life > 0);
+    },
+    draw(ctx) {
+      trail.forEach((c, i) => {
+        if (c.life <= 0) return;
+        pen(ctx, 2.6, c.life);
+        if (i % 3 === 0) cross(ctx, c.x, c.y, 5 + c.life * 5, c.rot, 2.6);
+      });
+      if (!arrived) {
+        const p = at(ease(Math.min(t / duration, 1)));
+        pen(ctx, 3);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    },
+  };
+}
+
+// --- Los siete hechizos ----------------------------------------------------------
+
+function fire(at: Vec): Effect {
+  let t = 0;
+  const flames = Array.from({ length: 22 }, () => ({
+    x: at.x + rand(-95, 95),
+    y: at.y + rand(-10, 45),
+    vy: rand(-170, -60),
+    h: rand(34, 84),
+    w: rand(11, 23),
+    life: rand(0.7, 1.4),
+    age: rand(-0.25, 0),
+    phase: rand(0, 6),
+  }));
+  const embers = Array.from({ length: 16 }, () => ({ x: at.x + rand(-60, 60), y: at.y, vx: rand(-40, 40), vy: rand(-260, -120), rot: rand(0, 3), life: rand(0.8, 1.6), age: 0 }));
+  return {
+    update(dt) {
+      t += dt;
+      flames.forEach((f) => {
+        f.age += dt;
+        if (f.age > 0) f.y += f.vy * dt;
+      });
+      embers.forEach((e) => {
+        e.age += dt;
+        e.x += e.vx * dt;
+        e.y += e.vy * dt;
+        e.rot += dt * 4;
+      });
+      return t < 1.8;
+    },
+    draw(ctx) {
+      // la llama grande, en el centro
+      const big = swell(t / 1.4);
+      if (big > 0) {
+        pen(ctx, 3.4);
+        flame(ctx, at.x, at.y + 50, 210 * big, 62 * big, Math.sin(t * 14) * 12);
+      }
+      flames.forEach((f) => {
+        if (f.age <= 0 || f.age > f.life) return;
+        const s = swell(f.age / f.life);
+        pen(ctx, 2.6);
+        flame(ctx, f.x, f.y, f.h * s, f.w * s, Math.sin(t * 18 + f.phase) * 5);
+      });
+      embers.forEach((e) => {
+        if (e.age > e.life) return;
+        pen(ctx, 2.4, 1 - e.age / e.life);
+        cross(ctx, e.x, e.y, 6, e.rot, 2.4);
+      });
+      ctx.globalAlpha = 1;
+    },
+  };
+}
+
+function water(at: Vec): Effect {
+  let t = 0;
+  const ground = at.y + 70;
+  const drops = Array.from({ length: 30 }, () => {
+    const a = rand(-165, -15) * (Math.PI / 180);
+    const v = rand(220, 460);
+    return { x: at.x + rand(-12, 12), y: at.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: rand(4, 8), alive: true };
+  });
+  const ripples: { x: number; age: number; max: number }[] = [{ x: at.x, age: 0, max: 90 }];
+  return {
+    update(dt) {
+      t += dt;
+      drops.forEach((d) => {
+        if (!d.alive) return;
+        d.vy += 980 * dt;
+        d.x += d.vx * dt;
+        d.y += d.vy * dt;
+        if (d.y > ground && d.vy > 0) {
+          d.alive = false;
+          ripples.push({ x: d.x, age: 0, max: rand(26, 50) });
+        }
+      });
+      ripples.forEach((r) => (r.age += dt));
+      return t < 2.2;
+    },
+    draw(ctx) {
+      // la superficie del agua, una ola a mano que aparece y se va
+      const s = swell(t / 2.2);
+      pen(ctx, 3, s);
+      ctx.beginPath();
+      for (let x = -170; x <= 170; x += 6) {
+        const y = ground + Math.sin(x / 22 + t * 6) * 5 * s;
+        if (x === -170) ctx.moveTo(at.x + x, y);
+        else ctx.lineTo(at.x + x, y);
+      }
+      ctx.stroke();
+      drops.forEach((d) => {
+        if (!d.alive) return;
+        pen(ctx, 2.4);
+        drop(ctx, d.x, d.y, d.r, Math.atan2(d.vy, d.vx));
+      });
+      ripples.forEach((r) => {
+        const k = r.age / 0.9;
+        if (k > 1) return;
+        pen(ctx, 2.4, 1 - k);
+        ctx.beginPath();
+        ctx.ellipse(r.x, ground, r.max * ease(k), r.max * ease(k) * 0.28, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+      ctx.globalAlpha = 1;
+    },
+  };
+}
+
+function wind(at: Vec): Effect {
+  let t = 0;
+  const swirls = Array.from({ length: 6 }, (_, k) => ({
+    x: at.x + rand(-50, 50),
+    y: at.y + rand(-40, 40),
+    vx: (k % 2 ? 1 : -1) * rand(60, 160),
+    vy: rand(-70, -10),
+    size: rand(0.7, 1.3),
+    spin: rand(5, 9) * (k % 2 ? 1 : -1),
+    delay: k * 0.07,
+  }));
+  const dashes = Array.from({ length: 14 }, () => ({ y: at.y + rand(-110, 110), x: at.x + rand(-200, 200), len: rand(50, 140), v: rand(500, 900) * (Math.random() < 0.5 ? -1 : 1), delay: rand(0, 0.5) }));
+  const leaves = Array.from({ length: 9 }, () => ({ x: at.x, y: at.y, vx: rand(-320, 320), vy: rand(-260, 40), rot: rand(0, 6), spin: rand(-9, 9) }));
+  return {
+    update(dt) {
+      t += dt;
+      swirls.forEach((s) => {
+        if (t < s.delay) return;
+        s.x += s.vx * dt;
+        s.y += s.vy * dt;
+      });
+      dashes.forEach((d) => {
+        if (t > d.delay) d.x += d.v * dt;
+      });
+      leaves.forEach((l) => {
+        l.vx *= 0.985;
+        l.vy += 140 * dt;
+        l.x += l.vx * dt;
+        l.y += l.vy * dt;
+        l.rot += l.spin * dt;
+      });
+      return t < 1.9;
+    },
+    draw(ctx) {
+      swirls.forEach((s) => {
+        const k = (t - s.delay) / 1.6;
+        if (k <= 0 || k > 1) return;
+        pen(ctx, 3, swell(k));
+        ctx.beginPath();
+        const turns = 2.6 * ease(k * 1.6);
+        for (let a = 0; a <= turns * Math.PI * 2; a += 0.25) {
+          const r = (3 + a * 6) * s.size;
+          const x = s.x + Math.cos(a + t * s.spin) * r;
+          const y = s.y + Math.sin(a + t * s.spin) * r * 0.75;
+          if (a === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      });
+      dashes.forEach((d) => {
+        const k = (t - d.delay) / 0.8;
+        if (k <= 0 || k > 1) return;
+        pen(ctx, 2.6, swell(k));
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(d.x - Math.sign(d.v) * d.len, d.y);
+        ctx.stroke();
+      });
+      leaves.forEach((l) => {
+        pen(ctx, 2.2, 1 - t / 1.9);
+        ctx.save();
+        ctx.translate(l.x, l.y);
+        ctx.rotate(l.rot);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 11, 5, 0, 0, Math.PI * 2);
+        ctx.fillStyle = PAPER;
+        ctx.fill();
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(-11, 0);
+        ctx.lineTo(11, 0);
+        ctx.stroke();
+        ctx.restore();
+      });
+      ctx.globalAlpha = 1;
+    },
+  };
+}
+
+function earth(at: Vec): Effect {
+  let t = 0;
+  let shake = 0;
+  const ground = at.y + 50;
+  const rocks = Array.from({ length: 9 }, (_, k) => {
+    const size = rand(14, 32);
+    return {
+      x: at.x + rand(-100, 100),
+      y: at.y - rand(260, 460) - k * 30,
+      vy: rand(0, 120),
+      size,
+      rot: rand(0, 6),
+      spin: rand(-3, 3),
+      verts: Array.from({ length: 7 }, (_, i) => ({ a: (i / 7) * Math.PI * 2 + rand(-0.25, 0.25), r: size * rand(0.7, 1.15) })),
+      bounced: false,
+      landed: false,
+    };
+  });
+  const cracks: { pts: Vec[]; born: number }[] = [];
+  const puffs: { x: number; age: number }[] = [];
+  const crackAt = (x: number) => {
+    for (let k = 0; k < 3; k++) {
+      const pts: Vec[] = [{ x, y: ground }];
+      const dir = rand(-1, 1) > 0 ? 1 : -1;
+      for (let i = 0; i < 5; i++) {
+        const last = pts[pts.length - 1];
+        pts.push({ x: last.x + dir * rand(10, 26), y: last.y + rand(-2, 14) });
+      }
+      cracks.push({ pts, born: t });
+    }
+  };
+  return {
+    get shake() {
+      return shake;
+    },
+    update(dt) {
+      t += dt;
+      shake = Math.max(0, shake - dt * 40);
+      rocks.forEach((r) => {
+        if (r.landed) return;
+        r.vy += 1900 * dt;
+        r.y += r.vy * dt;
+        r.rot += r.spin * dt;
+        if (r.y + r.size * 0.7 > ground && r.vy > 0) {
+          r.y = ground - r.size * 0.7;
+          if (!r.bounced) {
+            r.bounced = true;
+            r.vy = -r.vy * 0.32;
+            shake = Math.max(shake, 11);
+            puffs.push({ x: r.x, age: 0 });
+            crackAt(r.x);
+          } else {
+            r.landed = true;
+          }
+        }
+      });
+      puffs.forEach((p) => (p.age += dt));
+      return t < 2.3;
+    },
+    draw(ctx) {
+      const fade = t > 1.8 ? 1 - (t - 1.8) / 0.5 : 1;
+      cracks.forEach((c) => {
+        const k = ease((t - c.born) / 0.35);
+        pen(ctx, 2.6, fade);
+        polyline(ctx, c.pts.slice(0, Math.max(2, Math.ceil(c.pts.length * k))));
+      });
+      puffs.forEach((p) => {
+        const k = p.age / 0.6;
+        if (k > 1) return;
+        pen(ctx, 2.2, 1 - k);
+        for (const dx of [-18, 0, 18]) {
+          ctx.beginPath();
+          ctx.arc(p.x + dx * (1 + k), ground - 6 - k * 14, 6 + k * 10, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      });
+      rocks.forEach((r) => {
+        pen(ctx, 2.6, fade);
+        ctx.save();
+        ctx.translate(r.x, r.y);
+        ctx.rotate(r.rot);
+        ctx.beginPath();
+        r.verts.forEach((v, i) => (i === 0 ? ctx.moveTo(Math.cos(v.a) * v.r, Math.sin(v.a) * v.r) : ctx.lineTo(Math.cos(v.a) * v.r, Math.sin(v.a) * v.r)));
+        ctx.closePath();
+        ctx.fill();
+        // un brillo de papel, para que se lea como piedra y no como mancha
+        ctx.strokeStyle = PAPER;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-r.size * 0.35, -r.size * 0.25);
+        ctx.lineTo(-r.size * 0.05, -r.size * 0.4);
+        ctx.stroke();
+        ctx.restore();
+      });
+      ctx.globalAlpha = 1;
+    },
+  };
+}
+
+function lightning(at: Vec, height: number): Effect {
+  let t = 0;
+  let shake = 0;
+  const strikes = [0, 0.2, 0.42].map((delay) => {
+    const from = { x: at.x + rand(-60, 60), y: -20 };
+    const main = boltPath(from, at, 120, 6);
+    const branches = [0, 1].map(() => {
+      const start = main[Math.floor(rand(main.length * 0.3, main.length * 0.7))];
+      return boltPath(start, { x: start.x + rand(-140, 140), y: start.y + rand(60, 160) }, 50, 4);
+    });
+    return { delay, main, branches, hit: false };
+  });
+  const sparks = Array.from({ length: 14 }, () => ({ a: rand(0, Math.PI * 2), v: rand(120, 320), rot: rand(0, 3) }));
+  return {
+    get shake() {
+      return shake;
+    },
+    update(dt) {
+      t += dt;
+      shake = Math.max(0, shake - dt * 50);
+      strikes.forEach((s) => {
+        if (!s.hit && t >= s.delay) {
+          s.hit = true;
+          shake = 15;
+        }
+      });
+      return t < 1.6;
+    },
+    draw(ctx) {
+      strikes.forEach((s) => {
+        const k = t - s.delay;
+        if (k < 0 || k > 0.16) return;
+        // fogonazo: la pantalla en tinta un instante
+        if (k < 0.05) {
+          ctx.globalAlpha = 0.85 * (1 - k / 0.05);
+          ctx.fillStyle = INK;
+          ctx.fillRect(0, 0, ctx.canvas.width, height);
+        }
+        pen(ctx, 9);
+        polyline(ctx, s.main);
+        s.branches.forEach((b) => {
+          pen(ctx, 4);
+          polyline(ctx, b);
+        });
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = PAPER;
+        ctx.lineWidth = 2.4;
+        polyline(ctx, s.main);
+      });
+      // chamusquina y chispas en el sitio del impacto
+      if (t > 0.2) {
+        const k = (t - 0.2) / 1.4;
+        pen(ctx, 3, 1 - k);
+        for (let i = 0; i < 10; i++) {
+          const a = (i / 10) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.moveTo(at.x + Math.cos(a) * 14, at.y + Math.sin(a) * 14);
+          ctx.lineTo(at.x + Math.cos(a) * (30 + (i % 2) * 18), at.y + Math.sin(a) * (30 + (i % 2) * 18));
+          ctx.stroke();
+        }
+        sparks.forEach((sp) => {
+          const d = sp.v * ease(k);
+          cross(ctx, at.x + Math.cos(sp.a) * d, at.y + Math.sin(sp.a) * d, 6, sp.rot + k * 6, 2.4);
+        });
+      }
+      ctx.globalAlpha = 1;
+    },
+  };
+}
+
+function ice(at: Vec): Effect {
+  let t = 0;
+  const spikes = Array.from({ length: 11 }, (_, k) => ({ a: (k / 11) * Math.PI * 2 + rand(-0.15, 0.15), len: rand(45, 115), w: rand(9, 15) }));
+  const shards: { x: number; y: number; vx: number; vy: number; rot: number; spin: number; s: number }[] = [];
+  const flakes = Array.from({ length: 16 }, () => {
+    const a = rand(0, Math.PI * 2);
+    const v = rand(80, 260);
+    return { x: at.x, y: at.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: rand(7, 15), rot: rand(0, 1), spin: rand(-2, 2), phase: rand(0, 6) };
+  });
+  let shattered = false;
+  return {
+    update(dt) {
+      t += dt;
+      if (!shattered && t > 0.75) {
+        shattered = true;
+        spikes.forEach((s) => {
+          for (let i = 0; i < 3; i++) {
+            const d = s.len * rand(0.3, 1);
+            shards.push({ x: at.x + Math.cos(s.a) * d, y: at.y + Math.sin(s.a) * d, vx: Math.cos(s.a) * rand(40, 160), vy: Math.sin(s.a) * rand(40, 160) - 80, rot: rand(0, 6), spin: rand(-8, 8), s: rand(5, 10) });
+          }
+        });
+      }
+      shards.forEach((s) => {
+        s.vy += 900 * dt;
+        s.x += s.vx * dt;
+        s.y += s.vy * dt;
+        s.rot += s.spin * dt;
+      });
+      flakes.forEach((f) => {
+        f.vx *= 0.96;
+        f.vy = f.vy * 0.96 + 30 * dt;
+        f.x += (f.vx + Math.sin(t * 3 + f.phase) * 20) * dt;
+        f.y += f.vy * dt;
+        f.rot += f.spin * dt;
+      });
+      return t < 2.4;
+    },
+    draw(ctx) {
+      if (!shattered) {
+        const k = ease(t / 0.3);
+        spikes.forEach((s) => {
+          const tip = { x: at.x + Math.cos(s.a) * s.len * k, y: at.y + Math.sin(s.a) * s.len * k };
+          const nx = -Math.sin(s.a) * s.w * 0.5;
+          const ny = Math.cos(s.a) * s.w * 0.5;
+          pen(ctx, 2.6);
+          ctx.beginPath();
+          ctx.moveTo(at.x + nx, at.y + ny);
+          ctx.lineTo(tip.x, tip.y);
+          ctx.lineTo(at.x - nx, at.y - ny);
+          ctx.closePath();
+          ctx.fillStyle = PAPER;
+          ctx.fill();
+          ctx.stroke();
+        });
+      }
+      shards.forEach((s) => {
+        pen(ctx, 2.2, Math.max(0, 1 - (t - 0.75) / 0.9));
+        ctx.save();
+        ctx.translate(s.x, s.y);
+        ctx.rotate(s.rot);
+        ctx.beginPath();
+        ctx.moveTo(0, -s.s);
+        ctx.lineTo(s.s * 0.6, s.s);
+        ctx.lineTo(-s.s * 0.6, s.s);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+      });
+      flakes.forEach((f) => {
+        pen(ctx, 2.2, swell(t / 2.4));
+        snowflake(ctx, f.x, f.y, f.r, f.rot);
+      });
+      ctx.globalAlpha = 1;
+    },
+  };
+}
+
+function light(at: Vec): Effect {
+  let t = 0;
+  let shake = 8;
+  const burst = Array.from({ length: 56 }, () => {
+    const a = rand(0, Math.PI * 2);
+    const v = rand(220, 640);
+    return { x: at.x, y: at.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, rot: rand(0, 3), spin: rand(-8, 8), s: rand(6, 14) };
+  });
+  return {
+    get shake() {
+      return shake;
+    },
+    update(dt) {
+      t += dt;
+      shake = Math.max(0, shake - dt * 20);
+      burst.forEach((b) => {
+        b.vx *= 0.985;
+        b.vy = b.vy * 0.985 + 380 * dt;
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        b.rot += b.spin * dt;
+      });
+      return t < 2.6;
+    },
+    draw(ctx) {
+      const k = t / 2.6;
+      // rayos que giran despacio
+      pen(ctx, 3.2, swell(k));
+      for (let i = 0; i < 16; i++) {
+        const a = (i / 16) * Math.PI * 2 + t * 0.6;
+        const r0 = 40 + Math.sin(t * 8 + i) * 6;
+        const r1 = r0 + (i % 2 ? 70 : 120) * ease(t / 0.5);
+        ctx.beginPath();
+        ctx.moveTo(at.x + Math.cos(a) * r0, at.y + Math.sin(a) * r0);
+        ctx.lineTo(at.x + Math.cos(a) * r1, at.y + Math.sin(a) * r1);
+        ctx.stroke();
+      }
+      // el sol a mano
+      ctx.beginPath();
+      ctx.arc(at.x, at.y, 28 * ease(t / 0.35), 0, Math.PI * 2);
+      ctx.fillStyle = PAPER;
+      ctx.fill();
+      ctx.stroke();
+      // anillo que se abre
+      const ring = ease(t / 1.2);
+      pen(ctx, 6 * (1 - ring) + 1, 1 - ring);
+      ctx.beginPath();
+      ctx.arc(at.x, at.y, 40 + ring * 300, 0, Math.PI * 2);
+      ctx.stroke();
+      burst.forEach((b) => {
+        pen(ctx, 2.8, 1 - k);
+        cross(ctx, b.x, b.y, b.s, b.rot, 2.8);
+      });
+      ctx.globalAlpha = 1;
+    },
+  };
+}
+
+/** El hechizo de cada elemento, en el sitio donde se dibujó la letra. */
+export function spell(element: Element, at: Vec, height: number): Effect {
+  switch (element) {
+    case "fire":
+      return fire(at);
+    case "water":
+      return water(at);
+    case "wind":
+      return wind(at);
+    case "earth":
+      return earth(at);
+    case "lightning":
+      return lightning(at, height);
+    case "ice":
+      return ice(at);
+    case "light":
+      return light(at);
+  }
+}
+
+/** Fallo: una nube de humo donde estaba la letra. */
+export function puff(at: Vec): Effect {
+  let t = 0;
+  const clouds = Array.from({ length: 7 }, (_, k) => ({ a: (k / 7) * Math.PI * 2, r: rand(10, 18) }));
+  return {
+    update(dt) {
+      t += dt;
+      return t < 0.8;
+    },
+    draw(ctx) {
+      const k = ease(t / 0.8);
+      pen(ctx, 2.6, 1 - k);
+      clouds.forEach((c) => {
+        const d = 24 + k * 50;
+        ctx.beginPath();
+        ctx.arc(at.x + Math.cos(c.a) * d, at.y + Math.sin(c.a) * d * 0.7 - k * 30, c.r * (1 + k), 0, Math.PI * 2);
+        ctx.stroke();
+      });
+      ctx.globalAlpha = 1;
+    },
+  };
+}
+
+/** Celebración final: cruces que llueven sin parar hasta que se cierra. */
+export function confetti(width: number): Effect & { stop(): void } {
+  let running = true;
+  const bits: { x: number; y: number; vy: number; rot: number; spin: number; s: number; sway: number }[] = [];
+  let spawn = 0;
+  let t = 0;
+  return {
+    stop() {
+      running = false;
+    },
+    update(dt) {
+      t += dt;
+      spawn += dt;
+      while (running && spawn > 0.05) {
+        spawn -= 0.05;
+        bits.push({ x: rand(0, width), y: -20, vy: rand(80, 200), rot: rand(0, 3), spin: rand(-4, 4), s: rand(5, 12), sway: rand(0, 6) });
+      }
+      bits.forEach((b) => {
+        b.y += b.vy * dt;
+        b.x += Math.sin(t * 2 + b.sway) * 30 * dt;
+        b.rot += b.spin * dt;
+      });
+      for (let i = bits.length - 1; i >= 0; i--) if (bits[i].y > 4000) bits.splice(i, 1);
+      return running || bits.length > 0;
+    },
+    draw(ctx) {
+      bits.forEach((b) => {
+        pen(ctx, 2.6);
+        cross(ctx, b.x, b.y, b.s, b.rot, 2.6);
+      });
+      ctx.globalAlpha = 1;
+    },
+  };
+}

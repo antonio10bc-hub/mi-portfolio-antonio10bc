@@ -201,6 +201,60 @@
   }
 }
 
+/*
+ * Poses del mago (components/Ink.tsx). `wizard-idle` parpadea; en el minijuego,
+ * `wizard-cast` da un saltito y levanta la varita (el brazo gira desde el hombro,
+ * en unidades del viewBox) y `wizard-shake` niega con la cabeza. El balanceo
+ * (`animate-bob`) va en el SVG; el saltito y la negación, en su envoltorio, para
+ * que los dos `transform` no se pisen.
+ */
+.wizard-idle .wizard-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation:
+    pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 1.5s both,
+    wizard-blink 4.6s ease-in-out 3s infinite;
+}
+
+@keyframes wizard-blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  94% { transform: scaleY(0.1); }
+}
+
+.wizard-cast {
+  animation: wizard-hop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.wizard-cast .wizard-arm {
+  transform-box: view-box;
+  transform-origin: 112px 142px;
+  animation: wizard-raise 0.75s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.wizard-shake {
+  animation: wizard-shake 0.6s ease-in-out;
+  transform-origin: 50% 100%;
+}
+
+@keyframes wizard-hop {
+  0%, 100% { transform: translateY(0); }
+  35% { transform: translateY(-14px); }
+}
+
+@keyframes wizard-raise {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(24deg); }
+  60% { transform: rotate(-8deg); }
+}
+
+@keyframes wizard-shake {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-5deg); }
+  40% { transform: rotate(5deg); }
+  60% { transform: rotate(-4deg); }
+  80% { transform: rotate(3deg); }
+}
+
 /* Barra de scroll discreta, a juego con la paleta. */
 ::-webkit-scrollbar {
   width: 10px;

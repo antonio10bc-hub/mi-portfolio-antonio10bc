@@ -1,10 +1,11 @@
 import Link from "next/link";
 import Footer from "@/components/Footer";
-import { Cross, InkArrow, Wizard } from "@/components/Ink";
-import { Scribble, ScribbleCircle } from "@/components/InkBox";
+import { Cross, InkArrow } from "@/components/Ink";
+import WizardButton from "@/components/WizardButton";
+import { Scribble } from "@/components/InkBox";
 import { PHOTOS } from "@/lib/photos";
 import { PROJECTS } from "@/lib/projects";
-import { dictFor } from "@/lib/i18n";
+import { dictFor, isLang } from "@/lib/i18n";
 import JsonLd from "@/components/JsonLd";
 import { PERSON, SITE_URL } from "@/lib/site";
 
@@ -40,10 +41,7 @@ function Spell({
       className="spell group reveal flex w-fit items-center gap-3 md:gap-5"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <span className="relative">
-        <ScribbleCircle seed={seed} hover />
-        <span className="hand-display block text-[clamp(2rem,min(7vw,9vh),5.25rem)]">{title}</span>
-      </span>
+      <span className="hand-display block text-[clamp(2rem,min(7vw,9vh),5.25rem)]">{title}</span>
       <span className="flex flex-col items-start gap-1">
         {/* En un móvil estrecho la nota puede partirse en dos líneas. */}
         <span className="note md:whitespace-nowrap">({note})</span>
@@ -130,10 +128,11 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
             </nav>
           </div>
 
-          {/* El mago: en móvil se encoge primero; en escritorio llena su columna. */}
+          {/* El mago, a la mitad del alto de su sitio (en móvil se encoge primero).
+              Pulsarlo abre el minijuego secreto. */}
           <div className="relative min-h-[7rem] flex-1 md:col-span-5 md:col-start-8 md:min-h-0">
-            <div className="absolute inset-0">
-              <Wizard title={t.wizardAlt} hint={t.homeHint} className="origin-bottom animate-bob" />
+            <div className="absolute inset-x-0 inset-y-1/4">
+              <WizardButton lang={isLang(lang) ? lang : "en"} />
             </div>
           </div>
 

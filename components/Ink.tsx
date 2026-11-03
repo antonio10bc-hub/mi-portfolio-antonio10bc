@@ -146,7 +146,8 @@ const W = "f"; // relleno de papel con contorno
 const S = "s"; // solo contorno
 const K = "k"; // mancha maciza
 
-type Part = { d: string; kind: typeof W | typeof S | typeof K; t: number; w?: number };
+/** `arm`: parte del brazo de la varita, que va en su propio grupo para poder girar desde el hombro. */
+type Part = { d: string; kind: typeof W | typeof S | typeof K; t: number; w?: number; arm?: boolean };
 
 const WIZARD: Part[] = [
   // piernas y pies
@@ -165,10 +166,10 @@ const WIZARD: Part[] = [
   { d: "M152 206 h14 M159 199 v14", kind: S, t: 1.11, w: 4.4 },
   { d: "M84 222 h12 M90 216 v12", kind: S, t: 1.18, w: 4.4 },
   // brazo, mano y varita
-  { d: "M112 134 C98 138 82 144 66 152 C66 162 74 168 86 164 C96 158 104 154 114 152 Z", kind: W, t: 0.55 },
-  { d: "M68 148 C60 145 52 150 53 158 C56 165 66 165 70 159 Z", kind: W, t: 0.7 },
-  { d: "M57 153 h7 M56 158 h7", kind: S, t: 0.8, w: 2.6 },
-  { d: "M55 158 L8 180", kind: S, t: 0.85, w: 4.8 },
+  { d: "M112 134 C98 138 82 144 66 152 C66 162 74 168 86 164 C96 158 104 154 114 152 Z", kind: W, t: 0.55, arm: true },
+  { d: "M68 148 C60 145 52 150 53 158 C56 165 66 165 70 159 Z", kind: W, t: 0.7, arm: true },
+  { d: "M57 153 h7 M56 158 h7", kind: S, t: 0.8, w: 2.6, arm: true },
+  { d: "M55 158 L8 180", kind: S, t: 0.85, w: 4.8, arm: true },
   // la otra mano
   { d: "M158 160 C168 154 180 158 182 168 C178 174 170 174 164 170", kind: W, t: 0.65 },
   { d: "M172 158 c2 -5 7 -6 9 -2", kind: S, t: 0.75, w: 2.6 },
@@ -189,6 +190,17 @@ const WIZARD_DOTS: { cx: number; cy: number; rx: number; ry: number; t: number }
   { cx: 136, cy: 82, rx: 3, ry: 2.6, t: 1.65 },
   { cx: 155, cy: 76, rx: 2.4, ry: 3.2, t: 1.7 },
 ];
+
+/** Las partes del brazo (contiguas en el orden de dibujo) juntas en un array, el resto sueltas. */
+function groupArm(parts: Part[]) {
+  const out: (Part | Part[])[] = [];
+  for (const part of parts) {
+    const last = out[out.length - 1];
+    if (part.arm && Array.isArray(last)) last.push(part);
+    else out.push(part.arm ? [part] : part);
+  }
+  return out;
+}
 
 /** Cuánto tarda el mago en quedar dibujado: después empiezan las chispas. */
 export const WIZARD_DRAWN = 1.9;
@@ -230,6 +242,26 @@ export function Wizard({
   title?: string;
 }) {
   const filter = `${id}-ink`;
+  const renderPart = (part: Part, key: number | string) => {
+    const drawn = animate && part.kind !== K;
+    const popped = animate && part.kind === K;
+    return (
+      <path
+        key={key}
+        d={part.d}
+        pathLength={part.kind === K ? undefined : 1}
+        fill={part.kind === W ? "#FFFFFF" : part.kind === K ? "currentColor" : "none"}
+        stroke={part.kind === K ? "none" : "currentColor"}
+        strokeWidth={part.w ?? 3.6}
+        className={`${drawn ? "ink-line ink-draw" : ""} ${popped ? "origin-center animate-pop [transform-box:fill-box]" : ""}`}
+        style={
+          (drawn ? { "--d": `${part.t}s` } : popped ? { animationDelay: `${part.t}s` } : undefined) as
+            | CSSProperties
+            | undefined
+        }
+      />
+    );
+  };
   return (
     <svg
       viewBox="0 0 240 290"
@@ -246,26 +278,16 @@ export function Wizard({
         </filter>
       </defs>
       <g filter={`url(#${filter})`} strokeLinecap="round" strokeLinejoin="round">
-        {WIZARD.map((part, i) => {
-          const drawn = animate && part.kind !== K;
-          const popped = animate && part.kind === K;
-          return (
-            <path
-              key={i}
-              d={part.d}
-              pathLength={part.kind === K ? undefined : 1}
-              fill={part.kind === W ? "#FFFFFF" : part.kind === K ? "currentColor" : "none"}
-              stroke={part.kind === K ? "none" : "currentColor"}
-              strokeWidth={part.w ?? 3.6}
-              className={`${drawn ? "ink-line ink-draw" : ""} ${popped ? "origin-center animate-pop [transform-box:fill-box]" : ""}`}
-              style={
-                (drawn ? { "--d": `${part.t}s` } : popped ? { animationDelay: `${part.t}s` } : undefined) as
-                  | CSSProperties
-                  | undefined
-              }
-            />
-          );
-        })}
+        {groupArm(WIZARD).map((item, i) =>
+          Array.isArray(item) ? (
+            // El brazo, la mano y la varita: el minijuego lo hace girar desde el hombro.
+            <g key={`arm-${i}`} className="wizard-arm">
+              {item.map((part, j) => renderPart(part, `${i}-${j}`))}
+            </g>
+          ) : (
+            renderPart(item, i)
+          ),
+        )}
         {WIZARD_DOTS.map((dot, i) => (
           <ellipse
             key={i}
@@ -274,7 +296,7 @@ export function Wizard({
             rx={dot.rx}
             ry={dot.ry}
             fill="currentColor"
-            className={animate ? "origin-center animate-pop [transform-box:fill-box]" : ""}
+            className={`${i === 0 ? "wizard-eye" : ""} ${animate ? "origin-center animate-pop [transform-box:fill-box]" : ""}`}
             style={animate ? { animationDelay: `${dot.t}s` } : undefined}
           />
         ))}

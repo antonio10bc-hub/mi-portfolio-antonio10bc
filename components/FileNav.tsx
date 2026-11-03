@@ -1,12 +1,13 @@
 import Link from "next/link";
 import BackLink from "@/components/BackLink";
-import { ScribbleCircle } from "@/components/InkBox";
+import { Scribble } from "@/components/InkBox";
 import type { Dict } from "@/lib/i18n";
 
 /**
  * Fila superior de las páginas interiores: "volver" a la izquierda y, en
- * escritorio, las dos secciones a la derecha. La actual va rodeada con un círculo
- * a mano, que se dibuja al llegar; las otras lo dibujan al pasar el ratón.
+ * escritorio, las dos secciones a la derecha. La actual va subrayada a mano (el
+ * trazo se dibuja al llegar); al pasar el ratón las letras bailan. Sin círculos:
+ * rodear "photography" y "games" no gustó.
  */
 export default function FileNav({ t, current }: { t: Dict; current: "photography" | "games" }) {
   const sections = [
@@ -25,10 +26,10 @@ export default function FileNav({ t, current }: { t: Dict; current: "photography
               key={section.key}
               href={section.href}
               aria-current={active ? "page" : undefined}
-              className="group relative text-lg font-semibold text-ink"
+              className="group relative text-ink"
             >
-              <ScribbleCircle seed={`nav-${section.key}`} width={2.2} draw={active} delay={0.6} hover={!active} />
-              {section.label}
+              <span className="hand-display block text-2xl">{section.label}</span>
+              {active && <Scribble seed={`nav-${section.key}`} width={2.4} draw delay={0.6} className="absolute -bottom-2.5 left-0 h-2.5 w-full" />}
             </Link>
           );
         })}
