@@ -23,7 +23,7 @@ export default function WizardButton() {
         onClick={start}
         className="absolute inset-0 cursor-pointer transition-transform duration-500 ease-spring hover:-translate-y-2"
       >
-        <Wizard hint={active ? undefined : t.homeHint} className="wizard-idle origin-bottom animate-bob" />
+        <Wizard className="wizard-idle origin-bottom animate-bob" />
       </button>
     </div>
   );

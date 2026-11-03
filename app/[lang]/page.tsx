@@ -1,72 +1,40 @@
-import Link from "next/link";
-import Footer from "@/components/Footer";
-import { Cross, InkArrow } from "@/components/Ink";
+import { Cross } from "@/components/Ink";
+import FloatingWork, { type Work } from "@/components/FloatingWork";
+import { SpellMarks, SpellPills } from "@/components/HomeControls";
+import JsonLd from "@/components/JsonLd";
+import { SpellCaption, SpellProvider } from "@/components/SpellProvider";
+import TopBar from "@/components/TopBar";
 import WizardButton from "@/components/WizardButton";
-import { SpellName, SpellProvider, SpellTagline } from "@/components/SpellProvider";
-import { Scribble } from "@/components/InkBox";
 import { PHOTOS } from "@/lib/photos";
 import { PROJECTS } from "@/lib/projects";
 import { dictFor, isLang } from "@/lib/i18n";
-import JsonLd from "@/components/JsonLd";
 import { PERSON, SITE_URL } from "@/lib/site";
 
 /*
- * La home es la primera página del cuaderno: el nombre rotulado a mano, subrayado
- * de un trazo, y el mago, que se dibuja solo al llegar y lanza chispas con la
- * varita hacia los dos "hechizos" (Fotografía y Juegos). En escritorio, dos
- * columnas: texto a la izquierda, mago a la derecha apuntando a los enlaces. En
- * móvil, una columna de alto exacto en la que el mago se encoge primero.
+ * La home es una escena, con la composición de una página de juego infantil: una
+ * barra mínima arriba, en el centro una frase escrita a mano sobre una sola obra
+ * que flota (va pasando por fotos y juegos) sostenida por la varita del mago con
+ * sus dos gatos, y abajo el nombre, las píldoras de navegación y las siete marcas
+ * de hechizo. Pulsar el mago (o "lanza un hechizo") abre el minijuego en la propia
+ * home. **Cabe en una pantalla sin scroll**: la escena es lo único flexible.
  */
 
-function Spell({
-  href,
-  section,
-  title,
-  note,
-  seed,
-  delay,
-}: {
-  href: string;
-  /** Nombre fijo para las analíticas (no cambia con el idioma) */
-  section: string;
-  title: string;
-  note: string;
-  seed: string;
-  delay: number;
-}) {
-  return (
-    <Link
-      href={href}
-      data-track="section_clicked"
-      data-track-section={section}
-      className="spell group reveal flex w-fit items-center gap-3 md:gap-5"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      <span className="hand-display block text-[clamp(2rem,min(7vw,9vh),5.25rem)]">{title}</span>
-      <span className="flex flex-col items-start gap-1">
-        {/* En un móvil estrecho la nota puede partirse en dos líneas. */}
-        <span className="note md:whitespace-nowrap">({note})</span>
-        <InkArrow
-          seed={`${seed}-arrow`}
-          className="h-4 w-12 text-ink transition-transform duration-500 ease-spring group-hover:translate-x-2 md:h-5 md:w-16"
-        />
-      </span>
-    </Link>
-  );
-}
+/** Fotos que pasan por la escena, intercaladas con los juegos. */
+const FEATURED_PHOTOS = [0, 2, 4, 5, 8, 12];
 
 /** Cruces sueltas alrededor, como estrellas a boli. Solo en escritorio. */
 const STARS = [
-  { className: "left-[46%] top-[6%] h-4 w-4", delay: "0s" },
-  { className: "left-[58%] top-[30%] h-3 w-3", delay: "1.2s" },
-  { className: "left-[30%] top-[14%] h-3.5 w-3.5", delay: "0.6s" },
-  { className: "right-[2%] top-[12%] h-5 w-5", delay: "2s" },
-  { className: "right-[30%] bottom-[8%] h-3 w-3", delay: "2.8s" },
+  { className: "left-[8%] top-[30%] h-3 w-3", delay: "0s" },
+  { className: "left-[62%] top-[6%] h-4 w-4", delay: "1.2s" },
+  { className: "right-[3%] top-[18%] h-3.5 w-3.5", delay: "0.6s" },
+  { className: "left-[4%] bottom-[12%] h-3 w-3", delay: "2s" },
+  { className: "right-[30%] bottom-[6%] h-2.5 w-2.5", delay: "2.8s" },
 ];
 
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   const t = dictFor(lang);
+  const safeLang = isLang(lang) ? lang : "en";
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -93,62 +61,63 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
     ],
   };
 
-  return (
-    // La home entra entera en pantalla, footer incluido, pero sin recortar:
-    // si en algun dispositivo no cupiese, hace scroll en lugar de cortarse.
-    <div className="min-h-screen-safe w-full bg-paper font-sans text-ink">
-      <main className="page flex min-h-screen-safe h-screen-safe-mobile flex-col gap-2 pt-5 pb-[max(1rem,env(safe-area-inset-bottom))] md:gap-4 md:py-6">
-        <JsonLd data={jsonLd} />
+  // Una foto, un juego, una foto... Los juegos llevan a su entrada en /projects.
+  const photos: Work[] = FEATURED_PHOTOS.map((i) => ({ kind: "photo", src: PHOTOS[i].src, title: PHOTOS[i].title, href: "/photography" }));
+  const games: Work[] = PROJECTS.map((p, i) => ({ kind: "game", src: p.screenshot, title: p.name, href: `/projects#game-${i + 1}`, unoptimized: true }));
+  const works = photos.flatMap((photo, i) => (games[i] ? [photo, games[i]] : [photo]));
 
-        <SpellProvider lang={isLang(lang) ? lang : "en"}>
-          <div className="relative flex min-h-0 flex-1 flex-col gap-3 md:grid md:grid-cols-12 md:gap-x-8">
+  return (
+    // La home entra entera en pantalla, sin recortar: si en algún dispositivo no
+    // cupiese, hace scroll en lugar de cortarse.
+    <div className="min-h-screen-safe w-full bg-paper font-sans text-ink">
+      <main className="page flex min-h-screen-safe h-screen-safe-mobile flex-col gap-3 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:gap-4 md:py-5">
+        <JsonLd data={jsonLd} />
+        <TopBar lang={lang} />
+
+        <SpellProvider lang={safeLang}>
+          {/* La escena: la frase y, debajo, la obra que flota y el mago que la sostiene. */}
+          <section className="relative flex min-h-0 flex-1 flex-col">
             {STARS.map((star, i) => (
-              <Cross
-                key={i}
-                className={`absolute hidden animate-twinkle text-ink md:block ${star.className}`}
-                style={{ animationDelay: star.delay }}
-              />
+              <Cross key={i} className={`absolute hidden animate-twinkle text-ink md:block ${star.className}`} style={{ animationDelay: star.delay }} />
             ))}
 
-            {/* Nombre y hechizos */}
-            <div className="relative z-10 flex shrink-0 flex-col justify-center md:col-span-7 md:min-h-0">
-              <div className="reveal flex items-end gap-2">
-                <span className="note -rotate-3 text-[15px] text-ink md:text-lg">{t.homeHello}</span>
-                <InkArrow seed="hello" direction="down" curl className="mb-1 h-5 w-10 md:h-6 md:w-12" draw delay={0.3} />
+            {/* En el minijuego, la frase deja su sitio al marcador y a los mensajes. */}
+            <SpellCaption className="relative z-10 shrink-0 text-[clamp(1.05rem,min(3vw,4.2vh),2.5rem)] md:ml-[14%] md:mt-[clamp(0rem,3vh,2rem)]" />
+
+            {/* Aire entre la frase y la obra: el marco sobresale y la obra sube al flotar. */}
+            <div className="relative mt-6 min-h-0 flex-1 md:mt-12">
+              <div className="absolute left-0 top-0 h-[64%] w-[82%] md:left-[14%] md:h-full md:w-[40%]">
+                <FloatingWork works={works} labels={{ photo: t.photoKind, game: t.gameKind }} sizes="(max-width: 768px) 82vw, 40vw" />
               </div>
-
-              {/* En modo hechizo, el título es el marcador del juego. */}
-              <SpellName className="mt-1 text-[clamp(4rem,min(17vw,21vh),12.5rem)]" />
-              <Scribble seed="name" draw delay={0.5} className="mt-1 h-3 w-[min(70vw,38rem)] md:mt-2 md:h-5" />
-
-              {/* En modo hechizo, el lema da paso a los mensajes del juego. */}
-              <div className="reveal" style={{ animationDelay: "250ms" }}>
-                <SpellTagline text={t.homeTagline} className="hand mt-3 min-h-[1.5em] max-w-md text-mute md:mt-5 md:text-lg" />
-              </div>
-
-              <nav aria-label={t.sections} className="mt-4 hidden flex-col gap-3 md:mt-[clamp(1rem,5vh,3.5rem)] md:flex md:gap-[clamp(0.5rem,2.5vh,1.5rem)]">
-                <Spell href="/photography" section="photography" title={t.photoPanelTitle} note={t.frames(PHOTOS.length)} seed="spell-photo" delay={350} />
-                <Spell href="/projects" section="games" title={t.gamesPanelTitle} note={t.games(PROJECTS.length)} seed="spell-games" delay={450} />
-              </nav>
-            </div>
-
-            {/* El mago, a la mitad del alto de su sitio (en móvil se encoge primero).
-                Pulsarlo abre el minijuego secreto. */}
-            <div className="relative min-h-[7rem] flex-1 md:col-span-5 md:col-start-8 md:min-h-0">
-              <div className="absolute inset-x-0 inset-y-1/4">
+              <div className="absolute bottom-0 right-0 z-10 aspect-[240/290] h-[40%] md:right-[6%] md:h-[82%]">
                 <WizardButton />
               </div>
             </div>
+          </section>
 
-            {/* En móvil los hechizos van bajo el mago. */}
-            <nav aria-label={t.sections} className="mb-2 flex shrink-0 flex-col gap-1 md:hidden">
-              <Spell href="/photography" section="photography" title={t.photoPanelTitle} note={t.frames(PHOTOS.length)} seed="spell-photo" delay={0} />
-              <Spell href="/projects" section="games" title={t.gamesPanelTitle} note={t.games(PROJECTS.length)} seed="spell-games" delay={0} />
-            </nav>
+          {/* Abajo: quién, las píldoras y los hechizos. */}
+          <div className="grid shrink-0 gap-3 md:grid-cols-[1fr_auto_1fr] md:items-end md:gap-6">
+            <div className="order-3 flex flex-wrap items-baseline gap-x-3 md:order-none md:block">
+              <p className="text-[clamp(1.2rem,1.8vw,1.6rem)] font-medium [font-variation-settings:'INFM'_0,'BNCE'_0]">Antonio Asis</p>
+              <p className="hand mt-1 hidden max-w-[19rem] text-[13px] leading-snug md:block [@media(max-height:760px)]:md:hidden">{t.homeBio}</p>
+              <a
+                href={PERSON.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-track="instagram_clicked"
+                className="note text-ink underline decoration-wavy underline-offset-4 md:mt-2 md:inline-block"
+              >
+                @antonio10bc
+              </a>
+            </div>
+            <div className="order-1 md:order-none">
+              <SpellPills instagram={PERSON.instagram} />
+            </div>
+            <div className="order-2 flex justify-center md:order-none md:justify-end">
+              <SpellMarks />
+            </div>
           </div>
         </SpellProvider>
-
-        <Footer lang={lang} />
       </main>
     </div>
   );

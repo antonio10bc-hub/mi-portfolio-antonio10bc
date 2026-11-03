@@ -94,7 +94,7 @@ Cada trazo lleva `pathLength="1"` y se "dibuja" animando su desplazamiento de gu
 
 ### Páginas
 
-- **Portada.** "hi! i'm" con una flecha, "antonio" rotulado enorme y subrayado, el lema y los dos hechizos (fotografía, juegos) con su recuento. A la derecha el mago se dibuja trazo a trazo, se balancea y lanza chispas con la varita hacia los hechizos, con la nota "pick a spell". Cabe en una pantalla sin scroll.
+- **Portada.** Una escena, con la composición de una página de juego infantil: barra mínima arriba (secciones, "antonio" pequeño, idioma), en el centro una frase a mano en mayúsculas ("antonio hace fotos / y pequeños juegos") sobre una sola obra que flota y va pasando por fotos y juegos, sostenida por la varita del mago (el "sello", con sus dos gatos), y abajo el nombre en letra tranquila, píldoras dibujadas a mano y las siete marcas de hechizo. Cabe en una pantalla sin scroll.
 - **Juegos.** Cabecera de cuaderno (nota, título rotulado y subrayado, intro, índice y el garabato de un mando). Cada juego es una entrada: su número en una mancha de tinta, la captura torcida en un marco a mano, el nombre rotulado, la descripción y "jugar". Al final, "fin" con la letra pequeña común a todos los juegos.
 - **Fotografía.** Cabecera con el garabato de una cámara y la ficha del visor. Cada foto, torcida en su marco, con el título escrito debajo. El visor a pantalla completa es papel, con flechas a mano.
 - **404.** El mago, sin chispas y con interrogaciones sobre el sombrero: "poof!".

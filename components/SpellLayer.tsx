@@ -5,23 +5,27 @@ import { createPortal } from "react-dom";
 import { useSpell } from "@/components/SpellProvider";
 import { track } from "@/lib/analytics";
 import { DICTS } from "@/lib/i18n";
-import { matches, NAME, type Point } from "@/lib/spellbook";
+import { matches, NAME, type Element, type Point } from "@/lib/spellbook";
 import { confetti, INK, projectile, puff, spell, type Effect, type Vec } from "@/lib/spells";
 
 /*
- * La capa de dibujo del modo hechizo (ver SpellProvider): un canvas transparente
- * a pantalla completa encima de la home, donde se dibuja cada letra y se pintan
- * los hechizos. El mago es el de la home: la varita sale de su SVG y las poses van
- * en su envoltorio (`wizardRef`). Todo lo que se mueve va en un único bucle de
- * requestAnimationFrame mientras el modo está activo.
+ * La capa de los hechizos (ver SpellProvider): un canvas transparente a pantalla
+ * completa encima de la home. Dos modos:
+ *  - Suelto: solo pinta los hechizos de las marcas de abajo, de la varita a la obra
+ *    que flota; no recoge el puntero, la página se sigue usando.
+ *  - Minijuego (`active`): recoge el trazo, enseña la letra guía y la X, bloquea el
+ *    scroll y lee cada letra.
+ * El mago es el de la home: la varita sale de su SVG y las poses van en su
+ * envoltorio (`wizardRef`). Todo lo que se mueve va en un único bucle de
+ * requestAnimationFrame mientras la capa está montada.
  */
 
 /** Pausa tras el último trazo antes de leer la letra: deja dibujar la barra de la "t" o el punto de la "i". */
 const READ_DELAY = 650;
 const MAX_DPR = 2;
 
-export default function SpellLayer() {
-  const { lang, step, status, setStep, setStatus, setMessage, strike, stop, wizardRef } = useSpell();
+export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject<Element | null> }) {
+  const { lang, active, step, status, setStep, setStatus, setMessage, strike, stop, wizardRef, targetRef, castRef, lineWidth } = useSpell();
   const t = DICTS[lang];
   const onClose = stop;
 
@@ -45,6 +49,10 @@ export default function SpellLayer() {
   const stepRef = useRef(0);
   const statusRef = useRef(status);
   const celebration = useRef<ReturnType<typeof confetti> | null>(null);
+  const width = useRef(lineWidth);
+  useEffect(() => {
+    width.current = lineWidth;
+  }, [lineWidth]);
 
   useEffect(() => {
     stepRef.current = step;
@@ -131,7 +139,7 @@ export default function SpellLayer() {
 
     const ink = (points: Point[], dx = 0) => {
       ctx.strokeStyle = INK;
-      ctx.lineWidth = 7;
+      ctx.lineWidth = width.current;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
       ctx.beginPath();
@@ -182,8 +190,30 @@ export default function SpellLayer() {
     }
   }, [step]);
 
-  // Teclado, scroll del fondo y foco.
+  // Hechizo suelto: de la varita al centro de la obra que flota. Se registra en el
+  // proveedor y lanza el que estuviera esperando a que la capa se montara.
   useEffect(() => {
+    const cast = (element: Element) => {
+      const box = targetRef.current?.getBoundingClientRect();
+      const at = box ? { x: box.left + box.width / 2, y: box.top + box.height / 2 } : { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+      strike("wizard-cast", 750);
+      const hit = () => add(spell(element, at, window.innerHeight));
+      if (element === "lightning") window.setTimeout(hit, 180);
+      else add(projectile(wandTip(), at, hit));
+    };
+    castRef.current = cast;
+    if (pendingRef.current) {
+      cast(pendingRef.current);
+      pendingRef.current = null;
+    }
+    return () => {
+      castRef.current = null;
+    };
+  }, [add, castRef, pendingRef, strike, targetRef, wandTip]);
+
+  // Teclado, scroll del fondo y foco: solo en el minijuego.
+  useEffect(() => {
+    if (!active) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -196,13 +226,15 @@ export default function SpellLayer() {
       window.removeEventListener("keydown", onKey);
       if (readTimer.current) window.clearTimeout(readTimer.current);
       celebration.current?.stop();
+      celebration.current = null;
+      strokes.current = [];
     };
-  }, [onClose]);
+  }, [active, onClose]);
 
   const point = (e: React.PointerEvent | PointerEvent): Point => ({ x: e.clientX, y: e.clientY, stroke: strokeId.current });
 
   const onPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (statusRef.current !== "drawing") return;
+    if (!active || statusRef.current !== "drawing") return;
     e.currentTarget.setPointerCapture(e.pointerId);
     if (readTimer.current) window.clearTimeout(readTimer.current);
     drawing.current = true;
@@ -227,7 +259,7 @@ export default function SpellLayer() {
     // El contenedor no recoge el puntero: solo el canvas (mientras se dibuja) y la X.
     <div className="pointer-events-none fixed inset-0 z-40 select-none">
       {/* La letra que toca, enorme y casi invisible, en el centro: se puede calcar. */}
-      {status !== "done" && (
+      {active && status !== "done" && (
         <div aria-hidden className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <span key={step} className="hand-display animate-fade-in text-[min(56vw,52vh)] text-ink/5">
             {current.letter}
@@ -239,24 +271,26 @@ export default function SpellLayer() {
       <canvas
         ref={canvasRef}
         aria-label={t.spellIntro}
-        className={`absolute inset-0 h-full w-full touch-none ${status === "done" ? "" : "pointer-events-auto cursor-crosshair"}`}
+        className={`absolute inset-0 h-full w-full touch-none ${active && status !== "done" ? "pointer-events-auto cursor-crosshair" : ""}`}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
       />
 
-      <button
-        ref={closeRef}
-        type="button"
-        onClick={onClose}
-        aria-label={t.close}
-        className="pointer-events-auto absolute right-[max(1rem,env(safe-area-inset-right))] top-[max(1rem,env(safe-area-inset-top))] p-2 text-ink transition-transform duration-300 hover:rotate-90 md:right-8 md:top-6"
-      >
-        <svg viewBox="0 0 24 24" className="h-7 w-7 overflow-visible" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round">
-          <path d="M4.5 5.5 C9 10 14 15 19.5 18.5 M18.5 4.5 C14 9.5 9.5 14 5 19.5" />
-        </svg>
-      </button>
+      {active && (
+        <button
+          ref={closeRef}
+          type="button"
+          onClick={onClose}
+          aria-label={t.close}
+          className="pointer-events-auto absolute right-[max(1rem,env(safe-area-inset-right))] top-[max(1rem,env(safe-area-inset-top))] p-2 text-ink transition-transform duration-300 hover:rotate-90 md:right-8 md:top-6"
+        >
+          <svg viewBox="0 0 24 24" className="h-7 w-7 overflow-visible" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round">
+            <path d="M4.5 5.5 C9 10 14 15 19.5 18.5 M18.5 4.5 C14 9.5 9.5 14 5 19.5" />
+          </svg>
+        </button>
+      )}
     </div>,
     document.body,
   );

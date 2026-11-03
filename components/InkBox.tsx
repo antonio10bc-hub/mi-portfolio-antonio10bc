@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { roughEllipse, roughRect, roughUnderline } from "@/lib/ink";
+import { roughEllipse, roughPill, roughRect, roughUnderline } from "@/lib/ink";
 
 /*
  * Las formas a mano que se estiran con su caja: marco, círculo y subrayado. Miden
@@ -110,4 +110,28 @@ export function ScribbleCircle({ seed, className = "", ...drawn }: Drawn & { see
 /** Subrayado a mano; su tamaño lo da `className` (ancho y alto). */
 export function Scribble({ seed, width = 3.4, className = "", ...drawn }: Drawn & { seed: string }) {
   return <Stroke shape={roughUnderline} seed={seed} width={width} {...drawn} className={`block ${className}`} />;
+}
+
+/**
+ * Contorno de píldora a mano, encima del padre (`relative`). Con `fill`, debajo va
+ * la misma forma rellena de tinta, apagada; el padre la enciende al pasar el
+ * ratón (`group-hover:[&_.ink-pill-fill]:opacity-100`).
+ */
+export function InkPill({ seed, fill = false, width = 2.2, className = "" }: { seed: string; fill?: boolean; width?: number; className?: string }) {
+  const [ref, box] = useBox();
+  return (
+    <svg
+      ref={ref}
+      aria-hidden
+      viewBox={box ? `0 0 ${box.w} ${box.h}` : undefined}
+      className={`pointer-events-none absolute inset-0 h-full w-full min-w-0 overflow-visible ${className}`}
+    >
+      {box && box.w > 0 && (
+        <>
+          {fill && <path d={roughPill(seed, box.w, box.h)} fill="currentColor" stroke="none" className="ink-pill-fill opacity-0 transition-opacity duration-300" />}
+          <path d={roughPill(seed, box.w, box.h)} fill="none" stroke="currentColor" strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      )}
+    </svg>
+  );
 }

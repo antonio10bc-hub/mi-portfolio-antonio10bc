@@ -75,6 +75,15 @@
     }
   }
 
+  /*
+   * La frase de la escena de la home: a mano, en mayúsculas espaciadas y con mucho
+   * rebote, como un rótulo escrito encima del dibujo.
+   */
+  .hand-caption {
+    @apply font-sans font-semibold uppercase leading-[1.15] tracking-[0.05em];
+    font-variation-settings: "INFM" 100, "BNCE" 75;
+  }
+
   /* Texto corrido, a mano. */
   .hand {
     @apply font-sans text-[15px] leading-[1.5] md:text-base;

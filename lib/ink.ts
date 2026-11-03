@@ -117,3 +117,33 @@ export function roughUnderline(seed: string, w: number, h: number) {
   const back: Pt[] = [0, 1, 2, 3].map((k) => [w * (0.95 - k * 0.24), h * (0.78 + r[k + 8] * 0.1)]);
   return smooth([...out, ...back]);
 }
+
+/**
+ * Píldora a mano (los botones de la home): un rectángulo de puntas redondas,
+ * trazado de una vez y cerrado con un poco de sobra, como un óvalo alargado.
+ */
+export function roughPill(seed: string, w: number, h: number) {
+  // 23 puntos, cada uno con dos números (x en r[k], y en r[k + 23]), y uno para el cierre.
+  const r = noise(seed, 47);
+  const rad = h / 2;
+  const points: Pt[] = [];
+  // Lado de arriba, curva derecha, lado de abajo, curva izquierda.
+  const steps = 22;
+  for (let k = 0; k <= steps; k++) {
+    const t = k / steps;
+    let p: Pt;
+    if (t < 0.3) p = [rad + ((w - 2 * rad) * t) / 0.3, 0];
+    else if (t < 0.5) {
+      const a = -Math.PI / 2 + (Math.PI * (t - 0.3)) / 0.2;
+      p = [w - rad + Math.cos(a) * rad, rad + Math.sin(a) * rad];
+    } else if (t < 0.8) p = [w - rad - ((w - 2 * rad) * (t - 0.5)) / 0.3, h];
+    else {
+      const a = Math.PI / 2 + (Math.PI * (t - 0.8)) / 0.2;
+      p = [rad + Math.cos(a) * rad, rad + Math.sin(a) * rad];
+    }
+    points.push([p[0] + r[k] * 1.2, p[1] + r[k + 23] * 1.2]);
+  }
+  // Se pasa un poco del punto de partida, como al cerrar a mano.
+  points.push([rad + w * 0.06, r[46] * 1.5 - 1]);
+  return smooth(points);
+}

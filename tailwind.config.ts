@@ -37,6 +37,8 @@ const config: Config = {
         bob: 'bob 5s ease-in-out infinite',
         // Chispas de la varita.
         spark: 'spark 2.4s ease-out infinite',
+        // La obra que el mago sostiene en el aire.
+        float: 'float 6s ease-in-out infinite',
         // Cruces sueltas que titilan.
         twinkle: 'twinkle 3.6s ease-in-out infinite',
       },
@@ -66,6 +68,10 @@ const config: Config = {
           '0%': { opacity: '0', transform: 'translate(0, 0) scale(0.2) rotate(0deg)' },
           '15%': { opacity: '1', transform: 'translate(calc(var(--dx) * 0.25), calc(var(--dy) * 0.25)) scale(1) rotate(30deg)' },
           '100%': { opacity: '0', transform: 'translate(var(--dx), var(--dy)) scale(0.5) rotate(140deg)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0) rotate(-2deg)' },
+          '50%': { transform: 'translateY(-12px) rotate(-0.6deg)' },
         },
         twinkle: {
           '0%, 100%': { opacity: '1', transform: 'scale(1) rotate(0deg)' },

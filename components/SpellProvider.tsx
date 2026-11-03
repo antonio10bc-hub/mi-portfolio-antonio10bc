@@ -1,18 +1,20 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { track } from "@/lib/analytics";
 import { DICTS, type Lang } from "@/lib/i18n";
-import { NAME } from "@/lib/spellbook";
+import { NAME, type Element } from "@/lib/spellbook";
 
 /*
- * El minijuego secreto, dentro de la propia home: no hay pantalla aparte. Al pulsar
- * el mago la home entra en "modo hechizo": encima se pone una capa transparente
- * para dibujar (SpellLayer, que solo se descarga entonces), el título "antonio"
- * pasa a ser el marcador (sus letras se apagan y se vuelven a entintar al
- * acertarlas) y el lema de debajo, los mensajes del juego. El mago lanza desde
- * donde está. Este contexto es lo que comparten esas piezas.
+ * La magia de la home, sin pantallas aparte. Dos maneras de lanzar:
+ *  - Hechizo suelto: cualquiera de las siete marcas de abajo a la derecha hace que
+ *    el mago lo lance al momento contra la obra que flota en el centro.
+ *  - El minijuego (al pulsar el mago o "lanza un hechizo"): la home entra en modo
+ *    hechizo, se dibujan las letras de "antonio" sobre la propia página y cada una
+ *    lanza el suyo. La frase de la escena pasa a ser el marcador y los mensajes.
+ * Las dos pintan en SpellLayer, una capa de canvas que solo se descarga cuando
+ * hace falta y se retira sola cuando no queda nada que pintar.
  */
 
 const SpellLayer = dynamic(() => import("@/components/SpellLayer"), { ssr: false });
@@ -22,16 +24,28 @@ export type Pose = "" | "wizard-cast" | "wizard-shake";
 
 type SpellState = {
   lang: Lang;
+  /** El minijuego está en marcha. */
   active: boolean;
   step: number;
   status: SpellStatus;
   message: string;
   pose: Pose;
+  /** Grosor del trazo al dibujar letras, en px (el deslizador "trazo"). */
+  lineWidth: number;
+  setLineWidth: (n: number) => void;
+  /** El último hechizo suelto, para marcarlo en su botón, y cuántos van (para volver a dibujar la marca). */
+  lastCast: Element | null;
+  castCount: number;
   /** El envoltorio del mago: de ahí sale la punta de la varita y ahí van las poses. */
   wizardRef: React.RefObject<HTMLDivElement | null>;
+  /** La obra que flota en el centro: allí van los hechizos sueltos. */
+  targetRef: React.RefObject<HTMLAnchorElement | null>;
+  /** La capa registra aquí cómo lanzar un hechizo suelto. */
+  castRef: React.RefObject<((element: Element) => void) | null>;
   start: () => void;
   stop: () => void;
   restart: () => void;
+  castFree: (element: Element) => void;
   setStep: (n: number) => void;
   setStatus: (s: SpellStatus) => void;
   setMessage: (m: string) => void;
@@ -46,14 +60,25 @@ export function useSpell() {
   return value;
 }
 
+/** Tras el último hechizo suelto, cuánto espera la capa antes de retirarse. */
+const LAYER_IDLE = 4000;
+
 export function SpellProvider({ lang, children }: { lang: Lang; children: React.ReactNode }) {
   const t = DICTS[lang];
   const [active, setActive] = useState(false);
+  const [layerOn, setLayerOn] = useState(false);
   const [step, setStep] = useState(0);
   const [status, setStatus] = useState<SpellStatus>("drawing");
   const [message, setMessage] = useState("");
   const [pose, setPose] = useState<Pose>("");
+  const [lineWidth, setLineWidth] = useState(7);
+  const [lastCast, setLastCast] = useState<Element | null>(null);
+  const [castCount, setCastCount] = useState(0);
   const wizardRef = useRef<HTMLDivElement>(null);
+  const targetRef = useRef<HTMLAnchorElement>(null);
+  const castRef = useRef<((element: Element) => void) | null>(null);
+  const pending = useRef<Element | null>(null);
+  const idle = useRef<number | null>(null);
 
   const strike = useCallback((next: Pose, ms: number) => {
     setPose(next);
@@ -73,6 +98,7 @@ export function SpellProvider({ lang, children }: { lang: Lang; children: React.
     setStatus("drawing");
     setMessage(t.spellIntro);
     setActive(true);
+    setLayerOn(true);
   }, [active, t]);
 
   const stop = useCallback(() => {
@@ -80,62 +106,90 @@ export function SpellProvider({ lang, children }: { lang: Lang; children: React.
     setPose("");
   }, []);
 
+  const castFree = useCallback((element: Element) => {
+    track("spell_cast", { element });
+    setLastCast(element);
+    setCastCount((n) => n + 1);
+    if (idle.current) window.clearTimeout(idle.current);
+    if (castRef.current) castRef.current(element);
+    else {
+      // La capa aún no está montada: lanza en cuanto lo esté.
+      pending.current = element;
+      setLayerOn(true);
+    }
+  }, []);
+
+  // La capa se retira sola cuando ni hay juego ni hechizos sueltos recientes.
+  useEffect(() => {
+    if (active || !layerOn) return;
+    idle.current = window.setTimeout(() => setLayerOn(false), LAYER_IDLE);
+    return () => {
+      if (idle.current) window.clearTimeout(idle.current);
+    };
+  }, [active, layerOn, lastCast]);
+
   const value = useMemo(
-    () => ({ lang, active, step, status, message, pose, wizardRef, start, stop, restart, setStep, setStatus, setMessage, strike }),
-    [lang, active, step, status, message, pose, start, stop, restart, strike],
+    () => ({
+      lang, active, step, status, message, pose, lineWidth, setLineWidth, lastCast, castCount,
+      wizardRef, targetRef, castRef, start, stop, restart, castFree, setStep, setStatus, setMessage, strike,
+    }),
+    [lang, active, step, status, message, pose, lineWidth, lastCast, castCount, start, stop, restart, castFree, strike],
   );
 
   return (
     <SpellContext.Provider value={value}>
       {children}
-      {active && <SpellLayer />}
+      {layerOn && <SpellLayer pendingRef={pending} />}
     </SpellContext.Provider>
   );
 }
 
 /**
- * El título de la home. Fuera del juego es "antonio" y nada más. Dentro, es el
- * marcador: las letras acertadas en tinta, la que toca subrayada y las demás en
- * lápiz muy claro.
+ * La frase de la escena, a mano y en mayúsculas, en dos líneas escalonadas. En el
+ * minijuego deja su sitio al marcador ("antonio": las letras acertadas en tinta,
+ * la que toca subrayada, las demás en lápiz) y a los mensajes, con "otra vez" y
+ * "cerrar" al terminar.
  */
-export function SpellName({ className = "" }: { className?: string }) {
-  const { active, step, status } = useSpell();
-  return (
-    <h1 className={`hand-display wiggle ${className}`}>
-      {NAME.map((n, i) => {
-        const done = !active || i < step || status === "done";
-        const current = active && i === step && status !== "done";
-        return (
-          <span
-            key={i}
-            className={`transition-colors duration-500 ${done ? "text-ink" : current ? "text-ink underline decoration-wavy decoration-[0.06em] underline-offset-[0.12em]" : "text-ink/15"}`}
-          >
-            {n.letter}
-          </span>
-        );
-      })}
-    </h1>
-  );
-}
-
-/** El lema de la home; en modo hechizo, los mensajes del juego (y al final, "otra vez" / "cerrar"). */
-export function SpellTagline({ text, className = "" }: { text: string; className?: string }) {
-  const { active, message, status, restart, stop, lang } = useSpell();
+export function SpellCaption({ className = "" }: { className?: string }) {
+  const { active, step, status, message, restart, stop, lang } = useSpell();
   const t = DICTS[lang];
-  if (!active) return <p className={className}>{text}</p>;
+  if (!active) {
+    return (
+      <h1 className={`hand-caption ${className}`}>
+        <span className="block">{t.homeSentence[0]}</span>
+        <span className="block pl-[clamp(1.5rem,6vw,6rem)]">{t.homeSentence[1]}</span>
+      </h1>
+    );
+  }
   return (
-    <p aria-live="polite" className={`${className} !text-ink`}>
-      {status === "done" ? t.spellDone : message}
-      {status === "done" && (
-        <span className="ml-3 inline-flex gap-4 align-baseline">
-          <button type="button" onClick={restart} className="relative z-50 font-bold underline decoration-wavy decoration-2 underline-offset-4">
-            {t.again}
-          </button>
-          <button type="button" onClick={stop} className="relative z-50 font-bold text-mute">
-            {t.close.toLowerCase()}
-          </button>
-        </span>
-      )}
-    </p>
+    <div className={className}>
+      <p className="hand-display flex gap-[clamp(0.15rem,1vw,0.6rem)] text-[clamp(2.5rem,min(7vw,9vh),5rem)]" aria-label="antonio">
+        {NAME.map((n, i) => {
+          const done = i < step || status === "done";
+          const current = i === step && status !== "done";
+          return (
+            <span
+              key={i}
+              className={`transition-colors duration-500 ${done ? "text-ink" : current ? "text-ink underline decoration-wavy decoration-[0.06em] underline-offset-[0.12em]" : "text-ink/15"}`}
+            >
+              {n.letter}
+            </span>
+          );
+        })}
+      </p>
+      <p aria-live="polite" className="hand mt-2 md:text-lg">
+        {status === "done" ? t.spellDone : message}
+        {status === "done" && (
+          <span className="ml-3 inline-flex gap-4 align-baseline">
+            <button type="button" onClick={restart} className="font-bold underline decoration-wavy decoration-2 underline-offset-4">
+              {t.again}
+            </button>
+            <button type="button" onClick={stop} className="font-bold text-mute">
+              {t.close.toLowerCase()}
+            </button>
+          </span>
+        )}
+      </p>
+    </div>
   );
 }

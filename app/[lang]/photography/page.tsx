@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
-import FileNav from "@/components/FileNav";
+import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 import { CameraDoodle } from "@/components/Ink";
 import NextFile from "@/components/NextFile";
@@ -37,7 +37,7 @@ export default async function PhotographyPage({ params }: { params: Promise<{ la
   return (
     <div className="min-h-screen-safe w-full bg-paper font-sans text-ink">
       <div className="page flex min-h-screen-safe flex-col py-5 md:py-8">
-        <FileNav t={t} current="photography" />
+        <TopBar lang={lang} current="photography" />
 
         <SectionHeader
           className="reveal mt-10 md:mt-16"

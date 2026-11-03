@@ -260,12 +260,9 @@ export function Wizard({
   id = "wizard",
   animate = true,
   sparkles = true,
-  hint,
   className = "",
   title,
 }: {
-  /** Nota a mano bajo la varita, con flecha hacia la izquierda (solo en escritorio). */
-  hint?: string;
   /** Prefijo del id del filtro: único si hay más de un mago en la página. */
   id?: string;
   animate?: boolean;
@@ -340,26 +337,6 @@ export function Wizard({
           />
         ))}
       </g>
-      {hint && (
-        // Dentro del SVG para que siga a la punta de la varita aunque el mago se
-        // encuadre con márgenes; sale por la izquierda (overflow visible).
-        <g className="hidden md:inline" transform="translate(14 214) rotate(-5)">
-          <text x={0} y={0} textAnchor="end" className="fill-mute font-sans text-[13px] font-medium">
-            {hint}
-          </text>
-          <path
-            d="M-2 -18 C-14 -26 -30 -28 -46 -24 M-38 -30 -47 -24 -38 -18"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            pathLength={1}
-            className="ink-line ink-draw text-mute"
-            style={{ "--d": `${WIZARD_DRAWN + 0.2}s` } as CSSProperties}
-          />
-        </g>
-      )}
       {sparkles && (
         <g transform="translate(8 180)">
           {WAND_SPARKS.map((spark, k) => (

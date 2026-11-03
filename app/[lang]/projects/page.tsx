@@ -3,7 +3,7 @@ import Link from "next/link";
 import { pageMetadata } from "@/lib/seo";
 import { PERSON, SITE_URL, listJoin } from "@/lib/site";
 import JsonLd from "@/components/JsonLd";
-import FileNav from "@/components/FileNav";
+import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 import { Cross, GamepadDoodle, InkArrow } from "@/components/Ink";
 import { InkFrame, ScribbleCircle } from "@/components/InkBox";
@@ -125,7 +125,7 @@ export default async function ProjectsPage({ params }: { params: Promise<{ lang:
     <div className="min-h-screen-safe w-full bg-paper font-sans text-ink">
       <div className="page flex min-h-screen-safe flex-col py-5 md:py-8">
         <JsonLd data={jsonLd} />
-        <FileNav t={t} current="games" />
+        <TopBar lang={lang} current="games" />
 
         <SectionHeader
           className="reveal mt-10 md:mt-16"
