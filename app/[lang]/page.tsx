@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Footer from "@/components/Footer";
-import TreeSpecimen from "@/components/TreeSpecimen";
-import { Arrow, Barcode, Brackets, CornerMark, DataBars, Diamonds, Dots, Leader, XStack } from "@/components/Hud";
+import { Cross, InkArrow, Wizard } from "@/components/Ink";
+import { Scribble, ScribbleCircle } from "@/components/InkBox";
 import { PHOTOS } from "@/lib/photos";
 import { PROJECTS } from "@/lib/projects";
 import { dictFor } from "@/lib/i18n";
@@ -9,59 +9,61 @@ import JsonLd from "@/components/JsonLd";
 import { PERSON, SITE_URL } from "@/lib/site";
 
 /*
- * La home es el índice del archivo: el árbol tramado ("Solitude") como
- * espécimen central y, montados encima, el nombre con su línea de referencia
- * y los dos expedientes. En escritorio es una rejilla de 12 columnas y 3 filas
- * (auto, flexible, auto: con filas iguales, la más alta fijaba el alto de las
- * tres y la home dejaba de caber) donde todo se superpone al árbol; en móvil, una columna donde el árbol es el
- * de tamaño acotado: el espacio sobrante queda bajo los paneles y el pie se
- * queda abajo, encuadrado, sin scroll.
+ * La home es la primera página del cuaderno: el nombre rotulado a mano, subrayado
+ * de un trazo, y el mago, que se dibuja solo al llegar y lanza chispas con la
+ * varita hacia los dos "hechizos" (Fotografía y Juegos). En escritorio, dos
+ * columnas: texto a la izquierda, mago a la derecha apuntando a los enlaces. En
+ * móvil, una columna de alto exacto en la que el mago se encoge primero.
  */
 
-function SectionPanel({
+function Spell({
   href,
   section,
-  number,
-  meta,
   title,
-  description,
-  tone,
-  className,
+  note,
+  seed,
+  delay,
 }: {
   href: string;
   /** Nombre fijo para las analíticas (no cambia con el idioma) */
   section: string;
-  number: string;
-  meta: string;
   title: string;
-  description: string;
-  tone: "light" | "dark";
-  className: string;
+  note: string;
+  seed: string;
+  delay: number;
 }) {
-  const dark = tone === "dark";
   return (
     <Link
       href={href}
       data-track="section_clicked"
       data-track-section={section}
-      className={`group relative z-10 block shrink-0 px-7 py-4 transition-colors duration-500 ease-smooth md:p-8
-                  ${dark ? "bg-graphite text-paper hover:bg-ink" : "bg-panel text-ink hover:bg-ink hover:text-paper"} ${className}`}
+      className="spell group reveal flex w-fit items-center gap-3 md:gap-5"
+      style={{ animationDelay: `${delay}ms` }}
     >
-      {!dark && <Brackets size={18} weight={2} inset={8} />}
-      <div className="flex items-center justify-between gap-3">
-        <span className="code text-[11px] md:text-xs">
-          {number} <span aria-hidden>{"//"}</span> {meta}
-        </span>
-        {dark ? <Dots /> : <Arrow direction="right" className="transition-transform duration-500 ease-smooth group-hover:translate-x-1" />}
-      </div>
-      <h2 className="display mt-2 text-[clamp(2rem,min(5vw,7vh),4.25rem)] md:mt-4">{title}</h2>
-      <div className="mt-1.5 flex items-end justify-between gap-3 md:mt-2">
-        <p className="font-mono text-[11px] leading-snug md:text-xs">{description}</p>
-        {dark && <Arrow direction="right" className="shrink-0 transition-transform duration-500 ease-smooth group-hover:translate-x-1" />}
-      </div>
+      <span className="relative">
+        <ScribbleCircle seed={seed} hover />
+        <span className="hand-display block text-[clamp(2rem,min(7vw,9vh),5.25rem)]">{title}</span>
+      </span>
+      <span className="flex flex-col items-start gap-1">
+        {/* En un móvil estrecho la nota puede partirse en dos líneas. */}
+        <span className="note md:whitespace-nowrap">({note})</span>
+        <InkArrow
+          seed={`${seed}-arrow`}
+          className="h-4 w-12 text-ink transition-transform duration-500 ease-spring group-hover:translate-x-2 md:h-5 md:w-16"
+        />
+      </span>
     </Link>
   );
 }
+
+/** Cruces sueltas alrededor, como estrellas a boli. Solo en escritorio. */
+const STARS = [
+  { className: "left-[46%] top-[6%] h-4 w-4", delay: "0s" },
+  { className: "left-[58%] top-[30%] h-3 w-3", delay: "1.2s" },
+  { className: "left-[30%] top-[14%] h-3.5 w-3.5", delay: "0.6s" },
+  { className: "right-[2%] top-[12%] h-5 w-5", delay: "2s" },
+  { className: "right-[30%] bottom-[8%] h-3 w-3", delay: "2.8s" },
+];
 
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
@@ -91,85 +93,58 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       },
     ],
   };
+
   return (
     // La home entra entera en pantalla, footer incluido, pero sin recortar:
     // si en algun dispositivo no cupiese, hace scroll en lugar de cortarse.
     <div className="min-h-screen-safe w-full bg-paper font-sans text-ink">
-      <main className="page flex min-h-screen-safe h-screen-safe-mobile flex-col gap-3 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:gap-4 md:py-5">
+      <main className="page flex min-h-screen-safe h-screen-safe-mobile flex-col gap-2 pt-5 pb-[max(1rem,env(safe-area-inset-bottom))] md:gap-4 md:py-6">
         <JsonLd data={jsonLd} />
 
-        <div
-          className="relative flex min-h-0 flex-1 flex-col gap-3
-                     md:grid md:grid-cols-12 md:grid-rows-[auto_minmax(0,1fr)_auto] md:gap-x-6 md:gap-y-4"
-        >
-          {/* Espécimen. En móvil parte de su alto natural (ancho x 812/1148) y
-              reparte el espacio sobrante a medias con el separador de debajo de las
-              tarjetas: el árbol, centrado, gana el mismo aire arriba que abajo y las
-              tarjetas bajan, pero sin llegar al fondo. Si falta sitio, se encoge. */}
-          <div
-            className="reveal relative h-[calc((100vw-2rem)*0.707)] min-h-0 grow shrink
-                       md:col-start-3 md:col-end-12 lg:col-start-4 md:row-start-1 md:row-end-4 md:h-auto"
-          >
-            {/* Antes de pintar nada: si en esta sesión toca la impresión del árbol,
-                se marca para que tree.png no asome antes de que el canvas tome el relevo. */}
-            <script
-              dangerouslySetInnerHTML={{
-                __html:
-                  "try{if(sessionStorage.getItem('treeIntro')!=='1'&&!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.dataset.treeIntro='1'}catch(e){}",
-              }}
+        <div className="relative flex min-h-0 flex-1 flex-col gap-3 md:grid md:grid-cols-12 md:gap-x-8">
+          {STARS.map((star, i) => (
+            <Cross
+              key={i}
+              className={`absolute hidden animate-twinkle text-ink md:block ${star.className}`}
+              style={{ animationDelay: star.delay }}
             />
-            <TreeSpecimen alt={t.treeAlt} />
-          </div>
+          ))}
 
-          {/* Nombre */}
-          <div className="reveal relative z-10 order-first shrink-0 md:order-none md:col-start-1 md:col-end-8 md:row-start-1">
-            <div className="flex items-center gap-3">
-              <Dots />
-              <span className="code text-[11px] md:text-xs">{t.homeCode}</span>
+          {/* Nombre y hechizos */}
+          <div className="relative z-10 flex shrink-0 flex-col justify-center md:col-span-7 md:min-h-0">
+            <div className="reveal flex items-end gap-2">
+              <span className="note -rotate-3 text-[15px] text-ink md:text-lg">{t.homeHello}</span>
+              <InkArrow seed="hello" direction="down" curl className="mb-1 h-5 w-10 md:h-6 md:w-12" draw delay={0.3} />
             </div>
-            <h1 className="display mt-2 text-[clamp(3.5rem,min(13vw,15vh),10rem)] md:mt-3">antonio.</h1>
-            <div className="mt-2 flex items-start gap-4 md:mt-3">
-              <p className="font-mono text-xs md:text-sm">{t.homeTagline}</p>
-              <Leader length={170} drop={44} className="mt-2 hidden shrink-0 lg:block" />
+
+            <h1 className="hand-display wiggle mt-1 text-[clamp(4rem,min(17vw,21vh),12.5rem)]">antonio</h1>
+            <Scribble seed="name" draw delay={0.5} className="mt-1 h-3 w-[min(70vw,38rem)] md:mt-2 md:h-5" />
+
+            <p className="hand reveal mt-3 max-w-md text-mute md:mt-5 md:text-lg" style={{ animationDelay: "250ms" }}>
+              {t.homeTagline}
+            </p>
+
+            <nav aria-label={t.sections} className="mt-4 hidden flex-col gap-3 md:mt-[clamp(1rem,5vh,3.5rem)] md:flex md:gap-[clamp(0.5rem,2.5vh,1.5rem)]">
+              <Spell href="/photography" section="photography" title={t.photoPanelTitle} note={t.frames(PHOTOS.length)} seed="spell-photo" delay={350} />
+              <Spell href="/projects" section="games" title={t.gamesPanelTitle} note={t.games(PROJECTS.length)} seed="spell-games" delay={450} />
+            </nav>
+          </div>
+
+          {/* El mago: en móvil se encoge primero; en escritorio llena su columna. */}
+          <div className="relative min-h-[7rem] flex-1 md:col-span-5 md:col-start-8 md:min-h-0">
+            <div className="absolute inset-0">
+              <Wizard title={t.wizardAlt} hint={t.homeHint} className="origin-bottom animate-bob" />
             </div>
           </div>
 
-          <CornerMark corner="tr" className="absolute right-0 top-0 hidden md:block" />
-          <XStack className="hidden md:col-start-1 md:row-start-2 md:flex md:self-center" />
-          <Diamonds className="hidden md:col-start-7 md:row-start-2 md:block md:self-start md:justify-self-end" />
-
-          <SectionPanel
-            href="/photography"
-            section="photography"
-            number="01"
-            meta={t.frames(PHOTOS.length)}
-            title={t.photoPanelTitle}
-            description={t.photoPanelText}
-            tone="light"
-            className="reveal md:col-start-8 md:col-end-13 md:row-start-2 md:self-center"
-          />
-
-          <SectionPanel
-            href="/projects"
-            section="games"
-            number="02"
-            meta={t.games(PROJECTS.length)}
-            title={t.gamesPanelTitle}
-            description={t.gamesPanelText}
-            tone="dark"
-            className="reveal md:col-start-1 md:col-end-6 md:row-start-3 md:self-end"
-          />
-
-          {/* Separador móvil: se lleva la otra mitad del espacio sobrante. */}
-          <div aria-hidden className="grow md:hidden" />
-
-          <div aria-hidden className="hidden md:col-start-10 md:col-end-13 md:row-start-3 md:block md:self-end">
-            <DataBars seed="index" rows={8} />
-            <Barcode seed="antonio-index" className="mt-3 h-10 w-full" />
-          </div>
+          {/* En móvil los hechizos van bajo el mago. */}
+          <nav aria-label={t.sections} className="mb-2 flex shrink-0 flex-col gap-1 md:hidden">
+            <Spell href="/photography" section="photography" title={t.photoPanelTitle} note={t.frames(PHOTOS.length)} seed="spell-photo" delay={0} />
+            <Spell href="/projects" section="games" title={t.gamesPanelTitle} note={t.games(PROJECTS.length)} seed="spell-games" delay={0} />
+          </nav>
         </div>
 
-        <Footer lang={lang} className="mt-1" />
+        <Footer lang={lang} />
       </main>
     </div>
   );

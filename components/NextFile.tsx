@@ -1,16 +1,16 @@
 import Link from "next/link";
-import { Arrow, Barcode, Dots } from "@/components/Hud";
+import { Cross, InkArrow } from "@/components/Ink";
+import { InkFrame } from "@/components/InkBox";
 
 /**
- * Cierre de una página interior: el panel grafito que lleva al otro expediente,
- * el mismo lenguaje que el panel "games." de la home. Va a todo el ancho antes
- * del pie de /photography. Sin imágenes del otro expediente: no es un adelanto.
+ * Cierre de una página interior: lo siguiente del cuaderno, dentro de un marco a
+ * mano que se dibuja al llegar con el scroll. Va a todo el ancho antes del pie de
+ * /photography y lleva a los juegos. Sin imágenes de la otra sección.
  */
 export default function NextFile({
   href,
   section,
   label,
-  code,
   title,
   text,
   className = "",
@@ -18,9 +18,8 @@ export default function NextFile({
   href: string;
   /** Nombre fijo para las analíticas (no cambia con el idioma) */
   section: string;
-  /** "Next file" */
+  /** "next up" */
   label: string;
-  code: string;
   title: string;
   text: string;
   className?: string;
@@ -30,30 +29,22 @@ export default function NextFile({
       href={href}
       data-track="next_file_clicked"
       data-track-section={section}
-      className={`group flex min-h-[14rem] flex-col justify-between gap-8 bg-graphite p-6 text-paper
-                  transition-colors duration-500 ease-smooth hover:bg-ink md:p-8 ${className}`}
+      className={`ink-host group relative flex flex-col gap-4 px-6 py-8 text-ink md:flex-row md:items-center md:justify-between md:px-12 md:py-12 ${className}`}
     >
-      <div className="flex items-center gap-3">
-        <Dots />
-        <span className="code whitespace-nowrap text-[11px] md:text-xs">{label}</span>
-        {/* Código y código de barras solo desde xl: en media celda, a 768 y 1024,
-            el español ("Siguiente expediente", "Expediente 01 // ...") no cabe. */}
-        <span className="code ml-auto hidden whitespace-nowrap text-[11px] md:text-xs xl:inline">{code}</span>
-      </div>
-
+      <InkFrame seed={`next-${section}`} scroll outset={0} width={2.8} />
       <div>
-        <div className="flex items-end justify-between gap-4 border-b-2 border-paper pb-3">
-          <h2 className="display text-[clamp(2.75rem,7vw,5.5rem)]">{title}</h2>
-          <Arrow
-            direction="right"
-            className="mb-2 h-6 w-6 shrink-0 transition-transform duration-500 ease-smooth group-hover:translate-x-1.5 md:h-8 md:w-8"
-          />
-        </div>
-        <div className="mt-3 flex items-center gap-6">
-          <p className="font-mono text-[11px] leading-snug md:text-xs">{text}</p>
-          <Barcode seed={`next-${section}`} className="ml-auto hidden h-6 w-40 shrink-0 xl:block" />
-        </div>
+        <span className="note flex items-center gap-2 text-ink">
+          <Cross className="h-3 w-3" />
+          {label}
+        </span>
+        <h2 className="hand-display mt-2 text-[clamp(3rem,9vw,7rem)]">{title}</h2>
+        <p className="hand mt-3 text-mute">{text}</p>
       </div>
+      <InkArrow
+        seed={`next-${section}-arrow`}
+        curl
+        className="h-12 w-32 shrink-0 self-end transition-transform duration-500 ease-spring group-hover:translate-x-3 md:h-20 md:w-52 md:self-center"
+      />
     </Link>
   );
 }

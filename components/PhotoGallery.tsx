@@ -3,28 +3,27 @@
 import Image from "next/image";
 import { createPortal } from "react-dom";
 import { useCallback, useEffect, useState } from "react";
-import { Brackets } from "@/components/Hud";
+import { InkArrow } from "@/components/Ink";
+import { InkFrame, ScribbleCircle } from "@/components/InkBox";
 import { track } from "@/lib/analytics";
 import { PHOTOS } from "@/lib/photos";
 import { DICTS, type Lang } from "@/lib/i18n";
 
-const FEATURED_SIZES = "(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 66vw";
+const FEATURED_SIZES = "(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 66vw";
 const GRID_SIZES = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw";
 
-function Chevron({ direction }: { direction: "left" | "right" }) {
+/** Cada foto, pegada un poco torcida y siempre igual (la inclinación depende de su posición). */
+const TILTS = ["-rotate-[0.8deg]", "rotate-[1.1deg]", "-rotate-[1.3deg]", "rotate-[0.6deg]", "rotate-[1.4deg]", "-rotate-[0.5deg]"];
+
+const pad = (n: number) => String(n).padStart(2, "0");
+
+/** Botón del visor: una flecha o una cruz a mano, rodeada al pasar el ratón. */
+function ViewerButton({ label, onClick, className = "", children }: { label: string; onClick: (e: React.MouseEvent) => void; className?: string; children: React.ReactNode }) {
   return (
-    <svg
-      aria-hidden
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="square"
-      strokeLinejoin="miter"
-      className="h-5 w-5 md:h-6 md:w-6"
-    >
-      <path d={direction === "left" ? "M15 19.5 7.5 12 15 4.5" : "m9 4.5 7.5 7.5L9 19.5"} />
-    </svg>
+    <button onClick={onClick} aria-label={label} className={`group absolute z-10 p-3 text-ink md:p-4 ${className}`}>
+      <ScribbleCircle seed={`viewer-${label}`} width={2.2} hover className="!-inset-1 !h-[calc(100%+0.5rem)] !w-[calc(100%+0.5rem)]" />
+      {children}
+    </button>
   );
 }
 
@@ -91,56 +90,34 @@ export default function PhotoGallery({ lang }: { lang: Lang }) {
             }}
             aria-label={t.openPhoto(photo.title)}
             style={{ animationDelay: `${120 + Math.min(index, 8) * 60}ms` }}
-            // En 3 columnas la destacada no lleva proporción propia: toma el alto de
-            // la fila, que marca la foto 4:5 de al lado, y las dos cuadran al píxel
-            // (con 16:10 fija quedaba unos 12px más alta que su vecina).
-            className={`reveal halftone-host group relative w-full overflow-hidden bg-panel
-                        ${isFirst ? "md:col-span-2 aspect-[16/10] lg:aspect-auto" : "aspect-[4/5]"}`}
+            className={`reveal ink-host group flex w-full flex-col text-left ${isFirst ? "md:col-span-2" : ""}`}
           >
-            {/* La foto se imprime en semitono al entrar en pantalla (globals.css). */}
-            <div className="halftone-in absolute inset-0">
-              <Image
-                src={photo.src}
-                alt={altOf(photo)}
-                fill
-                priority={isFirst}
-                sizes={isFirst ? FEATURED_SIZES : GRID_SIZES}
-                className="object-cover transition-transform duration-[900ms] ease-smooth group-hover:scale-[1.03]"
-              />
-            </div>
-
-            {/* Marco de visor en papel sobre cada foto, como una cámara enfocando. La
-                sombra dura en tinta lo mantiene visible sobre cielos claros. */}
-            {/* Al pasar el ratón el visor se cierra sobre la foto, como al enfocar. */}
-            <Brackets
-              size={isFirst ? 28 : 22}
-              weight={3}
-              inset={isFirst ? 16 : 12}
-              className={`text-paper transition-[inset] duration-500 ease-smooth [filter:drop-shadow(1px_1px_0_rgba(32,30,32,0.45))]
-                          ${isFirst ? "group-hover:!inset-[30px]" : "group-hover:!inset-[22px]"}`}
-            />
-
-            {/* Código de fotograma: siempre visible, junto a la esquina superior
-                izquierda del marco y alineado con su línea, sin taparla. Se mueve con
-                el marco al enfocar: la misma distancia que gana el `inset`. */}
+            {/* La foto, pegada torcida en su marco a mano (que se dibuja al llegar con
+                el scroll). Al pasar el ratón se endereza. En 3 columnas la destacada no
+                lleva proporción propia: llena el alto de la fila menos el pie, igual
+                que la 4:5 de al lado, y las dos cuadran. */}
             <span
-              className={`code pointer-events-none absolute bg-ink px-2 py-1 text-[10px] text-paper
-                          transition-[left,top] duration-500 ease-smooth
-                          ${isFirst
-                            ? "left-[52px] top-4 group-hover:left-[66px] group-hover:top-[30px]"
-                            : "left-[42px] top-3 group-hover:left-[52px] group-hover:top-[22px]"}`}
+              className={`relative block w-full transition-transform duration-700 ease-spring group-hover:rotate-0
+                          ${TILTS[index % TILTS.length]}
+                          ${isFirst ? "aspect-[16/10] lg:aspect-auto lg:flex-1" : "aspect-[4/5]"}`}
             >
-              FR-{String(index + 1).padStart(2, "0")}
+              <span className="absolute inset-0 overflow-hidden bg-smudge">
+                <Image
+                  src={photo.src}
+                  alt={altOf(photo)}
+                  fill
+                  priority={isFirst}
+                  sizes={isFirst ? FEATURED_SIZES : GRID_SIZES}
+                  className="object-cover transition-transform duration-[900ms] ease-smooth group-hover:scale-[1.03]"
+                />
+              </span>
+              <InkFrame seed={`photo-${photo.id}`} scroll outset={6} width={2.6} />
             </span>
 
-            {/* El título entra al pasar el ratón; también está en el visor. */}
-            <span
-              className="code pointer-events-none absolute inset-x-0 bottom-0 flex translate-y-full items-center justify-between
-                         bg-ink px-3 py-2 text-[10px] text-paper transition-transform duration-500 ease-smooth
-                         group-hover:translate-y-0"
-            >
-              {photo.title}
-              <span aria-hidden>[+]</span>
+            {/* Pie a mano: el título y su número. */}
+            <span className="mt-5 flex items-baseline justify-between gap-3 px-1">
+              <span className="hand-display text-[1.5rem] md:text-[1.75rem]">{photo.title}</span>
+              <span className="note shrink-0">#{pad(index + 1)}</span>
             </span>
           </button>
         );
@@ -153,45 +130,29 @@ export default function PhotoGallery({ lang }: { lang: Lang }) {
             aria-modal="true"
             aria-label={selectedPhoto.title}
             className="animate-fade-in fixed inset-0 z-50 flex cursor-zoom-out select-none items-center justify-center
-                       bg-ink/95 p-4 md:p-10"
+                       bg-paper p-4 text-ink md:p-12"
             onClick={closeModal}
           >
-            <button
-              onClick={handlePrevious}
-              aria-label={t.previousPhoto}
-              className="absolute left-3 top-1/2 z-10 -translate-y-1/2 p-3 md:left-8 md:p-4
-                         border border-paper/30 bg-ink text-paper transition-colors duration-300 hover:bg-paper hover:text-ink"
-            >
-              <Chevron direction="left" />
-            </button>
+            <ViewerButton label={t.previousPhoto} onClick={handlePrevious} className="left-1 top-1/2 -translate-y-1/2 md:left-6">
+              <InkArrow seed="viewer-prev" direction="left" className="h-6 w-14 md:h-8 md:w-20" />
+            </ViewerButton>
 
-            <button
-              onClick={handleNext}
-              aria-label={t.nextPhoto}
-              className="absolute right-3 top-1/2 z-10 -translate-y-1/2 p-3 md:right-8 md:p-4
-                         border border-paper/30 bg-ink text-paper transition-colors duration-300 hover:bg-paper hover:text-ink"
-            >
-              <Chevron direction="right" />
-            </button>
+            <ViewerButton label={t.nextPhoto} onClick={handleNext} className="right-1 top-1/2 -translate-y-1/2 md:right-6">
+              <InkArrow seed="viewer-next" className="h-6 w-14 md:h-8 md:w-20" />
+            </ViewerButton>
 
-            <button
-              onClick={closeModal}
-              aria-label={t.close}
-              className="absolute right-4 top-4 z-10 p-2.5 md:right-8 md:top-8
-                         border border-paper/30 bg-ink text-paper transition-colors duration-300 hover:bg-paper hover:text-ink"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="square" strokeLinejoin="miter" className="h-5 w-5">
-                <path d="M18 6 6 18" />
-                <path d="m6 6 12 12" />
+            <ViewerButton label={t.close} onClick={closeModal} className="right-2 top-2 md:right-6 md:top-6">
+              <svg viewBox="0 0 24 24" className="h-6 w-6 overflow-visible md:h-7 md:w-7" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round">
+                <path d="M4.5 5.5 C9 10 14 15 19.5 18.5 M18.5 4.5 C14 9.5 9.5 14 5 19.5" />
               </svg>
-            </button>
+            </ViewerButton>
 
             <figure
-              className="relative flex h-full w-full max-w-[90rem] flex-col items-center justify-center gap-5 cursor-default"
+              className="relative flex h-full w-full max-w-[90rem] flex-col items-center justify-center gap-6 cursor-default md:px-20"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* La clave reinicia la impresión en semitono con cada foto. */}
-              <div key={selectedPhoto.id} className="halftone-flash relative h-full max-h-[78vh] w-full overflow-hidden">
+              {/* La clave reinicia el marco con cada foto: se vuelve a dibujar al pasar. */}
+              <div key={selectedPhoto.id} className="relative h-full max-h-[76vh] w-full">
                 <Image
                   src={selectedPhoto.src}
                   alt={altOf(selectedPhoto)}
@@ -202,11 +163,10 @@ export default function PhotoGallery({ lang }: { lang: Lang }) {
                 />
               </div>
 
-              <figcaption className="code flex items-center gap-3 text-[10px] text-paper/70 md:text-[11px]">
-                <span className="text-paper">{selectedPhoto.title}</span>
-                <span aria-hidden className="h-3 w-px bg-paper/30" />
-                <span>FR-
-                  {String((selectedIndex ?? 0) + 1).padStart(2, "0")} / {String(PHOTOS.length).padStart(2, "0")}
+              <figcaption className="flex items-baseline gap-4">
+                <span className="hand-display text-[1.75rem] md:text-[2.25rem]">{selectedPhoto.title}</span>
+                <span className="note">
+                  {pad((selectedIndex ?? 0) + 1)} / {pad(PHOTOS.length)}
                 </span>
               </figcaption>
             </figure>

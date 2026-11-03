@@ -1,43 +1,44 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { pageMetadata } from "@/lib/seo";
 import { PERSON, SITE_URL, listJoin } from "@/lib/site";
 import JsonLd from "@/components/JsonLd";
 import FileNav from "@/components/FileNav";
-import Link from "next/link";
-import SpecList from "@/components/SpecList";
 import Footer from "@/components/Footer";
-import { Arrow, Barcode, DataBars, Diamonds, Dots, PixelGlyph, Slashes } from "@/components/Hud";
+import { Cross, GamepadDoodle, InkArrow } from "@/components/Ink";
+import { InkFrame, ScribbleCircle } from "@/components/InkBox";
 import ProjectCard from "@/components/ProjectCard";
 import SectionHeader from "@/components/SectionHeader";
+import SpecList from "@/components/SpecList";
 import { PROJECTS } from "@/lib/projects";
 import { dictFor, type Dict } from "@/lib/i18n";
 
 const count = String(PROJECTS.length).padStart(2, "0");
-
-const codeOf = (index: number) => `G-${String(index + 1).padStart(2, "0")}`;
+const anchorOf = (index: number) => `game-${index + 1}`;
 
 /**
- * Índice real del expediente, bajo la intro: cada juego con su código y un
- * salto a su ficha. Llena la columna izquierda, que en escritorio quedaba vacía
- * frente a la tabla de datos.
+ * Índice bajo la intro: cada juego con su número y un salto a su entrada. Solo en
+ * escritorio, donde la columna izquierda de la cabecera tiene sitio.
  */
 function Contents({ t }: { t: Dict }) {
   return (
     <nav aria-label={t.contents} className="mt-8 hidden max-w-md md:block">
-      <span className="label text-ink">{t.contents}</span>
-      <ol className="mt-2 border-t-2 border-ink">
+      <span className="note text-ink">{t.contents}</span>
+      <ol className="mt-2">
         {PROJECTS.map((project, index) => (
           <li key={project.name}>
-            <a
-              href={`#${codeOf(index).toLowerCase()}`}
-              className="group flex items-baseline gap-3 border-b border-ink/15 py-2 text-ink transition-colors duration-300 hover:bg-panel"
-            >
-              <span className="code w-10 shrink-0 text-[11px]">{codeOf(index)}</span>
-              <span className="font-mono text-xs">{project.name}</span>
-              <span aria-hidden className="min-w-4 flex-1 -translate-y-1 border-b border-dotted border-ink/40" />
-              <span className="code pr-1 text-[11px] text-mute transition-colors duration-300 group-hover:text-ink">
-                #{String(index + 1).padStart(2, "0")}
+            <a href={`#${anchorOf(index)}`} className="group flex items-baseline gap-3 py-1.5 text-ink">
+              <span className="hand w-5 shrink-0 font-bold">{index + 1}.</span>
+              <span className="hand relative">
+                {project.name}
+                {/* Al pasar el ratón, el nombre se subraya con un trazo recto a mano. */}
+                <span
+                  aria-hidden
+                  className="absolute -bottom-0.5 left-0 h-[2px] w-full origin-left scale-x-0 rounded-full bg-ink transition-transform duration-500 ease-smooth group-hover:scale-x-100"
+                />
               </span>
+              <span aria-hidden className="min-w-4 flex-1 -translate-y-1 border-b-2 border-dotted border-ink/30" />
+              <InkArrow seed={`contents-${index}`} direction="down" className="h-4 w-6 shrink-0 text-mute transition-colors duration-300 group-hover:text-ink" />
             </a>
           </li>
         ))}
@@ -47,26 +48,24 @@ function Contents({ t }: { t: Dict }) {
 }
 
 /**
- * Cierre del expediente: un panel secundario (borde discontinuo, como pide la
- * dirección de arte) con la ficha común a todos los juegos y la salida al otro
- * expediente. Va dentro de la rejilla: con un número impar de juegos ocupa la
- * celda libre de la última fila. No lleva imágenes: es el final de los juegos,
- * no un adelanto de Fotografía.
+ * Fin del cuaderno de juegos, en la celda que deja libre un número impar (o a
+ * todo el ancho con uno par): "fin" rotulado, la letra pequeña común a todos los
+ * juegos y una salida a Fotografía. Sin imágenes: es el final de los juegos.
  */
-function EndOfFile({ t, className = "" }: { t: Dict; className?: string }) {
+function TheEnd({ t, className = "" }: { t: Dict; className?: string }) {
   return (
-    <div className={`flex min-h-[18rem] flex-col justify-between gap-10 border-2 border-dashed border-ink p-6 text-ink md:p-8 ${className}`}>
+    <div className={`ink-host relative flex min-h-[20rem] flex-col justify-between gap-10 p-5 text-ink md:p-10 ${className}`}>
+      <InkFrame seed="the-end" scroll outset={0} width={2.8} />
       <div>
-        <div className="flex items-center gap-3">
-          <Dots />
-          <span className="code whitespace-nowrap text-[11px] md:text-xs">{t.endOfFile}</span>
-          <span className="code ml-auto text-[11px] text-mute md:text-xs">{count} / {count}</span>
-        </div>
-        <p className="display mt-6 text-[clamp(4rem,9vw,8rem)]">{t.endTitle}.</p>
+        <span className="note flex items-center gap-2">
+          <Cross className="h-3 w-3" />
+          {t.endNote}
+        </span>
+        <p className="hand-display mt-3 text-[clamp(4rem,8vw,7.5rem)]">{t.endTitle}</p>
       </div>
 
       <SpecList
-        title={t.specs}
+        title={t.finePrint}
         rows={[
           [t.gamesTitle, count],
           [t.platform, t.browser],
@@ -75,40 +74,19 @@ function EndOfFile({ t, className = "" }: { t: Dict; className?: string }) {
         ]}
       />
 
-      <div className="flex items-center gap-4">
-        <Link
-          href="/photography"
-          data-track="next_file_clicked"
-          data-track-section="photography"
-          className="group code inline-flex items-center gap-2 whitespace-nowrap border-2 border-ink px-3 py-1.5 text-[11px]
-                     transition-colors duration-300 hover:bg-ink hover:text-paper"
-        >
-          {/* "Siguiente expediente //" solo desde xl: en media celda a 768 partía el botón. */}
-          <span className="hidden xl:inline">
-            {t.nextFile} <span aria-hidden>{"//"}</span>
-          </span>
-          {t.photoTitle}
-          <Arrow direction="right" className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
-        </Link>
-        <Barcode seed="end-of-file" className="hidden h-8 flex-1 xl:block" />
-      </div>
-    </div>
-  );
-}
-
-/** Columna de datos de la cabecera: textura, no información. */
-function HeaderData({ t }: { t: Dict }) {
-  return (
-    <div aria-hidden className="hidden text-ink md:block">
-      <div className="flex items-center justify-between">
-        <Slashes className="text-sm">{t.index}</Slashes>
-        <div className="flex items-center gap-3">
-          <Diamonds />
-          <PixelGlyph mask={0b110011101} />
-        </div>
-      </div>
-      <DataBars seed="projects" className="mt-5" />
-      <Barcode seed="antonio-projects" className="mt-5 h-14 w-full" />
+      <Link
+        href="/photography"
+        data-track="next_file_clicked"
+        data-track-section="photography"
+        className="group flex w-fit flex-wrap items-center gap-x-3 gap-y-1"
+      >
+        <span className="note w-full sm:w-auto">{t.nextUp}:</span>
+        <span className="relative">
+          <ScribbleCircle seed="the-end-link" width={2.2} hover />
+          <span className="hand-display block text-[1.75rem]">{t.photoPanelTitle}</span>
+        </span>
+        <InkArrow seed="the-end-arrow" className="h-4 w-12 transition-transform duration-500 ease-spring group-hover:translate-x-2" />
+      </Link>
     </div>
   );
 }
@@ -150,28 +128,20 @@ export default async function ProjectsPage({ params }: { params: Promise<{ lang:
         <FileNav t={t} current="games" />
 
         <SectionHeader
-          className="reveal mt-6 md:mt-8"
+          className="reveal mt-10 md:mt-16"
           eyebrow={t.gamesEyebrow}
           title={t.gamesTitle}
-          code={t.gamesCode}
-          meta={t.games(count)}
-          intro={
-            <>
-              {t.gamesIntro1}
-              <br />
-              {t.gamesIntro2}
-            </>
-          }
-          aside={<HeaderData t={t} />}
+          intro={t.gamesIntro}
           contents={<Contents t={t} />}
+          aside={<GamepadDoodle className="w-[min(100%,22rem)] -rotate-6" />}
         />
 
-        <div className="mt-10 grid grid-cols-1 gap-x-10 gap-y-14 md:mt-14 md:grid-cols-2 md:gap-y-20">
+        <div className="mt-6 grid grid-cols-1 gap-x-14 gap-y-20 md:mt-10 md:grid-cols-2 md:gap-y-28">
           {PROJECTS.map((project, index) => (
             <div
               key={project.name}
-              id={codeOf(index).toLowerCase()}
-              className="reveal scroll-mt-8"
+              id={anchorOf(index)}
+              className="reveal scroll-mt-10"
               style={{ animationDelay: `${80 + index * 70}ms` }}
             >
               <ProjectCard project={project} index={index} t={t} lang={lang} />
@@ -180,10 +150,10 @@ export default async function ProjectsPage({ params }: { params: Promise<{ lang:
 
           {/* Con un número impar de juegos ocupa la celda libre de la última fila;
               con uno par, va a todo el ancho. */}
-          <EndOfFile t={t} className={`reveal ${PROJECTS.length % 2 === 0 ? "md:col-span-2" : ""}`} />
+          <TheEnd t={t} className={`reveal ${PROJECTS.length % 2 === 0 ? "md:col-span-2" : ""}`} />
         </div>
 
-        <Footer lang={lang} className="mt-16 md:mt-24" />
+        <Footer lang={lang} className="mt-24 md:mt-32" />
       </div>
     </div>
   );

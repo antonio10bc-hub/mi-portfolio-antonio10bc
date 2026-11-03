@@ -1,13 +1,16 @@
 import GameMedia from "@/components/GameMedia";
-import { Arrow, Barcode, Brackets, Dots } from "@/components/Hud";
+import { InkArrow, InkBlob } from "@/components/Ink";
+import { InkFrame, ScribbleCircle } from "@/components/InkBox";
 import type { Project } from "@/lib/projects";
 import type { Dict } from "@/lib/i18n";
 
 /**
- * Ficha de un juego: código de proyecto, la captura real dentro de un panel
- * gris con marco de visor, el nombre como titular, una regla de tinta, la
- * tagline en texto de datos y la acción. La captura va a todo color: es el
- * contenido, y la regla monocroma es solo para la interfaz.
+ * Un juego como entrada de cuaderno: su número en una mancha de tinta, la captura
+ * (y el vídeo) pegada un poco torcida dentro de un marco a mano que se dibuja al
+ * llegar con el scroll, el nombre rotulado, la descripción y "jugar", que se rodea
+ * con un círculo al pasar el ratón. La captura va a todo color: es el contenido.
+ * Al pasar el ratón la foto se endereza; el `transform` de la ficha en sí nunca se
+ * anima (las entradas van en el envoltorio de la página).
  */
 export default function ProjectCard({
   project,
@@ -20,7 +23,9 @@ export default function ProjectCard({
   t: Dict;
   lang: string;
 }) {
-  const number = String(index + 1).padStart(2, "0");
+  const number = index + 1;
+  // Torcida a un lado o al otro según la posición, como pegada a mano.
+  const tilt = index % 2 === 0 ? "-rotate-[1.2deg]" : "rotate-[1deg]";
 
   return (
     <a
@@ -29,22 +34,23 @@ export default function ProjectCard({
       rel="noopener noreferrer"
       data-track="game_clicked"
       data-track-game={project.name}
-      data-track-position={index + 1}
+      data-track-position={number}
       className="group flex h-full flex-col text-ink"
     >
       <div className="flex items-center gap-3">
-        <Dots />
-        <span className="code text-[11px] md:text-xs">{t.projectCode}: G-{number}</span>
-        <span className="label ml-auto text-ink">{t.game}</span>
+        <InkBlob seed={`blob-${project.name}`} className="h-10 w-10 text-ink md:h-11 md:w-11">
+          <span className="text-sm font-extrabold text-paper md:text-base">{number}</span>
+        </InkBlob>
+        <span className="note">{t.game}</span>
       </div>
 
-      <div className="halftone-host relative mt-3 bg-panel p-4 md:p-6">
-        <Brackets size={22} weight={2} inset={8} className="z-10 text-ink transition-[inset] duration-500 ease-smooth group-hover:!inset-[3px]" />
-        <div className="halftone-in relative aspect-[16/10] overflow-hidden" style={{ backgroundColor: project.tint }}>
-          {/* Las capturas ya son WebP de 1280px optimizados: se sirven tal cual desde
-              el CDN, sin pasar por el optimizador (que en la primera visita las
-              generaba al vuelo y tardaban en aparecer). Las dos primeras se piden ya.
-              Encima, el vídeo del juego en bucle (GameMedia). */}
+      <div
+        className={`ink-host relative mt-5 transition-transform duration-700 ease-spring group-hover:rotate-0 ${tilt}`}
+      >
+        <div className="relative aspect-[16/10] overflow-hidden" style={{ backgroundColor: project.tint }}>
+          {/* Las capturas ya son WebP de 1280px optimizados: se sirven tal cual, sin
+              pasar por el optimizador. Las dos primeras se piden ya. Encima, el vídeo
+              del juego en bucle (GameMedia). */}
           <div className="absolute inset-0 transition-transform duration-700 ease-smooth group-hover:scale-[1.03] motion-reduce:group-hover:scale-100">
             <GameMedia
               screenshot={project.screenshot}
@@ -54,25 +60,23 @@ export default function ProjectCard({
             />
           </div>
         </div>
+        <InkFrame seed={`frame-${project.name}`} scroll outset={6} width={2.8} />
       </div>
 
-      <div className="mt-4 flex items-end justify-between gap-4 border-b-2 border-ink pb-3">
-        <h2 className="display text-[clamp(2.5rem,7vw,4.5rem)]">{project.name}.</h2>
-        <span className="code shrink-0 text-xs text-mute">#{number}</span>
-      </div>
+      <h2 className="hand-display mt-8 text-[clamp(2.5rem,5.5vw,4.5rem)]">{project.name}</h2>
 
-      <p className="datatext mt-3 flex-1">{lang === "es" ? project.taglineEs : project.tagline}</p>
+      <p className="hand mt-3 flex-1 text-mute">{lang === "es" ? project.taglineEs : project.tagline}</p>
 
-      <div className="mt-5 flex items-center gap-4">
-        <span
-          className="code inline-flex items-center gap-2 border-2 border-ink px-3 py-1.5 text-[11px]
-                     transition-colors duration-300 group-hover:bg-ink group-hover:text-paper"
-        >
-          {t.play}
-          <Arrow className="h-3.5 w-3.5" />
+      <span className="mt-5 flex items-center gap-2">
+        <span className="relative">
+          <ScribbleCircle seed={`play-${project.name}`} width={2.4} hover />
+          <span className="hand-display block text-[1.75rem] md:text-[2rem]">{t.play}</span>
         </span>
-        <Barcode seed={project.name} className="hidden h-8 flex-1 md:block" />
-      </div>
+        <InkArrow
+          seed={`play-${project.name}-arrow`}
+          className="h-4 w-12 transition-transform duration-500 ease-spring group-hover:translate-x-2 md:h-5 md:w-14"
+        />
+      </span>
     </a>
   );
 }

@@ -1,0 +1,403 @@
+/*
+ * Vocabulario gráfico de la dirección de arte "Cuaderno de tinta" (docs/art-direction):
+ * trazos a mano en tinta sobre papel. Todo es decorativo (aria-hidden) y pinta en
+ * `currentColor`. Las formas "a mano" salen de una semilla de texto con un hash
+ * determinista, nunca de Math.random(): el HTML del servidor y el del cliente
+ * coinciden y cada marco tiene siempre el mismo temblor.
+ *
+ * Los trazos llevan pathLength="1" y la clase `ink-line`: con `ink-draw` se dibujan
+ * al cargar (retraso en --d), ver globals.css. Aquí van los dibujos de tamaño fijo
+ * (escalan uniformes); el marco, el círculo y el subrayado, que se estiran con su
+ * caja, están en InkBox.tsx y se dibujan en píxeles medidos.
+ */
+
+import type { CSSProperties } from "react";
+import { noise, r2 as f, smooth, type Pt } from "@/lib/ink";
+
+type Drawn = {
+  /** Se dibuja al cargar, con este retraso en segundos. */
+  draw?: boolean;
+  delay?: number;
+};
+
+/** Flecha a mano. `curl` la hace dar un rizo antes de llegar. */
+export function InkArrow({
+  seed = "arrow",
+  direction = "right",
+  curl = false,
+  className = "",
+  width = 3.6,
+  draw,
+  delay = 0,
+}: {
+  seed?: string;
+  direction?: "right" | "left" | "down";
+  curl?: boolean;
+  className?: string;
+  /** Grosor en unidades del viewBox (80 de ancho): escala con la flecha. */
+  width?: number;
+} & Drawn) {
+  const r = noise(seed, 12);
+  const shaft: Pt[] = curl
+    ? [[2, 22], [20, 14 + r[0] * 2], [34, 6], [40, 14], [32, 20], [30, 12], [48, 10 + r[1] * 2], [76, 15]]
+    : [[2, 16 + r[0] * 2], [26, 13 + r[1] * 2], [52, 16 + r[2] * 2], [76, 14]];
+  const head = `M${f(62 + r[3])} ${f(4 + r[4])}L77 ${f(14.5 + r[5] * 0.5)}L${f(61 + r[6])} ${f(25 + r[7])}`;
+  const rotate = direction === "left" ? "scaleX(-1)" : direction === "down" ? "rotate(90deg)" : undefined;
+  return (
+    <svg aria-hidden viewBox="0 0 80 30" className={`block overflow-visible ${className}`} style={{ transform: rotate }}>
+      <path
+        d={smooth(shaft) + head}
+        pathLength={1}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={width}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={`ink-line ${draw ? "ink-draw" : ""}`}
+        style={draw ? ({ "--d": `${delay}s` } as CSSProperties) : undefined}
+      />
+    </svg>
+  );
+}
+
+/** La cruz de la túnica del mago: el "+" que hace de estrella y de viñeta. */
+export function Cross({ className = "", style }: { className?: string; style?: CSSProperties }) {
+  return (
+    <svg aria-hidden viewBox="0 0 16 16" className={`block h-3.5 w-3.5 overflow-visible ${className}`} style={style}>
+      <path d="M2.5 8.6 13.6 7.6M7.6 2.4 8.4 13.6" fill="none" stroke="currentColor" strokeWidth={3.1} strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** Mancha de tinta: un círculo deforme y macizo, para números y sellos. */
+export function InkBlob({ seed, className = "", children }: { seed: string; className?: string; children?: React.ReactNode }) {
+  const r = noise(seed, 20);
+  const steps = 14;
+  const points: Pt[] = Array.from({ length: steps + 3 }, (_, k) => {
+    const t = (Math.PI * 2 * k) / steps;
+    const rad = 44 + r[k % steps] * 5;
+    return [50 + Math.cos(t) * rad, 50 + Math.sin(t) * rad];
+  });
+  return (
+    <span className={`relative inline-flex items-center justify-center ${className}`}>
+      <svg aria-hidden viewBox="0 0 100 100" className="absolute inset-0 h-full w-full overflow-visible">
+        <path d={smooth(points)} fill="currentColor" />
+      </svg>
+      <span className="relative">{children}</span>
+    </span>
+  );
+}
+
+/**
+ * Chispas de varita: cruces que salen de un punto hacia `angle` (grados, 0 =
+ * derecha, 180 = izquierda), giran y se apagan, en bucle y escalonadas.
+ */
+export function Sparkles({
+  seed = "sparkles",
+  count = 7,
+  angle = 180,
+  spread = 70,
+  distance = 90,
+  delay = 0,
+  className = "",
+}: {
+  seed?: string;
+  count?: number;
+  angle?: number;
+  spread?: number;
+  distance?: number;
+  delay?: number;
+  className?: string;
+}) {
+  const r = noise(seed, count * 3);
+  return (
+    <span aria-hidden className={`pointer-events-none absolute h-0 w-0 ${className}`}>
+      {Array.from({ length: count }, (_, k) => {
+        const a = ((angle + r[k] * spread) * Math.PI) / 180;
+        const dist = distance * (0.55 + 0.45 * Math.abs(r[k + count]));
+        const size = 9 + Math.abs(r[k + count * 2]) * 9;
+        return (
+          <Cross
+            key={k}
+            className="spark absolute -translate-x-1/2 -translate-y-1/2 animate-spark text-ink"
+            style={
+              {
+                width: size,
+                height: size,
+                "--dx": `${f(Math.cos(a) * dist)}px`,
+                "--dy": `${f(Math.sin(a) * dist)}px`,
+                animationDelay: `${f(delay + (k * 2.4) / count)}s`,
+              } as CSSProperties
+            }
+          />
+        );
+      })}
+    </span>
+  );
+}
+
+/*
+ * El mago. Dibujo propio en el estilo de la referencia (tinta gruesa, trazo
+ * ingenuo, túnica con cruces y manchas), no una copia. Se dibuja trazo a trazo
+ * al cargar; el filtro de tinta solo ondula los bordes, sin desenfoque. La punta
+ * de la varita está en (8, 180) de un viewBox de 240x290: ahí van las chispas.
+ */
+const W = "f"; // relleno de papel con contorno
+const S = "s"; // solo contorno
+const K = "k"; // mancha maciza
+
+type Part = { d: string; kind: typeof W | typeof S | typeof K; t: number; w?: number };
+
+const WIZARD: Part[] = [
+  // piernas y pies
+  { d: "M114 246 L112 264 M132 246 L133 264", kind: S, t: 0.1 },
+  { d: "M112 264 C100 266 90 270 88 276 C98 278 108 278 116 276 C116 272 114 267 112 264 Z", kind: W, t: 0.2 },
+  { d: "M133 264 C144 266 154 270 158 276 C148 278 138 278 130 276 C130 272 131 267 133 264 Z", kind: W, t: 0.25 },
+  { d: "M96 276 v-3 M103 277 v-3 M143 277 v-3 M150 276 v-3", kind: S, t: 0.35, w: 2.4 },
+  // túnica
+  { d: "M108 122 C100 140 92 158 82 180 C74 198 66 216 56 238 C66 244 76 240 86 245 C98 249 108 242 120 247 C134 251 146 243 158 248 C168 250 176 244 184 240 C178 222 174 204 170 186 C164 162 160 142 154 122 C140 114 120 114 108 122 Z", kind: W, t: 0.3 },
+  { d: "M56 238 C52 228 60 214 72 216 C82 220 80 234 88 244 C78 248 64 246 56 238 Z", kind: K, t: 1.0 },
+  { d: "M160 247 C164 240 176 236 184 240 C180 246 170 250 160 247 Z", kind: K, t: 1.05 },
+  // cruces de la túnica
+  { d: "M93 176 h15 M100.5 168.5 v15", kind: S, t: 0.9, w: 4.4 },
+  { d: "M140 166 h15 M147.5 158.5 v15", kind: S, t: 0.97, w: 4.4 },
+  { d: "M112 216 h15 M119.5 208.5 v15", kind: S, t: 1.04, w: 4.4 },
+  { d: "M152 206 h14 M159 199 v14", kind: S, t: 1.11, w: 4.4 },
+  { d: "M84 222 h12 M90 216 v12", kind: S, t: 1.18, w: 4.4 },
+  // brazo, mano y varita
+  { d: "M112 134 C98 138 82 144 66 152 C66 162 74 168 86 164 C96 158 104 154 114 152 Z", kind: W, t: 0.55 },
+  { d: "M68 148 C60 145 52 150 53 158 C56 165 66 165 70 159 Z", kind: W, t: 0.7 },
+  { d: "M57 153 h7 M56 158 h7", kind: S, t: 0.8, w: 2.6 },
+  { d: "M55 158 L8 180", kind: S, t: 0.85, w: 4.8 },
+  // la otra mano
+  { d: "M158 160 C168 154 180 158 182 168 C178 174 170 174 164 170", kind: W, t: 0.65 },
+  { d: "M172 158 c2 -5 7 -6 9 -2", kind: S, t: 0.75, w: 2.6 },
+  // barba
+  { d: "M118 114 C112 126 116 140 110 154 C106 166 108 176 102 188 C110 182 114 180 116 192 C120 182 122 176 128 186 C128 176 132 168 136 176 C136 162 140 150 138 138 C138 128 142 120 144 112 Z", kind: W, t: 0.95 },
+  { d: "M124 128 C122 144 120 158 116 176 M132 128 C131 142 130 152 128 168", kind: S, t: 1.15, w: 2.6 },
+  // cara: ojo bajo el ala y nariz larga hacia la varita
+  { d: "M126 104 C110 104 92 106 72 112 C88 118 108 120 128 117 Z", kind: W, t: 1.1 },
+  // sombrero con la punta vencida
+  { d: "M118 96 C124 72 136 46 150 22 C154 14 160 10 166 12 C160 16 158 22 158 32 C158 56 160 76 166 97 C150 102 132 101 118 96 Z", kind: W, t: 1.2 },
+  { d: "M112 96 C128 103 150 104 172 96", kind: S, t: 1.45 },
+];
+
+const WIZARD_DOTS: { cx: number; cy: number; rx: number; ry: number; t: number }[] = [
+  { cx: 136, cy: 108, rx: 2.8, ry: 2.8, t: 1.5 }, // ojo
+  { cx: 142, cy: 58, rx: 2.8, ry: 3.6, t: 1.55 },
+  { cx: 153, cy: 38, rx: 2.2, ry: 3, t: 1.6 },
+  { cx: 136, cy: 82, rx: 3, ry: 2.6, t: 1.65 },
+  { cx: 155, cy: 76, rx: 2.4, ry: 3.2, t: 1.7 },
+];
+
+/** Cuánto tarda el mago en quedar dibujado: después empiezan las chispas. */
+export const WIZARD_DRAWN = 1.9;
+
+/*
+ * Chispas de la varita, dentro del propio SVG del mago para que sigan a la punta
+ * aunque el dibujo se escale o se encuadre con márgenes. En un elemento SVG las
+ * longitudes de un `transform` de CSS van en unidades del viewBox, así que --dx y
+ * --dy escalan con el mago. Salen hacia la izquierda, adonde apunta la varita.
+ */
+const SPARKS = noise("wand", 30);
+const WAND_SPARKS = Array.from({ length: 9 }, (_, k) => {
+  const a = ((185 + SPARKS[k] * 55) * Math.PI) / 180;
+  const dist = 44 + Math.abs(SPARKS[k + 9]) * 46;
+  return {
+    dx: f(Math.cos(a) * dist),
+    dy: f(Math.sin(a) * dist),
+    size: f(4.5 + Math.abs(SPARKS[k + 18]) * 4.5),
+    delay: f((k * 2.4) / 9),
+  };
+});
+
+export function Wizard({
+  id = "wizard",
+  animate = true,
+  sparkles = true,
+  hint,
+  className = "",
+  title,
+}: {
+  /** Nota a mano bajo la varita, con flecha hacia la izquierda (solo en escritorio). */
+  hint?: string;
+  /** Prefijo del id del filtro: único si hay más de un mago en la página. */
+  id?: string;
+  animate?: boolean;
+  /** Chispas en bucle desde la punta de la varita. */
+  sparkles?: boolean;
+  className?: string;
+  title?: string;
+}) {
+  const filter = `${id}-ink`;
+  return (
+    <svg
+      viewBox="0 0 240 290"
+      role={title ? "img" : undefined}
+      aria-label={title}
+      aria-hidden={title ? undefined : true}
+      className={`block h-full w-full overflow-visible ${className}`}
+    >
+      <defs>
+        {/* Ondula el borde del trazo como la tinta en papel. Solo desplaza: no desenfoca. */}
+        <filter id={filter} x="-10%" y="-10%" width="120%" height="120%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves={2} seed={7} result="n" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale={3.2} xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </defs>
+      <g filter={`url(#${filter})`} strokeLinecap="round" strokeLinejoin="round">
+        {WIZARD.map((part, i) => {
+          const drawn = animate && part.kind !== K;
+          const popped = animate && part.kind === K;
+          return (
+            <path
+              key={i}
+              d={part.d}
+              pathLength={part.kind === K ? undefined : 1}
+              fill={part.kind === W ? "#FFFFFF" : part.kind === K ? "currentColor" : "none"}
+              stroke={part.kind === K ? "none" : "currentColor"}
+              strokeWidth={part.w ?? 3.6}
+              className={`${drawn ? "ink-line ink-draw" : ""} ${popped ? "origin-center animate-pop [transform-box:fill-box]" : ""}`}
+              style={
+                (drawn ? { "--d": `${part.t}s` } : popped ? { animationDelay: `${part.t}s` } : undefined) as
+                  | CSSProperties
+                  | undefined
+              }
+            />
+          );
+        })}
+        {WIZARD_DOTS.map((dot, i) => (
+          <ellipse
+            key={i}
+            cx={dot.cx}
+            cy={dot.cy}
+            rx={dot.rx}
+            ry={dot.ry}
+            fill="currentColor"
+            className={animate ? "origin-center animate-pop [transform-box:fill-box]" : ""}
+            style={animate ? { animationDelay: `${dot.t}s` } : undefined}
+          />
+        ))}
+      </g>
+      {hint && (
+        // Dentro del SVG para que siga a la punta de la varita aunque el mago se
+        // encuadre con márgenes; sale por la izquierda (overflow visible).
+        <g className="hidden md:inline" transform="translate(14 214) rotate(-5)">
+          <text x={0} y={0} textAnchor="end" className="fill-mute font-sans text-[13px] font-medium">
+            {hint}
+          </text>
+          <path
+            d="M-2 -18 C-14 -26 -30 -28 -46 -24 M-38 -30 -47 -24 -38 -18"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            pathLength={1}
+            className="ink-line ink-draw text-mute"
+            style={{ "--d": `${WIZARD_DRAWN + 0.2}s` } as CSSProperties}
+          />
+        </g>
+      )}
+      {sparkles && (
+        <g transform="translate(8 180)">
+          {WAND_SPARKS.map((spark, k) => (
+            <path
+              key={k}
+              d={`M${-spark.size} 0.6 ${spark.size} -0.6M-0.5 ${-spark.size} 0.5 ${spark.size}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={3}
+              strokeLinecap="round"
+              className="spark animate-spark opacity-0 [transform-box:fill-box] [transform-origin:center]"
+              style={
+                {
+                  "--dx": `${spark.dx}px`,
+                  "--dy": `${spark.dy}px`,
+                  animationDelay: `${f(WIZARD_DRAWN + spark.delay)}s`,
+                } as CSSProperties
+              }
+            />
+          ))}
+        </g>
+      )}
+    </svg>
+  );
+}
+
+/** Garabato de cámara para la cabecera de Fotografía. */
+export function CameraDoodle({ className = "", draw = true }: { className?: string; draw?: boolean }) {
+  const parts = [
+    "M22 46 C20 38 26 34 34 34 L52 34 C56 26 60 22 70 22 L96 23 C104 24 106 30 110 34 L150 34 C160 34 166 40 165 50 L164 116 C164 126 158 130 148 130 L36 131 C26 131 21 126 21 116 Z",
+    "M93 52 C118 51 132 68 131 88 C130 108 114 120 94 119 C72 118 58 102 59 84 C60 66 74 53 93 52 Z",
+    "M94 66 C106 66 116 75 116 87 C115 99 106 106 94 106 C82 105 74 96 74 85 C75 74 83 66 94 66 Z",
+    "M140 46 h14 M30 58 C40 57 48 58 52 60",
+    "M18 70 C6 80 4 102 14 118 M168 70 C182 84 182 104 170 120",
+  ];
+  return (
+    <svg aria-hidden viewBox="0 0 186 150" className={`block overflow-visible ${className}`}>
+      {parts.map((d, i) => (
+        <path
+          key={i}
+          d={d}
+          pathLength={1}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={3.4}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={`ink-line ${draw ? "ink-draw" : ""}`}
+          style={{ "--d": `${0.2 + i * 0.22}s` } as CSSProperties}
+        />
+      ))}
+      <ellipse cx="88" cy="80" rx="5" ry="6" fill="currentColor" className={draw ? "origin-center animate-pop [transform-box:fill-box]" : ""} style={{ animationDelay: "1.4s" }} />
+      <path d="M118 104 C122 110 116 116 110 113 C106 108 112 102 118 104 Z" fill="currentColor" className={draw ? "origin-center animate-pop [transform-box:fill-box]" : ""} style={{ animationDelay: "1.5s" }} />
+    </svg>
+  );
+}
+
+/** Garabato de mando para la cabecera de Juegos. */
+export function GamepadDoodle({ className = "", draw = true }: { className?: string; draw?: boolean }) {
+  const parts = [
+    "M46 40 C64 36 80 42 92 42 C104 42 120 36 138 40 C160 45 172 74 176 100 C179 120 168 132 154 126 C142 121 134 106 122 102 C110 99 76 99 64 102 C52 106 44 121 32 126 C18 132 7 120 10 100 C14 74 26 45 46 40 Z",
+    "M42 62 L42 86 M30 74 L54 74",
+    "M92 42 C92 30 98 22 106 16 C114 10 118 6 126 4",
+    "M70 66 C76 66 80 70 80 74",
+  ];
+  return (
+    <svg aria-hidden viewBox="0 0 186 140" className={`block overflow-visible ${className}`}>
+      {parts.map((d, i) => (
+        <path
+          key={i}
+          d={d}
+          pathLength={1}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={i === 1 ? 5.4 : 3.4}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={`ink-line ${draw ? "ink-draw" : ""}`}
+          style={{ "--d": `${0.2 + i * 0.25}s` } as CSSProperties}
+        />
+      ))}
+      {[
+        [136, 64, 7, 1.2],
+        [152, 78, 7, 1.3],
+        [120, 78, 6, 1.4],
+        [136, 92, 6, 1.5],
+      ].map(([cx, cy, r, t], i) => (
+        <circle
+          key={i}
+          cx={cx}
+          cy={cy}
+          r={r}
+          fill={i < 2 ? "currentColor" : "none"}
+          stroke="currentColor"
+          strokeWidth={3}
+          className={draw ? "origin-center animate-pop [transform-box:fill-box]" : ""}
+          style={{ animationDelay: `${t}s` }}
+        />
+      ))}
+    </svg>
+  );
+}

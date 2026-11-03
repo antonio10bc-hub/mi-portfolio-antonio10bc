@@ -6,7 +6,7 @@
   :root {
     color-scheme: light;
     background-color: #FFFFFF;
-    color: #201E20;
+    color: #141214;
   }
 
   html {
@@ -17,22 +17,23 @@
     text-size-adjust: 100%;
   }
 
-
   body {
     background-color: #FFFFFF;
-    color: #201E20;
+    color: #141214;
     text-rendering: optimizeLegibility;
+    /* Cuerpo de texto a mano: informal al máximo y con un poco de rebote. */
+    font-variation-settings: "INFM" 100, "BNCE" 15;
   }
 
   ::selection {
-    background-color: #201E20;
+    background-color: #141214;
     color: #FFFFFF;
   }
 
-  /* Foco visible en tinta y en ángulo recto, como el resto de la interfaz. */
   :focus-visible {
-    outline: 2px solid #201E20;
-    outline-offset: 3px;
+    outline: 2.5px solid #141214;
+    outline-offset: 4px;
+    border-radius: 6px;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -40,6 +41,8 @@
     *, *::before, *::after {
       animation-duration: 0.001ms !important;
       animation-iteration-count: 1 !important;
+      /* Sin esto, un trazo con retraso seguiría invisible hasta que le tocara. */
+      animation-delay: 0s !important;
       transition-duration: 0.001ms !important;
     }
   }
@@ -47,39 +50,47 @@
 
 @layer components {
   /*
-   * Titular: grotesca muy condensada, negra y en minúsculas, siempre con punto
-   * final en el texto ("projects."). El ancho va por `font-variation-settings`
-   * y no por `font-stretch`, que depende de cómo declare la fuente @font-face.
+   * Contenedor de todas las páginas. En escritorio grande se abre hasta 92rem y
+   * el margen crece con la ventana.
    */
-  .display {
-    @apply font-sans font-extrabold lowercase leading-[0.82] tracking-[-0.035em];
-    font-variation-settings: "wdth" 62;
+  .page {
+    @apply mx-auto w-full max-w-[92rem] px-5 md:px-[clamp(2rem,4vw,4.5rem)];
   }
 
   /*
-   * Contenedor de todas las páginas. En escritorio grande se abre hasta 92rem y
-   * el margen crece con la ventana: con el antiguo max-w-6xl, a 1920 un tercio
-   * de la pantalla era blanco muerto a los lados.
+   * Rotulado a mano: Shantell Sans en negrita máxima, informal al 100% y con
+   * rebote, que mueve cada letra arriba y abajo de la línea como un rotulador.
+   * Al pasar el ratón por un `.group` el rebote se invierte: las letras bailan.
    */
-  .page {
-    @apply mx-auto w-full max-w-[92rem] px-4 md:px-[clamp(2rem,4vw,4.5rem)];
+  .hand-display {
+    @apply font-sans font-extrabold lowercase leading-[0.86] tracking-[-0.02em];
+    font-variation-settings: "INFM" 100, "BNCE" 55;
+    transition: font-variation-settings 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  /* Identificadores de expediente: "PROJECT #0653", "FR-01". */
-  .code {
-    @apply font-mono font-bold uppercase tracking-[0.02em];
+  @media (hover: hover) and (pointer: fine) {
+    .group:hover .hand-display,
+    .hand-display.wiggle:hover {
+      font-variation-settings: "INFM" 100, "BNCE" -55;
+    }
   }
 
-  /* Microtipografía de datos en mayúsculas. */
+  /* Texto corrido, a mano. */
+  .hand {
+    @apply font-sans text-[15px] leading-[1.5] md:text-base;
+    font-weight: 440;
+  }
+
+  /* Anotación al margen: pequeña, a lápiz. */
+  .note {
+    @apply font-sans text-[13px] leading-snug text-mute md:text-sm;
+    font-weight: 500;
+  }
+
+  /* Rótulo en mayúsculas para datos cortos (cifras, idioma). */
   .label {
-    @apply font-mono text-[10px] md:text-[11px] uppercase tracking-label text-mute;
-  }
-
-  /* Texto de expediente: monoespaciada pequeña y justificada, como en la referencia. */
-  .datatext {
-    @apply font-mono text-[11px] md:text-xs leading-[1.45] text-ink;
-    text-align: justify;
-    hyphens: none;
+    @apply font-sans text-[11px] font-semibold uppercase tracking-[0.06em] md:text-xs;
+    font-variation-settings: "INFM" 60, "BNCE" 0;
   }
 }
 
@@ -107,7 +118,7 @@
 
 /*
  * Alto exacto de pantalla, solo en móvil, para la home: hace falta un alto
- * definido para que el árbol pueda encogerse. Va fuera de @layer y con su propia
+ * definido para que el mago pueda encogerse. Va fuera de @layer y con su propia
  * media query porque una variante de Tailwind (`max-md:`) copiaría solo la regla
  * de 100vh y no la de 100svh, y en Safari 100vh es más alto que lo visible.
  * Nunca con overflow-hidden: si algo no cupiera, la página hace scroll.
@@ -126,6 +137,70 @@
   }
 }
 
+/*
+ * Trazos de tinta (components/Ink.tsx). Cada trazo lleva pathLength="1" y un
+ * guion de longitud 1: con el desplazamiento a 0 se ve entero, que es el estado
+ * de reposo. Animar el desplazamiento de 1 a 0 lo "dibuja".
+ *  - `.ink-draw`: se dibuja al cargar, con el retraso en --d.
+ *  - `.ink-scroll`: se dibuja con el scroll, siguiendo la `view-timeline` con
+ *    nombre de su `.ink-host` (la foto o la captura que enmarca). No vale `view()`
+ *    en el propio trazo: el botón de cada foto lleva `overflow: hidden`, eso lo
+ *    convierte en contenedor de scroll y `view()` mediría contra él. Solo en
+ *    escritorio; donde no hay soporte, el marco ya está dibujado.
+ */
+.ink-line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+/* Declarada aquí y no solo en Tailwind: allí solo se emite si se usa `animate-draw`. */
+@keyframes ink-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+.ink-draw {
+  animation: ink-draw 0.7s cubic-bezier(0.65, 0, 0.35, 1) var(--d, 0s) both;
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .ink-host {
+      view-timeline-name: --ink;
+    }
+
+    .ink-scroll {
+      animation: ink-draw linear both;
+      animation-timeline: --ink;
+      animation-range: entry 5% entry 85%;
+    }
+  }
+}
+
+/*
+ * `.ink-hover`: un trazo (el círculo a mano de un enlace) que se dibuja al pasar
+ * el ratón por su `.group` o al llegar con el teclado, y se borra al salir.
+ */
+.ink-hover {
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.group:focus-visible .ink-hover {
+  stroke-dashoffset: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .group:hover .ink-hover {
+    stroke-dashoffset: 0;
+  }
+
+  /* Con el ratón sobre un hechizo de la home, la varita echa chispas más deprisa. */
+  main:has(.spell:hover) .spark {
+    animation-duration: 1.1s;
+  }
+}
+
 /* Barra de scroll discreta, a juego con la paleta. */
 ::-webkit-scrollbar {
   width: 10px;
@@ -135,92 +210,18 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(32, 30, 32, 0.25);
-  border-radius: 0;
+  background-color: rgba(20, 18, 20, 0.3);
+  border-radius: 999px;
   border: 3px solid transparent;
   background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(32, 30, 32, 0.5);
+  background-color: rgba(20, 18, 20, 0.6);
   background-clip: content-box;
 }
 
 @media (max-width: 767px) {
   .reveal {
     animation: none;
-  }
-}
-
-/*
- * Impresión del árbol de la home: el script de arranque marca <html data-tree-intro>
- * en la primera visita de la sesión, y tree.png no se pinta hasta que el canvas
- * (TreeSpecimen) lo sustituye. Si el JavaScript fallara, aparece igualmente a los 3 s.
- */
-[data-tree-intro] .tree-png {
-  opacity: 0;
-  animation: tree-fallback 0s linear 3s forwards;
-}
-
-@keyframes tree-fallback {
-  to {
-    opacity: 1;
-  }
-}
-
-/*
- * Impresión en semitono: fotos, capturas y titulares aparecen como una trama de
- * puntos que crecen hasta cerrar la imagen, como el árbol de la home. Es una
- * máscara de puntos (radial-gradient con borde duro, no un degradado visible) cuyo
- * radio se anima: con celdas de 10px, a 7.5px los puntos ya se solapan y la imagen
- * queda entera. Las imágenes van con el scroll; los titulares, al cargar.
- * La línea de tiempo es una `view-timeline` con nombre en `.halftone-host`, no
- * `view()` en la propia imagen: el botón de cada foto lleva `overflow: hidden`, eso
- * lo convierte en contenedor de scroll, y `view()` mediría la imagen contra él (la
- * llena entera, así que siempre "ya ha entrado") en vez de contra la página. Solo en escritorio y sin movimiento reducido; donde no hay
- * soporte la imagen se ve sin más, que es el estado de reposo.
- */
-@property --dot {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 7.5px;
-}
-
-@keyframes halftone-print {
-  0% { --dot: 0px; }
-  45% { --dot: 3.5px; }
-  100% { --dot: 7.5px; }
-}
-
-@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-  .halftone-in,
-  .halftone-title,
-  .halftone-flash {
-    -webkit-mask-image: radial-gradient(circle, #000 var(--dot), transparent calc(var(--dot) + 0.5px));
-    mask-image: radial-gradient(circle, #000 var(--dot), transparent calc(var(--dot) + 0.5px));
-    -webkit-mask-size: 10px 10px;
-    mask-size: 10px 10px;
-    -webkit-mask-position: center;
-    mask-position: center;
-  }
-
-  .halftone-title {
-    animation: halftone-print 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
-  }
-
-  /* Visor a pantalla completa: cada foto se imprime rápido al abrirla o al pasar. */
-  .halftone-flash {
-    animation: halftone-print 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-
-  @supports (animation-timeline: view()) {
-    .halftone-host {
-      view-timeline-name: --print;
-    }
-
-    .halftone-in {
-      animation: halftone-print linear both;
-      animation-timeline: --print;
-      animation-range: entry 0% entry 70%;
-    }
   }
 }

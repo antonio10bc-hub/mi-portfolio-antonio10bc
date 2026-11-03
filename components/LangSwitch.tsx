@@ -31,7 +31,7 @@ export default function LangSwitch({ lang, label }: { lang: Lang; label: string 
             data-track="language_changed"
             data-track-to={l}
             className={`uppercase transition-colors duration-300 ${
-              l === lang ? "text-ink underline decoration-1 underline-offset-4" : "hover:text-ink"
+              l === lang ? "text-ink underline decoration-wavy decoration-2 underline-offset-4" : "text-mute hover:text-ink"
             }`}
           >
             {l}

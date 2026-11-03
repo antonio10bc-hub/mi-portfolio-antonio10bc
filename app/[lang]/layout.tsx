@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, JetBrains_Mono } from "next/font/google";
+import { Shantell_Sans } from "next/font/google";
 import "../globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -9,17 +9,12 @@ import { LANGS, dictFor } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/seo";
 import { PERSON, SITE_URL } from "@/lib/site";
 
-// Archivo con el eje de ancho: los titulares van a wdth 62 (ver .display).
-const archivo = Archivo({
+// Una sola familia, variable: el peso y los ejes de informalidad (INFM) y rebote
+// (BNCE) la llevan de rótulo a mano a texto corrido (ver .hand-display y .hand).
+const shantell = Shantell_Sans({
   subsets: ["latin"],
-  axes: ["wdth"],
-  variable: "--font-archivo",
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains-mono",
+  axes: ["INFM", "BNCE"],
+  variable: "--font-shantell",
   display: "swap",
 });
 
@@ -56,10 +51,8 @@ export default async function RootLayout({
 }>) {
   const t = dictFor((await params).lang);
   return (
-    // suppressHydrationWarning: el script de arranque de la home marca
-    // data-tree-intro en <html> antes de hidratar. Solo afecta a los atributos de <html>.
-    <html lang={t.htmlLang} suppressHydrationWarning>
-      <body className={`${archivo.variable} ${jetbrainsMono.variable} antialiased`}>
+    <html lang={t.htmlLang}>
+      <body className={`${shantell.variable} antialiased`}>
         <div className="relative z-10">
           <PageTransition>{children}</PageTransition>
         </div>

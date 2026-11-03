@@ -1,8 +1,10 @@
-# Dirección de arte: "Specimen File"
+# Dirección de arte: "Cuaderno de tinta"
 
-Referencia: [`reference.jpg`](./reference.jpg) (póster *Project #0653*, @ctmak).
+Referencia: un dibujo ajeno de un mago a tinta negra sobre blanco, de trazo grueso, ingenuo y algo tembloroso: sombrero cónico con manchas, nariz larga, barba, túnica ancha con cruces "+" y manchas de tinta, pies planos y varita. No se guarda en el repositorio porque no es nuestro; el mago del sitio es un dibujo propio en ese estilo.
 
 Este documento tiene dos partes. La primera es el **prompt de dirección de arte**: un texto autocontenido que se puede pegar en cualquier herramienta (un modelo de imagen, un generador de UI, un diseñador humano) para obtener piezas coherentes con la referencia. La segunda es la **ampliación a la web**: cómo se traduce ese lenguaje a este portfolio, con tokens, componentes y reglas concretas. El código implementa la parte 2.
+
+La identidad anterior ("Specimen File": ficha de laboratorio, semitono, códigos de barras) está en el historial de git.
 
 ---
 
@@ -11,112 +13,95 @@ Este documento tiene dos partes. La primera es el **prompt de dirección de arte
 ```text
 ROL
 Actúa como director de arte. Vas a diseñar dentro de un lenguaje visual llamado
-"Specimen File": la estética de una ficha técnica de laboratorio, un expediente
-de catalogación o la pantalla de un instrumento de medida, impresa en papel.
+"Cuaderno de tinta": las páginas de la libreta de un mago que hace fotos y
+juegos, dibujadas a rotulador negro sobre papel blanco.
 
 CONCEPTO
-Cada pieza es un expediente que documenta un espécimen. El espécimen (una
-imagen) ocupa el centro y está tramado en puntos, como una impresión en
-semitono de baja resolución. A su alrededor, una capa de interfaz técnica lo
-mide, lo etiqueta y lo clasifica: marcos de visor, líneas de referencia,
-códigos, tablas de datos, códigos de barras. La interfaz es fría y precisa;
-el espécimen es orgánico. El contraste entre ambos es la pieza.
+Todo parece hecho a mano y con prisa, pero con cariño. El trazo es grueso,
+ingenuo y algo tembloroso, como el de un dibujo infantil o un fanzine
+fotocopiado: líneas que se pasan de las esquinas, círculos que no cierran donde
+empiezan, manchas de tinta que se acumulan en los bordes. Nada es perfecto y
+nada es descuidado. El humor es amable, nunca chistoso.
 
 PALETA (estrictamente monocroma)
-- Papel:     #FFFFFF  fondo, siempre plano. Sin degradados, sin texturas.
-- Panel:     #DEDEDC  bloques grises que enmarcan o tapan parcialmente.
-- Tinta:     #201E20  texto, líneas, puntos. Casi negro, nunca #000.
-- Grafito:   #48444A  paneles oscuros de aviso o de acción, con texto en papel.
-- Gris medio:#6B676E  texto secundario.
-No hay color de acento. El único color permitido es el que trae el propio
-contenido fotográfico cuando se muestra a sangre, nunca en la interfaz.
+- Papel: #FFFFFF  fondo, siempre plano. Sin texturas, sin degradados.
+- Tinta: #141214  trazos, texto, manchas.
+- Lápiz: #5F5A60  notas al margen y texto secundario.
+No hay color de acento. El único color permitido es el del contenido (una foto,
+una captura de un juego), y va siempre a todo color.
 
-TIPOGRAFÍA (tres voces, nunca más)
-1. Titular: grotesca muy condensada, peso negro (800 a 900), en minúsculas,
-   interletrado negativo y SIEMPRE terminada en punto: "design." "graphics."
-   Se usa para palabras sueltas, muy grandes, como etiquetas de esquina.
-2. Código: monoespaciada en mayúsculas y negrita para identificadores:
-   "PROJECT #0653", "X-ORCH-26", "#201E20".
-3. Datos: la misma monoespaciada, en cuerpo pequeño (9 a 12 px), justificada,
-   para descripciones y textos de expediente. Se acepta el espaciado irregular
-   de la justificación: forma parte del carácter.
+TIPOGRAFÍA (una sola familia, a mano)
+Una letra de rotulador redondeada e irregular (Shantell Sans), en dos voces:
+1. Rótulo: negrita máxima, en minúsculas, con rebote (cada letra un poco por
+   encima o por debajo de la línea). Palabras sueltas y muy grandes.
+2. Texto: el mismo trazo, peso normal, informal, para frases y notas.
+Las notas al margen van pequeñas, en lápiz y ligeramente giradas.
 
-IMAGEN
-- El espécimen se trama en semitono (puntos en rejilla ordenada, tamaño de
-  punto visible, 2 a 4 px), en tinta sobre transparente. El fondo de la foto
-  se elimina y los bordes se disuelven: la densidad de puntos cae hacia fuera.
-- El espécimen puede desbordar sus marcos y cruzar paneles: la interfaz se
-  monta encima, no lo encierra.
+PERSONAJE
+Un mago pequeño: sombrero cónico con la punta vencida y manchas, nariz larga,
+barba en mechones, túnica ancha con cruces "+" y manchas de tinta en el bajo,
+pies planos, varita. Siempre en el mismo trazo que el resto. Es el anfitrión,
+no el protagonista: aparece en la portada y cuando algo sale mal.
 
 ELEMENTOS GRÁFICOS (vocabulario cerrado)
-- Marcos de visor: cuatro esquinas en L, sin lados, alrededor de lo que se mide.
-- Esquinas de página: L gruesas (6 a 8 px) en esquinas opuestas del formato.
-- Líneas de referencia: trazo de 2 px con punto relleno en cada extremo y un
-  quiebro a 45°, que conecta un texto con un punto del espécimen.
-- Tres puntos "● ● ●" como cabecera de panel o separador.
-- Bordes discontinuos para paneles secundarios.
-- Código de barras, tabla de barras de datos, "////", columna de "×", rombos
-  agrupados, glifos pixelados de 3x3: como textura de datos, nunca protagonistas.
-- Corchetes de línea con quiebro en la base de la página, como regla de pie.
+- Cruz "+": la estrella de la túnica, como viñeta, adorno y chispa de varita.
+- Marco a mano: cuatro trazos que se combean y se pasan de las esquinas.
+- Círculo a mano: algo más de una vuelta alrededor de una palabra.
+- Subrayado: una ida ondulada y una vuelta más corta.
+- Flecha a mano, a veces con un rizo.
+- Mancha de tinta: un círculo deforme y macizo, para números.
+- Garabatos de objetos (cámara, mando) en el mismo trazo.
+
+MOVIMIENTO
+Los trazos se dibujan solos: al llegar a la página, al hacer scroll, al pasar
+el ratón. Lo que se mueve lo hace con un rebote corto, como un trazo que se
+pasa un poco y vuelve. Nada parpadea ni gira sin motivo.
 
 COMPOSICIÓN
-- Formato con márgenes amplios y una fila superior de tres titulares
-  repartidos (izquierda, centro, derecha) y una fila inferior equivalente.
-- Rejilla de 12 columnas, asimétrica: el espécimen en el centro, bloques de
-  texto y paneles anclados a los laterales y superpuestos al espécimen.
-- Esquinas siempre rectas. Ningún radio, ninguna sombra difusa, ningún blur.
-- Mucho blanco. Densidad en los bordes, aire en el centro.
-
-TONO
-Técnico, catalogador, ligeramente ficticio (códigos, números de expediente),
-pero nunca recargado: cada elemento decorativo parece tener una función.
+Mucho blanco. Elementos ligeramente torcidos, como pegados a mano en la libreta.
+Las fotos van enmarcadas a mano con su pie escrito debajo.
 
 EVITAR
-Color de acento, degradados, glassmorphism, sombras suaves, esquinas
-redondeadas, ilustración vectorial, iconos genéricos, emojis, tipografías
-humanistas o redondeadas, más de tres familias tipográficas.
+Color de acento, degradados, sombras, blur, cristal, esquinas perfectas,
+iconos vectoriales genéricos, tipografías geométricas, emojis, más de una
+familia tipográfica.
 ```
 
 ---
 
-## 2. Ampliación: el portfolio como expediente
+## 2. Ampliación: el portfolio como cuaderno
 
-El portfolio es un archivo de dos colecciones (fotografía y juegos). Cada página es un expediente; cada foto y cada juego, un espécimen catalogado.
+El portfolio es la libreta de un mago con dos hechizos: la fotografía y los juegos. La portada es el mago lanzando chispas hacia ellos.
 
 ### Qué se conserva
 
-Todo el contenido: el nombre, "Photography & Creative Game Design.", las dos secciones con sus descripciones y recuentos, las 17 fotos con sus títulos, los 4 juegos con su nombre, su tagline, su enlace y **su captura real**, el pie (copyright, Instagram, Madrid). Las capturas y las fotos se muestran **a todo color**: son el contenido, y la regla de la paleta es que la interfaz es monocroma, no el contenido.
+Todo el contenido: el nombre, "Photography & Creative Game Design.", las dos secciones con sus recuentos, las 17 fotos con sus títulos, los juegos con su nombre, su descripción, su captura y su vídeo, el pie (copyright, idioma, Madrid). Las fotos y las capturas van **a todo color**: la regla monocroma es para la interfaz, no para el contenido.
 
 ### Tokens
 
 | token | valor | uso |
 |---|---|---|
-| `paper` | `#FFFFFF` | fondo de todas las páginas |
-| `panel` | `#DEDEDC` | paneles grises, marco de las capturas |
-| `ink` | `#201E20` | texto, líneas, bordes, puntos |
-| `graphite` | `#48444A` | panel de acción oscuro |
-| `mute` | `#6B676E` | texto secundario (contraste 5.4:1 sobre papel) |
+| `paper` | `#FFFFFF` | fondo de todas las páginas y del visor de fotos |
+| `ink` | `#141214` | texto, trazos, manchas |
+| `mute` | `#5F5A60` | notas y texto secundario (6:1 sobre papel) |
+| `smudge` | `#F1EFEC` | hueco de una foto mientras carga, nada más |
 
-Tipografía: **Archivo** variable con el eje `wdth` a 62 y peso 800 para los titulares (`.display`), **JetBrains Mono** para código y datos (`font-mono`). Nada más.
+Tipografía: **Shantell Sans** variable, con sus ejes `INFM` (informalidad) y `BNCE` (rebote). `.hand-display` (800, INFM 100, BNCE 55, minúsculas) para rótulos; al pasar el ratón el rebote se invierte y las letras bailan. `.hand` para texto, `.note` para notas al margen.
 
-### Especímenes tramados
+### Trazos que se dibujan
 
-Dos fotos del propio archivo, tramadas con ImageMagick (semitono `h4x4a`, recortadas, fondo eliminado por niveles y bordes disueltos con un degradado radial), en `public/images/dither/`:
-
-- `tree.png`: *Solitude* (foto 9). Espécimen de la home.
-- `peak.png`: *Snow Peak* (foto 13). Espécimen de la cabecera de Fotografía.
-
-Se sirven con `unoptimized`: la optimización de `next/image` reescala con suavizado y emborronaría los puntos.
+Cada trazo lleva `pathLength="1"` y se "dibuja" animando su desplazamiento de guion de 1 a 0. Tres momentos: al cargar (el mago, los subrayados, los garabatos), con el scroll (los marcos de fotos y juegos, solo en escritorio) y al pasar el ratón (el círculo alrededor de un enlace). Sin animación, todo está ya dibujado.
 
 ### Páginas
 
-- **Home (índice del archivo).** Sin fila superior de titulares: en la web sobraba y se quitó. En el centro el árbol tramado; superpuestos, el nombre con línea de referencia hacia el árbol, el panel gris con marco de visor que lleva a Fotografía y el panel grafito que lleva a Proyectos. Fila inferior de pie. Cabe en una pantalla sin scroll, como antes.
-- **Proyectos.** Cabecera de expediente (titular gigante, código, intro, tabla de datos y código de barras). Cada juego es una ficha: código de proyecto, captura dentro de un panel gris con marco de visor, nombre como titular, regla de tinta, tagline en monoespaciada y acción.
-- **Fotografía.** Cabecera de expediente con el pico tramado. Rejilla de fotos de esquinas rectas; cada foto lleva el marco de visor en papel (las cuatro esquinas, como una cámara enfocando) y su código de fotograma (`FR-01`) en una pestaña de tinta junto a la esquina superior izquierda. El visor a pantalla completa es tinta sólida, sin blur.
+- **Portada.** "hi! i'm" con una flecha, "antonio" rotulado enorme y subrayado, el lema y los dos hechizos (fotografía, juegos) con su recuento. A la derecha el mago se dibuja trazo a trazo, se balancea y lanza chispas con la varita hacia los hechizos, con la nota "pick a spell". Cabe en una pantalla sin scroll.
+- **Juegos.** Cabecera de cuaderno (nota, título rotulado y subrayado, intro, índice y el garabato de un mando). Cada juego es una entrada: su número en una mancha de tinta, la captura torcida en un marco a mano, el nombre rotulado, la descripción y "jugar". Al final, "fin" con la letra pequeña común a todos los juegos.
+- **Fotografía.** Cabecera con el garabato de una cámara y la ficha del visor. Cada foto, torcida en su marco, con el título escrito debajo. El visor a pantalla completa es papel, con flechas a mano.
+- **404.** El mago, sin chispas y con interrogaciones sobre el sombrero: "poof!".
 
 ### Reglas de implementación
 
-- Ningún `border-radius` en la interfaz (salvo los puntos, que son círculos).
-- Ningún `backdrop-filter`, `filter: blur()`, sombra difusa ni degradado de color.
-- La decoración (códigos de barras, tablas, rombos, ×) se oculta por debajo de `md`: en un móvil no hay margen que llenar y solo añade ruido.
-- Los titulares en `clamp()`, como siempre: el condensado ayuda, pero no exime.
+- Ningún `backdrop-filter`, `filter: blur()`, sombra ni degradado. El único filtro es el de tinta del mago: una ondulación (`feTurbulence` + `feDisplacementMap`) que solo desplaza el borde, sin desenfoque, sobre un dibujo pequeño.
+- Las formas "a mano" salen de una semilla de texto, nunca de `Math.random()`: el servidor y el cliente pintan lo mismo y cada marco tiene siempre el mismo temblor.
+- La decoración extra (cruces sueltas, garabatos de cabecera, índices) se oculta por debajo de `md`.
+- Los rótulos en `clamp()`, siempre: la letra a mano es ancha.

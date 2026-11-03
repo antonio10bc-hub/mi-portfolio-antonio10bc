@@ -1,48 +1,27 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
-import Image from "next/image";
 import FileNav from "@/components/FileNav";
-import { PHOTOS } from "@/lib/photos";
-import NextFile from "@/components/NextFile";
-import SpecList from "@/components/SpecList";
 import Footer from "@/components/Footer";
-import { Brackets, XStack } from "@/components/Hud";
+import { CameraDoodle } from "@/components/Ink";
+import NextFile from "@/components/NextFile";
 import PhotoGallery from "@/components/PhotoGallery";
 import SectionHeader from "@/components/SectionHeader";
+import SpecList from "@/components/SpecList";
+import { PHOTOS } from "@/lib/photos";
 import { dictFor, isLang, type Dict } from "@/lib/i18n";
 
-/** Ficha del visor, bajo la intro: cuántos fotogramas hay y cómo se recorren. */
+/** Ficha del visor, bajo la intro: cuántas fotos hay y cómo se recorren. */
 function ViewerSpec({ t }: { t: Dict }) {
   return (
     <SpecList
       title={t.viewer}
       className="mt-8 hidden max-w-md md:block"
       rows={[
-        [t.framesLabel, String(PHOTOS.length).padStart(2, "0")],
-        [t.browse, "\u2190 \u2192"],
+        [t.framesLabel, String(PHOTOS.length)],
+        [t.browse, "← →"],
         [t.close, "Esc"],
       ]}
     />
-  );
-}
-
-/** Espécimen de la cabecera: "Snow Peak" tramado, dentro de un marco de visor. */
-function HeaderSpecimen() {
-  return (
-    <div className="relative flex items-center gap-4 text-ink">
-      <XStack className="hidden md:flex" />
-      <div className="relative flex-1 bg-panel/50 p-3">
-        <Brackets size={20} weight={2} />
-        <Image
-          src="/images/dither/peak.png"
-          alt=""
-          width={1500}
-          height={720}
-          unoptimized
-          className="h-auto w-full"
-        />
-      </div>
-    </div>
   );
 }
 
@@ -61,10 +40,10 @@ export default async function PhotographyPage({ params }: { params: Promise<{ la
         <FileNav t={t} current="photography" />
 
         <SectionHeader
-          className="reveal mt-6 md:mt-8"
+          className="reveal mt-10 md:mt-16"
           eyebrow={t.photoEyebrow}
           title={t.photoTitle}
-          code={t.photoCode}
+          intro={t.photoIntro}
           meta={
             <a
               href="https://www.instagram.com/antonio10bc/"
@@ -72,31 +51,29 @@ export default async function PhotographyPage({ params }: { params: Promise<{ la
               rel="noopener noreferrer"
               aria-label="Instagram @antonio10bc"
               data-track="instagram_clicked"
-              className="normal-case tracking-normal underline decoration-1 underline-offset-4 transition-opacity duration-300 hover:opacity-60"
+              className="hand font-semibold text-ink underline decoration-wavy decoration-2 underline-offset-[6px] transition-colors duration-300 hover:text-mute"
             >
               @antonio10bc
             </a>
           }
-          intro={t.photoIntro}
-          aside={<HeaderSpecimen />}
           contents={<ViewerSpec t={t} />}
+          aside={<CameraDoodle className="w-[min(100%,22rem)] rotate-6" />}
         />
 
-        <div className="mt-8 grid grid-cols-1 gap-4 md:mt-12 md:grid-cols-2 md:gap-5 lg:grid-cols-3">
+        <div className="mt-6 grid grid-cols-1 gap-x-8 gap-y-12 md:mt-10 md:grid-cols-2 md:gap-y-16 lg:grid-cols-3">
           <PhotoGallery lang={isLang(lang) ? lang : "en"} />
         </div>
 
         <NextFile
           href="/projects"
           section="games"
-          label={t.nextFile}
-          code={t.gamesCode}
+          label={t.nextUp}
           title={t.gamesPanelTitle}
           text={t.gamesPanelText}
-          className="mt-14 md:mt-20"
+          className="mt-20 md:mt-28"
         />
 
-        <Footer lang={lang} className="mt-16 md:mt-24" />
+        <Footer lang={lang} className="mt-20 md:mt-28" />
       </div>
     </div>
   );

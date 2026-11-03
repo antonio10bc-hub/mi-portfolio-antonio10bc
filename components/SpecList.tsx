@@ -1,7 +1,6 @@
 /**
- * Ficha de datos de expediente: un título en microtipografía y filas
- * "término ........ valor" con línea de puntos. La usan la ficha del visor de
- * Fotografía y el cierre de expediente de Juegos.
+ * Ficha a mano: un título y filas "término ........ valor" con una línea de
+ * puntos. La usan la ficha del visor de Fotografía y el final de Juegos.
  */
 export default function SpecList({
   title,
@@ -14,13 +13,13 @@ export default function SpecList({
 }) {
   return (
     <div className={className}>
-      <span className="label text-ink">{title}</span>
-      <dl className="mt-2 border-t-2 border-ink">
+      <span className="note text-ink">{title}</span>
+      <dl className="mt-2">
         {rows.map(([term, value]) => (
-          <div key={term} className="flex items-baseline gap-3 border-b border-ink/15 py-2 text-ink">
-            <dt className="font-mono text-xs">{term}</dt>
-            <span aria-hidden className="min-w-4 flex-1 -translate-y-1 border-b border-dotted border-ink/40" />
-            <dd className="code pr-1 text-[11px]">{value}</dd>
+          <div key={term} className="flex items-baseline gap-3 py-1.5 text-ink">
+            <dt className="hand">{term}</dt>
+            <span aria-hidden className="min-w-4 flex-1 -translate-y-1 border-b-2 border-dotted border-ink/30" />
+            <dd className="hand font-bold">{value}</dd>
           </div>
         ))}
       </dl>
