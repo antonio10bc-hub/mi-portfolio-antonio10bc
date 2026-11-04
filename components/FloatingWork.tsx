@@ -73,7 +73,7 @@ export default function FloatingWork({
           <Image src={next.src} alt="" fill sizes={sizes} unoptimized={next.unoptimized} className="object-cover" />
         </span>
       </Link>
-      <figcaption key={`c-${index}`} className="mt-4 flex shrink-0 animate-fade-in items-baseline gap-2 md:justify-center">
+      <figcaption key={`c-${index}`} className="mt-3 flex shrink-0 animate-fade-in items-baseline justify-center gap-2">
         <span className="hand-display text-[clamp(1.25rem,2vw,1.6rem)]">{work.title.toLowerCase()}</span>
         <span className="note">({work.kind === "photo" ? labels.photo : labels.game})</span>
       </figcaption>

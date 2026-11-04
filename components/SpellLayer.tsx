@@ -6,7 +6,7 @@ import { useSpell } from "@/components/SpellProvider";
 import { track } from "@/lib/analytics";
 import { DICTS } from "@/lib/i18n";
 import { matches, NAME, type Element, type Point } from "@/lib/spellbook";
-import { confetti, INK, projectile, puff, spell, type Effect, type Vec } from "@/lib/spells";
+import { areaAround, confetti, INK, projectile, puff, spell, type Effect, type Vec } from "@/lib/spells";
 
 /*
  * La capa de los hechizos (ver SpellProvider): un canvas transparente a pantalla
@@ -95,7 +95,7 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
     setStatus("casting");
     strike("wizard-cast", 750);
     setMessage(t.elements[element]);
-    const cast = () => add(spell(element, at, window.innerHeight));
+    const cast = () => add(spell(element, areaAround(at), window.innerHeight));
     // El rayo cae del cielo; lo demás sale de la varita.
     if (element === "lightning") window.setTimeout(cast, 180);
     else add(projectile(wandTip(), at, cast));
@@ -192,10 +192,12 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
   // proveedor y lanza el que estuviera esperando a que la capa se montara.
   useEffect(() => {
     const cast = (element: Element) => {
+      // El hechizo llena toda la obra que flota, no solo su centro.
       const box = targetRef.current?.getBoundingClientRect();
-      const at = box ? { x: box.left + box.width / 2, y: box.top + box.height / 2 } : { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+      const area = box ? { x: box.left, y: box.top, w: box.width, h: box.height } : areaAround({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+      const at = { x: area.x + area.w / 2, y: area.y + area.h / 2 };
       strike("wizard-cast", 750);
-      const hit = () => add(spell(element, at, window.innerHeight));
+      const hit = () => add(spell(element, area, window.innerHeight));
       if (element === "lightning") window.setTimeout(hit, 180);
       else add(projectile(wandTip(), at, hit));
     };

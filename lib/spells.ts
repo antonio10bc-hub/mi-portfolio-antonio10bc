@@ -35,6 +35,22 @@ function pen(ctx: CanvasRenderingContext2D, width: number, alpha = 1) {
   ctx.lineJoin = "round";
 }
 
+/**
+ * Traza el camino actual en tinta con un ribete de papel debajo, como una
+ * pegatina: así la línea se lee también sobre una foto oscura (los hechizos
+ * sueltos caen encima de la obra que flota).
+ */
+function haloStroke(ctx: CanvasRenderingContext2D) {
+  const ink = ctx.strokeStyle;
+  const width = ctx.lineWidth;
+  ctx.strokeStyle = PAPER;
+  ctx.lineWidth = width + 3;
+  ctx.stroke();
+  ctx.strokeStyle = ink;
+  ctx.lineWidth = width;
+  ctx.stroke();
+}
+
 /** La cruz de la túnica: la estrella y la chispa de todo el sitio. */
 export function cross(ctx: CanvasRenderingContext2D, x: number, y: number, s: number, rot: number, w: number) {
   ctx.save();
@@ -46,7 +62,7 @@ export function cross(ctx: CanvasRenderingContext2D, x: number, y: number, s: nu
   ctx.moveTo(-s * 0.05, -s);
   ctx.lineTo(s * 0.05, s);
   ctx.lineWidth = w;
-  ctx.stroke();
+  haloStroke(ctx);
   ctx.restore();
 }
 
@@ -113,10 +129,11 @@ function boltPath(from: Vec, to: Vec, spread: number, depth: number): Vec[] {
   return [...boltPath(from, mid, spread / 2, depth - 1), ...boltPath(mid, to, spread / 2, depth - 1).slice(1)];
 }
 
-function polyline(ctx: CanvasRenderingContext2D, pts: Vec[]) {
+function polyline(ctx: CanvasRenderingContext2D, pts: Vec[], halo = false) {
   ctx.beginPath();
   pts.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
-  ctx.stroke();
+  if (halo) haloStroke(ctx);
+  else ctx.stroke();
 }
 
 // --- El viaje: de la punta de la varita al sitio de la letra -------------------
@@ -163,20 +180,47 @@ export function projectile(from: Vec, to: Vec, onArrive: () => void): Effect {
 }
 
 // --- Los siete hechizos ----------------------------------------------------------
+//
+// Cada hechizo llena una zona (`Area`): la obra que flota, para los hechizos
+// sueltos de la home, o una caja alrededor de la letra dibujada, en el minijuego.
+// El número de partículas y su tamaño crecen con la zona, para que una ventana
+// grande quede cubierta de punta a punta y no con un estallido en el centro.
 
-function fire(at: Vec): Effect {
+/** Zona del hechizo, en px de pantalla: esquina superior izquierda y tamaño. */
+export type Area = { x: number; y: number; w: number; h: number };
+
+/** La caja de un hechizo lanzado en un punto (las letras del minijuego). */
+export const areaAround = (at: Vec): Area => ({ x: at.x - 130, y: at.y - 110, w: 260, h: 220 });
+
+const centre = (a: Area): Vec => ({ x: a.x + a.w / 2, y: a.y + a.h / 2 });
+/** Cuántas veces más partículas que en la caja de una letra (de 1 a 3). */
+const amount = (a: Area) => Math.max(1, Math.min(3, (a.w * a.h) / (260 * 220)));
+/** Cuánto más grandes (de 1 a 2.2), según el alto de la zona. */
+const grow = (a: Area) => Math.max(1, Math.min(2.2, a.h / 220));
+const inX = (a: Area, from = 0, to = 1) => a.x + a.w * rand(from, to);
+const inY = (a: Area, from = 0, to = 1) => a.y + a.h * rand(from, to);
+/** Distancia del centro al borde de la elipse inscrita en la zona, en la dirección `angle`. */
+const toEdge = (a: Area, angle: number) => {
+  const rx = a.w / 2;
+  const ry = a.h / 2;
+  return (rx * ry) / Math.hypot(ry * Math.cos(angle), rx * Math.sin(angle));
+};
+
+function fire(area: Area): Effect {
   let t = 0;
-  const flames = Array.from({ length: 22 }, () => ({
-    x: at.x + rand(-95, 95),
-    y: at.y + rand(-10, 45),
-    vy: rand(-170, -60),
-    h: rand(34, 84),
-    w: rand(11, 23),
+  const at = centre(area);
+  const g = grow(area);
+  const flames = Array.from({ length: Math.round(22 * amount(area)) }, () => ({
+    x: inX(area, 0.04, 0.96),
+    y: inY(area, 0.55, 1.02),
+    vy: rand(-170, -60) * g,
+    h: rand(34, 84) * g,
+    w: rand(11, 23) * g,
     life: rand(0.7, 1.4),
     age: rand(-0.25, 0),
     phase: rand(0, 6),
   }));
-  const embers = Array.from({ length: 16 }, () => ({ x: at.x + rand(-60, 60), y: at.y, vx: rand(-40, 40), vy: rand(-260, -120), rot: rand(0, 3), life: rand(0.8, 1.6), age: 0 }));
+  const embers = Array.from({ length: Math.round(16 * amount(area)) }, () => ({ x: inX(area, 0.05, 0.95), y: inY(area, 0.4, 0.9), vx: rand(-40, 40), vy: rand(-260, -120) * g, rot: rand(0, 3), life: rand(0.8, 1.6), age: 0 }));
   return {
     update(dt) {
       t += dt;
@@ -197,7 +241,7 @@ function fire(at: Vec): Effect {
       const big = swell(t / 1.4);
       if (big > 0) {
         pen(ctx, 3.4);
-        flame(ctx, at.x, at.y + 50, 210 * big, 62 * big, Math.sin(t * 14) * 12);
+        flame(ctx, at.x, area.y + area.h * 0.98, Math.max(210, area.h * 0.9) * big, Math.max(62, area.w * 0.16) * big, Math.sin(t * 14) * 12 * g);
       }
       flames.forEach((f) => {
         if (f.age <= 0 || f.age > f.life) return;
@@ -215,15 +259,18 @@ function fire(at: Vec): Effect {
   };
 }
 
-function water(at: Vec): Effect {
+function water(area: Area): Effect {
   let t = 0;
-  const ground = at.y + 70;
-  const drops = Array.from({ length: 30 }, () => {
-    const a = rand(-165, -15) * (Math.PI / 180);
-    const v = rand(220, 460);
-    return { x: at.x + rand(-12, 12), y: at.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: rand(4, 8), alive: true };
+  const at = centre(area);
+  const g = grow(area);
+  const ground = area.y + area.h * 0.92;
+  // Varios surtidores repartidos a lo ancho, para que el agua cubra toda la zona.
+  const drops = Array.from({ length: Math.round(30 * amount(area)) }, () => {
+    const a = rand(-150, -30) * (Math.PI / 180);
+    const v = rand(220, 460) * Math.sqrt(g);
+    return { x: inX(area, 0.06, 0.94), y: ground - 4, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: rand(4, 8) * Math.sqrt(g), alive: true };
   });
-  const ripples: { x: number; age: number; max: number }[] = [{ x: at.x, age: 0, max: 90 }];
+  const ripples: { x: number; age: number; max: number }[] = [{ x: at.x, age: 0, max: Math.max(90, area.w * 0.3) }];
   return {
     update(dt) {
       t += dt;
@@ -245,12 +292,12 @@ function water(at: Vec): Effect {
       const s = swell(t / 2.2);
       pen(ctx, 3, s);
       ctx.beginPath();
-      for (let x = -170; x <= 170; x += 6) {
+      for (let x = 0; x <= area.w; x += 6) {
         const y = ground + Math.sin(x / 22 + t * 6) * 5 * s;
-        if (x === -170) ctx.moveTo(at.x + x, y);
-        else ctx.lineTo(at.x + x, y);
+        if (x === 0) ctx.moveTo(area.x + x, y);
+        else ctx.lineTo(area.x + x, y);
       }
-      ctx.stroke();
+      haloStroke(ctx);
       drops.forEach((d) => {
         if (!d.alive) return;
         pen(ctx, 2.4);
@@ -269,19 +316,20 @@ function water(at: Vec): Effect {
   };
 }
 
-function wind(at: Vec): Effect {
+function wind(area: Area): Effect {
   let t = 0;
-  const swirls = Array.from({ length: 6 }, (_, k) => ({
-    x: at.x + rand(-50, 50),
-    y: at.y + rand(-40, 40),
+  const g = grow(area);
+  const swirls = Array.from({ length: Math.round(6 * amount(area)) }, (_, k) => ({
+    x: inX(area, 0.1, 0.9),
+    y: inY(area, 0.15, 0.85),
     vx: (k % 2 ? 1 : -1) * rand(60, 160),
     vy: rand(-70, -10),
-    size: rand(0.7, 1.3),
+    size: rand(0.7, 1.3) * g,
     spin: rand(5, 9) * (k % 2 ? 1 : -1),
     delay: k * 0.07,
   }));
-  const dashes = Array.from({ length: 14 }, () => ({ y: at.y + rand(-110, 110), x: at.x + rand(-200, 200), len: rand(50, 140), v: rand(500, 900) * (Math.random() < 0.5 ? -1 : 1), delay: rand(0, 0.5) }));
-  const leaves = Array.from({ length: 9 }, () => ({ x: at.x, y: at.y, vx: rand(-320, 320), vy: rand(-260, 40), rot: rand(0, 6), spin: rand(-9, 9) }));
+  const dashes = Array.from({ length: Math.round(14 * amount(area)) }, () => ({ y: inY(area, 0.02, 0.98), x: inX(area), len: rand(50, 140) * g, v: rand(500, 900) * (Math.random() < 0.5 ? -1 : 1), delay: rand(0, 0.5) }));
+  const leaves = Array.from({ length: Math.round(9 * amount(area)) }, () => ({ x: inX(area, 0.1, 0.9), y: inY(area, 0.2, 0.8), vx: rand(-320, 320), vy: rand(-260, 40), rot: rand(0, 6), spin: rand(-9, 9) }));
   return {
     update(dt) {
       t += dt;
@@ -316,7 +364,7 @@ function wind(at: Vec): Effect {
           if (a === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
-        ctx.stroke();
+        haloStroke(ctx);
       });
       dashes.forEach((d) => {
         const k = (t - d.delay) / 0.8;
@@ -325,7 +373,7 @@ function wind(at: Vec): Effect {
         ctx.beginPath();
         ctx.moveTo(d.x, d.y);
         ctx.lineTo(d.x - Math.sign(d.v) * d.len, d.y);
-        ctx.stroke();
+        haloStroke(ctx);
       });
       leaves.forEach((l) => {
         pen(ctx, 2.2, 1 - t / 1.9);
@@ -348,15 +396,16 @@ function wind(at: Vec): Effect {
   };
 }
 
-function earth(at: Vec): Effect {
+function earth(area: Area): Effect {
   let t = 0;
   let shake = 0;
-  const ground = at.y + 50;
-  const rocks = Array.from({ length: 9 }, (_, k) => {
-    const size = rand(14, 32);
+  const g = grow(area);
+  const ground = area.y + area.h * 0.95;
+  const rocks = Array.from({ length: Math.round(9 * amount(area)) }, (_, k) => {
+    const size = rand(14, 32) * Math.sqrt(g);
     return {
-      x: at.x + rand(-100, 100),
-      y: at.y - rand(260, 460) - k * 30,
+      x: inX(area, 0.06, 0.94),
+      y: area.y - rand(120, 360) - k * 22,
       vy: rand(0, 120),
       size,
       rot: rand(0, 6),
@@ -412,7 +461,7 @@ function earth(at: Vec): Effect {
       cracks.forEach((c) => {
         const k = ease((t - c.born) / 0.35);
         pen(ctx, 2.6, fade);
-        polyline(ctx, c.pts.slice(0, Math.max(2, Math.ceil(c.pts.length * k))));
+        polyline(ctx, c.pts.slice(0, Math.max(2, Math.ceil(c.pts.length * k))), true);
       });
       puffs.forEach((p) => {
         const k = p.age / 0.6;
@@ -447,19 +496,23 @@ function earth(at: Vec): Effect {
   };
 }
 
-function lightning(at: Vec, height: number): Effect {
+function lightning(area: Area, height: number): Effect {
   let t = 0;
   let shake = 0;
-  const strikes = [0, 0.2, 0.42].map((delay) => {
-    const from = { x: at.x + rand(-60, 60), y: -20 };
-    const main = boltPath(from, at, 120, 6);
+  const n = Math.round(3 * amount(area));
+  const strikes = Array.from({ length: n }, (_, k) => {
+    const delay = k * (0.62 / n);
+    // Repartidas a lo ancho: cada descarga cae en su franja de la zona.
+    const to = { x: area.x + area.w * ((k + rand(0.2, 0.8)) / n), y: inY(area, 0.45, 0.9) };
+    const from = { x: to.x + rand(-60, 60), y: -20 };
+    const main = boltPath(from, to, 120, 6);
     const branches = [0, 1].map(() => {
       const start = main[Math.floor(rand(main.length * 0.3, main.length * 0.7))];
       return boltPath(start, { x: start.x + rand(-140, 140), y: start.y + rand(60, 160) }, 50, 4);
     });
-    return { delay, main, branches, hit: false };
+    const sparks = Array.from({ length: 10 }, () => ({ a: rand(0, Math.PI * 2), v: rand(120, 320), rot: rand(0, 3) }));
+    return { delay, to, main, branches, sparks, hit: false };
   });
-  const sparks = Array.from({ length: 14 }, () => ({ a: rand(0, Math.PI * 2), v: rand(120, 320), rot: rand(0, 3) }));
   return {
     get shake() {
       return shake;
@@ -473,7 +526,7 @@ function lightning(at: Vec, height: number): Effect {
           shake = 15;
         }
       });
-      return t < 1.6;
+      return t < 2;
     },
     draw(ctx) {
       strikes.forEach((s) => {
@@ -496,35 +549,43 @@ function lightning(at: Vec, height: number): Effect {
         ctx.lineWidth = 2.4;
         polyline(ctx, s.main);
       });
-      // chamusquina y chispas en el sitio del impacto
-      if (t > 0.2) {
-        const k = (t - 0.2) / 1.4;
+      // chamusquina y chispas en el sitio de cada impacto
+      strikes.forEach(({ delay, to, sparks }) => {
+        const k = (t - delay) / 1.2;
+        if (k <= 0 || k > 1) return;
         pen(ctx, 3, 1 - k);
         for (let i = 0; i < 10; i++) {
           const a = (i / 10) * Math.PI * 2;
           ctx.beginPath();
-          ctx.moveTo(at.x + Math.cos(a) * 14, at.y + Math.sin(a) * 14);
-          ctx.lineTo(at.x + Math.cos(a) * (30 + (i % 2) * 18), at.y + Math.sin(a) * (30 + (i % 2) * 18));
-          ctx.stroke();
+          ctx.moveTo(to.x + Math.cos(a) * 14, to.y + Math.sin(a) * 14);
+          ctx.lineTo(to.x + Math.cos(a) * (30 + (i % 2) * 18), to.y + Math.sin(a) * (30 + (i % 2) * 18));
+          haloStroke(ctx);
         }
         sparks.forEach((sp) => {
           const d = sp.v * ease(k);
-          cross(ctx, at.x + Math.cos(sp.a) * d, at.y + Math.sin(sp.a) * d, 6, sp.rot + k * 6, 2.4);
+          cross(ctx, to.x + Math.cos(sp.a) * d, to.y + Math.sin(sp.a) * d, 6, sp.rot + k * 6, 2.4);
         });
-      }
+      });
       ctx.globalAlpha = 1;
     },
   };
 }
 
-function ice(at: Vec): Effect {
+function ice(area: Area): Effect {
   let t = 0;
-  const spikes = Array.from({ length: 11 }, (_, k) => ({ a: (k / 11) * Math.PI * 2 + rand(-0.15, 0.15), len: rand(45, 115), w: rand(9, 15) }));
+  const at = centre(area);
+  const g = grow(area);
+  // Púas hasta casi el borde de la zona, en todas direcciones.
+  const count = Math.round(11 * Math.sqrt(amount(area))) + 3;
+  const spikes = Array.from({ length: count }, (_, k) => {
+    const a = (k / count) * Math.PI * 2 + rand(-0.15, 0.15);
+    return { a, len: toEdge(area, a) * rand(0.55, 0.95), w: rand(9, 15) * g };
+  });
   const shards: { x: number; y: number; vx: number; vy: number; rot: number; spin: number; s: number }[] = [];
-  const flakes = Array.from({ length: 16 }, () => {
+  const flakes = Array.from({ length: Math.round(16 * amount(area)) }, () => {
     const a = rand(0, Math.PI * 2);
-    const v = rand(80, 260);
-    return { x: at.x, y: at.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: rand(7, 15), rot: rand(0, 1), spin: rand(-2, 2), phase: rand(0, 6) };
+    const v = rand(30, 120);
+    return { x: inX(area, 0.05, 0.95), y: inY(area, 0.05, 0.95), vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: rand(7, 15) * Math.sqrt(g), rot: rand(0, 1), spin: rand(-2, 2), phase: rand(0, 6) };
   });
   let shattered = false;
   return {
@@ -594,12 +655,14 @@ function ice(at: Vec): Effect {
   };
 }
 
-function light(at: Vec): Effect {
+function light(area: Area): Effect {
   let t = 0;
   let shake = 8;
-  const burst = Array.from({ length: 56 }, () => {
+  const at = centre(area);
+  const g = grow(area);
+  const burst = Array.from({ length: Math.round(56 * amount(area)) }, () => {
     const a = rand(0, Math.PI * 2);
-    const v = rand(220, 640);
+    const v = rand(220, 640) * Math.sqrt(g);
     return { x: at.x, y: at.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, rot: rand(0, 3), spin: rand(-8, 8), s: rand(6, 14) };
   });
   return {
@@ -624,16 +687,17 @@ function light(at: Vec): Effect {
       pen(ctx, 3.2, swell(k));
       for (let i = 0; i < 16; i++) {
         const a = (i / 16) * Math.PI * 2 + t * 0.6;
-        const r0 = 40 + Math.sin(t * 8 + i) * 6;
-        const r1 = r0 + (i % 2 ? 70 : 120) * ease(t / 0.5);
+        const r0 = 40 * g + Math.sin(t * 8 + i) * 6;
+        // Los rayos llegan hasta el borde de la zona.
+        const r1 = r0 + Math.max(0, toEdge(area, a) - r0) * (i % 2 ? 0.6 : 1) * ease(t / 0.5);
         ctx.beginPath();
         ctx.moveTo(at.x + Math.cos(a) * r0, at.y + Math.sin(a) * r0);
         ctx.lineTo(at.x + Math.cos(a) * r1, at.y + Math.sin(a) * r1);
-        ctx.stroke();
+        haloStroke(ctx);
       }
       // el sol a mano
       ctx.beginPath();
-      ctx.arc(at.x, at.y, 28 * ease(t / 0.35), 0, Math.PI * 2);
+      ctx.arc(at.x, at.y, 28 * g * ease(t / 0.35), 0, Math.PI * 2);
       ctx.fillStyle = PAPER;
       ctx.fill();
       ctx.stroke();
@@ -641,8 +705,8 @@ function light(at: Vec): Effect {
       const ring = ease(t / 1.2);
       pen(ctx, 6 * (1 - ring) + 1, 1 - ring);
       ctx.beginPath();
-      ctx.arc(at.x, at.y, 40 + ring * 300, 0, Math.PI * 2);
-      ctx.stroke();
+      ctx.arc(at.x, at.y, 40 + ring * Math.max(300, Math.hypot(area.w, area.h) * 0.6), 0, Math.PI * 2);
+      haloStroke(ctx);
       burst.forEach((b) => {
         pen(ctx, 2.8, 1 - k);
         cross(ctx, b.x, b.y, b.s, b.rot, 2.8);
@@ -652,23 +716,23 @@ function light(at: Vec): Effect {
   };
 }
 
-/** El hechizo de cada elemento, en el sitio donde se dibujó la letra. */
-export function spell(element: Element, at: Vec, height: number): Effect {
+/** El hechizo de cada elemento, llenando su zona. */
+export function spell(element: Element, area: Area, height: number): Effect {
   switch (element) {
     case "fire":
-      return fire(at);
+      return fire(area);
     case "water":
-      return water(at);
+      return water(area);
     case "wind":
-      return wind(at);
+      return wind(area);
     case "earth":
-      return earth(at);
+      return earth(area);
     case "lightning":
-      return lightning(at, height);
+      return lightning(area, height);
     case "ice":
-      return ice(at);
+      return ice(area);
     case "light":
-      return light(at);
+      return light(area);
   }
 }
 

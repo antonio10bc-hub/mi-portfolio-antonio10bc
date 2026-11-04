@@ -85,24 +85,27 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
             <SpellCaption className="relative z-10 shrink-0 text-[clamp(1.05rem,min(3vw,4.2vh),2.5rem)] md:ml-[14%] md:mt-[clamp(0rem,3vh,2rem)]" />
 
             {/* Aire entre la frase y la obra: el marco sobresale y la obra sube al flotar. */}
-            <div className="relative mt-6 min-h-0 flex-1 md:mt-12">
-              <div className="absolute left-0 top-0 h-[64%] w-[82%] md:left-[14%] md:h-full md:w-[40%]">
-                <FloatingWork works={works} labels={{ photo: t.photoKind, game: t.gameKind }} sizes="(max-width: 768px) 82vw, 40vw" />
-              </div>
-              <div className="absolute bottom-0 right-0 z-10 aspect-[240/290] h-[40%] md:right-[6%] md:h-[82%]">
-                <WizardButton />
+            {/* La obra y el mago, juntos y centrados en la pantalla: en columna en el
+                móvil y en fila en escritorio, con la varita apuntando a la obra. */}
+            <div className="relative mt-6 min-h-0 flex-1 md:mt-10">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 md:flex-row md:gap-[clamp(1.5rem,4vw,4rem)]">
+                <div className="aspect-[4/3] h-[48%] max-w-[88%] md:h-[72%] md:max-w-[46%]">
+                  <FloatingWork works={works} labels={{ photo: t.photoKind, game: t.gameKind }} sizes="(max-width: 768px) 88vw, 46vw" />
+                </div>
+                <div className="relative z-10 aspect-[240/290] h-[36%] shrink-0 md:h-[56%]">
+                  <WizardButton />
+                </div>
               </div>
             </div>
           </section>
 
-          {/* Abajo: las píldoras en el centro y los hechizos a la derecha. La columna
-              izquierda queda vacía para que las píldoras sigan centradas. */}
-          <div className="grid shrink-0 gap-3 md:grid-cols-[1fr_auto_1fr] md:items-end md:gap-6">
-            <div aria-hidden className="hidden md:block" />
-            <div className="order-1 md:order-none">
+          {/* Abajo: las píldoras a la izquierda y los hechizos a la derecha (en el
+              móvil, una fila encima de la otra, cada una pegada a su lado). */}
+          <div className="flex shrink-0 flex-col gap-2 md:flex-row md:items-end md:justify-between md:gap-6">
+            <div className="self-start">
               <SpellPills instagram={PERSON.instagram} />
             </div>
-            <div className="order-2 flex justify-center md:order-none md:justify-end">
+            <div className="self-end">
               <SpellMarks />
             </div>
           </div>

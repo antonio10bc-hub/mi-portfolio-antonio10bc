@@ -23,7 +23,7 @@ export function SpellPills({ instagram }: { instagram: string }) {
   const { lang, start } = useSpell();
   const t = DICTS[lang];
   return (
-    <nav aria-label={t.sections} className="flex flex-wrap justify-center gap-x-2.5 gap-y-2">
+    <nav aria-label={t.sections} className="flex flex-wrap justify-start gap-x-2.5 gap-y-2">
       <button type="button" onClick={start} className={pill}>
         <PillShape seed="pill-spell" />
         <span className="relative">{t.castSpell}</span>

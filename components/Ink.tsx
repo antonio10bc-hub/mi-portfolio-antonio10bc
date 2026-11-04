@@ -362,34 +362,3 @@ export function Wizard({
     </svg>
   );
 }
-
-/** Garabato de cámara para la cabecera de Fotografía. */
-export function CameraDoodle({ className = "", draw = true }: { className?: string; draw?: boolean }) {
-  const parts = [
-    "M22 46 C20 38 26 34 34 34 L52 34 C56 26 60 22 70 22 L96 23 C104 24 106 30 110 34 L150 34 C160 34 166 40 165 50 L164 116 C164 126 158 130 148 130 L36 131 C26 131 21 126 21 116 Z",
-    "M93 52 C118 51 132 68 131 88 C130 108 114 120 94 119 C72 118 58 102 59 84 C60 66 74 53 93 52 Z",
-    "M94 66 C106 66 116 75 116 87 C115 99 106 106 94 106 C82 105 74 96 74 85 C75 74 83 66 94 66 Z",
-    "M140 46 h14 M30 58 C40 57 48 58 52 60",
-    "M18 70 C6 80 4 102 14 118 M168 70 C182 84 182 104 170 120",
-  ];
-  return (
-    <svg aria-hidden viewBox="0 0 186 150" className={`block overflow-visible ${className}`}>
-      {parts.map((d, i) => (
-        <path
-          key={i}
-          d={d}
-          pathLength={1}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={3.4}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className={`ink-line ${draw ? "ink-draw" : ""}`}
-          style={{ "--d": `${0.2 + i * 0.22}s` } as CSSProperties}
-        />
-      ))}
-      <ellipse cx="88" cy="80" rx="5" ry="6" fill="currentColor" className={draw ? "origin-center animate-pop [transform-box:fill-box]" : ""} style={{ animationDelay: "1.4s" }} />
-      <path d="M118 104 C122 110 116 116 110 113 C106 108 112 102 118 104 Z" fill="currentColor" className={draw ? "origin-center animate-pop [transform-box:fill-box]" : ""} style={{ animationDelay: "1.5s" }} />
-    </svg>
-  );
-}

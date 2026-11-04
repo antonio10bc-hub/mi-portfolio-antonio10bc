@@ -2,28 +2,10 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
-import { CameraDoodle } from "@/components/Ink";
 import NextFile from "@/components/NextFile";
 import PhotoGallery from "@/components/PhotoGallery";
 import SectionHeader from "@/components/SectionHeader";
-import SpecList from "@/components/SpecList";
-import { PHOTOS } from "@/lib/photos";
-import { dictFor, isLang, type Dict } from "@/lib/i18n";
-
-/** Ficha del visor, bajo la intro: cuántas fotos hay y cómo se recorren. */
-function ViewerSpec({ t }: { t: Dict }) {
-  return (
-    <SpecList
-      title={t.viewer}
-      className="mt-8 hidden max-w-md md:block"
-      rows={[
-        [t.framesLabel, String(PHOTOS.length)],
-        [t.browse, "← →"],
-        [t.close, "Esc"],
-      ]}
-    />
-  );
-}
+import { dictFor, isLang } from "@/lib/i18n";
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params;
@@ -56,8 +38,6 @@ export default async function PhotographyPage({ params }: { params: Promise<{ la
               @antonio10bc
             </a>
           }
-          contents={<ViewerSpec t={t} />}
-          aside={<CameraDoodle className="w-[min(100%,22rem)] rotate-6" />}
         />
 
         <div className="mt-6 grid grid-cols-1 gap-x-8 gap-y-12 md:mt-10 md:grid-cols-2 md:gap-y-16 lg:grid-cols-3">

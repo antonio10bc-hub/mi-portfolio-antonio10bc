@@ -90,18 +90,18 @@ Tipografía: **Shantell Sans** variable, con sus ejes `INFM` (informalidad) y `B
 
 ### Trazos que se dibujan
 
-Cada trazo lleva `pathLength="1"` y se "dibuja" animando su desplazamiento de guion de 1 a 0. Tres momentos: al cargar (el mago, los subrayados, los garabatos), con el scroll (los marcos de fotos y juegos, solo en escritorio) y al pasar el ratón (el círculo alrededor de un enlace). Sin animación, todo está ya dibujado.
+Cada trazo lleva `pathLength="1"` y se "dibuja" animando su desplazamiento de guion de 1 a 0. Tres momentos: al cargar (el mago, los subrayados), con el scroll (los marcos de fotos y juegos, solo en escritorio) y al pasar el ratón (el círculo alrededor de un enlace). Sin animación, todo está ya dibujado.
 
 ### Páginas
 
 - **Portada.** Una escena, con la composición de una página de juego infantil: barra mínima arriba (secciones, "antonio" pequeño, idioma), en el centro una frase a mano en mayúsculas ("antonio hace fotos / y pequeños juegos") sobre una sola obra que flota y va pasando por fotos y juegos, sostenida por la varita del mago (el "sello", con sus dos gatos), y abajo el nombre en letra tranquila, píldoras dibujadas a mano y las siete marcas de hechizo. Cabe en una pantalla sin scroll.
-- **Juegos.** Cabecera de cuaderno (nota, título rotulado y subrayado, intro, índice y el garabato de un mando). Cada juego es una entrada: su número en una mancha de tinta, la captura torcida en un marco a mano, el nombre rotulado, la descripción y "jugar". Al final, "fin" con la letra pequeña común a todos los juegos.
-- **Fotografía.** Cabecera con el garabato de una cámara y la ficha del visor. Cada foto, torcida en su marco, con el título escrito debajo. El visor a pantalla completa es papel, con flechas a mano.
+- **Juegos.** Cabecera de cuaderno (nota, título rotulado y subrayado, intro). Cada juego es una entrada: su número en una mancha de tinta, la captura torcida en un marco a mano, el nombre rotulado, la descripción y "jugar".
+- **Fotografía.** Cabecera de cuaderno con el Instagram. Cada foto, torcida en su marco, con el título escrito debajo. El visor a pantalla completa es papel, con flechas a mano.
 - **404.** El mago, sin chispas y con interrogaciones sobre el sombrero: "poof!".
 
 ### Reglas de implementación
 
 - Ningún `backdrop-filter`, `filter: blur()`, sombra ni degradado. El único filtro es el de tinta del mago: una ondulación (`feTurbulence` + `feDisplacementMap`) que solo desplaza el borde, sin desenfoque, sobre un dibujo pequeño.
 - Las formas "a mano" salen de una semilla de texto, nunca de `Math.random()`: el servidor y el cliente pintan lo mismo y cada marco tiene siempre el mismo temblor.
-- La decoración extra (cruces sueltas, garabatos de cabecera, índices) se oculta por debajo de `md`.
+- La decoración extra (cruces sueltas) se oculta por debajo de `md`.
 - Los rótulos en `clamp()`, siempre: la letra a mano es ancha.
