@@ -23,9 +23,11 @@ import { confetti, INK, projectile, puff, spell, type Effect, type Vec } from "@
 /** Pausa tras el último trazo antes de leer la letra: deja dibujar la barra de la "t" o el punto de la "i". */
 const READ_DELAY = 650;
 const MAX_DPR = 2;
+/** Grosor del trazo de las letras: el de un rotulador, a juego con la tinta de los dibujos. */
+const INK_WIDTH = 7;
 
 export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject<Element | null> }) {
-  const { lang, active, step, status, setStep, setStatus, setMessage, strike, stop, wizardRef, targetRef, castRef, lineWidth } = useSpell();
+  const { lang, active, step, status, setStep, setStatus, setMessage, strike, stop, wizardRef, targetRef, castRef } = useSpell();
   const t = DICTS[lang];
   const onClose = stop;
 
@@ -49,10 +51,6 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
   const stepRef = useRef(0);
   const statusRef = useRef(status);
   const celebration = useRef<ReturnType<typeof confetti> | null>(null);
-  const width = useRef(lineWidth);
-  useEffect(() => {
-    width.current = lineWidth;
-  }, [lineWidth]);
 
   useEffect(() => {
     stepRef.current = step;
@@ -139,7 +137,7 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
 
     const ink = (points: Point[], dx = 0) => {
       ctx.strokeStyle = INK;
-      ctx.lineWidth = width.current;
+      ctx.lineWidth = INK_WIDTH;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
       ctx.beginPath();

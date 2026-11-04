@@ -1,15 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { InkPill, ScribbleCircle } from "@/components/InkBox";
 import { useSpell } from "@/components/SpellProvider";
 import { DICTS } from "@/lib/i18n";
 import type { Element } from "@/lib/spellbook";
 
 /*
- * Los mandos de abajo de la home: las píldoras del centro (navegación y el
- * minijuego) y, a la derecha, las siete marcas de hechizo (cada una lo lanza al
- * momento contra la obra que flota) con el deslizador del grosor del trazo.
+ * Los mandos de abajo de la home: las píldoras del centro (el minijuego y el
+ * Instagram) y, a la derecha, las siete marcas de hechizo (cada una lo lanza al
+ * momento contra la obra que flota). Fotografía y juegos no tienen píldora: ya
+ * están en la barra de arriba y en la obra que flota.
  */
 
 const pill =
@@ -24,14 +24,6 @@ export function SpellPills({ instagram }: { instagram: string }) {
   const t = DICTS[lang];
   return (
     <nav aria-label={t.sections} className="flex flex-wrap justify-center gap-x-2.5 gap-y-2">
-      <Link href="/photography" data-track="section_clicked" data-track-section="photography" className={pill}>
-        <PillShape seed="pill-photo" />
-        <span className="relative">{t.photoPanelTitle}</span>
-      </Link>
-      <Link href="/projects" data-track="section_clicked" data-track-section="games" className={pill}>
-        <PillShape seed="pill-games" />
-        <span className="relative">{t.gamesPanelTitle}</span>
-      </Link>
       <button type="button" onClick={start} className={pill}>
         <PillShape seed="pill-spell" />
         <span className="relative">{t.castSpell}</span>
@@ -82,10 +74,10 @@ const MARKS: Record<Element, React.ReactNode> = {
 const ORDER: Element[] = ["fire", "water", "wind", "earth", "lightning", "ice", "light"];
 
 export function SpellMarks() {
-  const { lang, castFree, lastCast, castCount, lineWidth, setLineWidth } = useSpell();
+  const { lang, castFree, lastCast, castCount } = useSpell();
   const t = DICTS[lang];
   return (
-    <div className="flex items-center gap-6">
+    <div className="flex items-center">
       <div role="group" aria-label={t.spellsLabel} className="flex items-center gap-2.5 md:gap-3">
         {ORDER.map((element) => (
           <button
@@ -103,19 +95,6 @@ export function SpellMarks() {
           </button>
         ))}
       </div>
-      {/* Grosor del trazo al dibujar letras en el minijuego. */}
-      <label className="note hidden items-center gap-2 lg:flex">
-        <span>{t.lineLabel}</span>
-        <input
-          type="range"
-          min={3}
-          max={14}
-          step={1}
-          value={lineWidth}
-          onChange={(e) => setLineWidth(Number(e.target.value))}
-          className="h-1 w-20 cursor-pointer accent-ink"
-        />
-      </label>
     </div>
   );
 }

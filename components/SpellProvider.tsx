@@ -30,9 +30,6 @@ type SpellState = {
   status: SpellStatus;
   message: string;
   pose: Pose;
-  /** Grosor del trazo al dibujar letras, en px (el deslizador "trazo"). */
-  lineWidth: number;
-  setLineWidth: (n: number) => void;
   /** El último hechizo suelto, para marcarlo en su botón, y cuántos van (para volver a dibujar la marca). */
   lastCast: Element | null;
   castCount: number;
@@ -71,7 +68,6 @@ export function SpellProvider({ lang, children }: { lang: Lang; children: React.
   const [status, setStatus] = useState<SpellStatus>("drawing");
   const [message, setMessage] = useState("");
   const [pose, setPose] = useState<Pose>("");
-  const [lineWidth, setLineWidth] = useState(7);
   const [lastCast, setLastCast] = useState<Element | null>(null);
   const [castCount, setCastCount] = useState(0);
   const wizardRef = useRef<HTMLDivElement>(null);
@@ -130,10 +126,10 @@ export function SpellProvider({ lang, children }: { lang: Lang; children: React.
 
   const value = useMemo(
     () => ({
-      lang, active, step, status, message, pose, lineWidth, setLineWidth, lastCast, castCount,
+      lang, active, step, status, message, pose, lastCast, castCount,
       wizardRef, targetRef, castRef, start, stop, restart, castFree, setStep, setStatus, setMessage, strike,
     }),
-    [lang, active, step, status, message, pose, lineWidth, lastCast, castCount, start, stop, restart, castFree, strike],
+    [lang, active, step, status, message, pose, lastCast, castCount, start, stop, restart, castFree, strike],
   );
 
   return (

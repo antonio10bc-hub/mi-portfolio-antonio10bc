@@ -14,8 +14,8 @@ import { PERSON, SITE_URL } from "@/lib/site";
  * La home es una escena, con la composición de una página de juego infantil: una
  * barra mínima arriba, en el centro una frase escrita a mano sobre una sola obra
  * que flota (va pasando por fotos y juegos) sostenida por la varita del mago con
- * sus dos gatos, y abajo el nombre, las píldoras de navegación y las siete marcas
- * de hechizo. Pulsar el mago (o "lanza un hechizo") abre el minijuego en la propia
+ * sus dos gatos, y abajo las píldoras de navegación y las siete marcas de
+ * hechizo. Pulsar el mago (o "lanza un hechizo") abre el minijuego en la propia
  * home. **Cabe en una pantalla sin scroll**: la escena es lo único flexible.
  */
 
@@ -95,21 +95,10 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
             </div>
           </section>
 
-          {/* Abajo: quién, las píldoras y los hechizos. */}
+          {/* Abajo: las píldoras en el centro y los hechizos a la derecha. La columna
+              izquierda queda vacía para que las píldoras sigan centradas. */}
           <div className="grid shrink-0 gap-3 md:grid-cols-[1fr_auto_1fr] md:items-end md:gap-6">
-            <div className="order-3 flex flex-wrap items-baseline gap-x-3 md:order-none md:block">
-              <p className="text-[clamp(1.2rem,1.8vw,1.6rem)] font-medium [font-variation-settings:'INFM'_0,'BNCE'_0]">Antonio Asis</p>
-              <p className="hand mt-1 hidden max-w-[19rem] text-[13px] leading-snug md:block [@media(max-height:760px)]:md:hidden">{t.homeBio}</p>
-              <a
-                href={PERSON.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-track="instagram_clicked"
-                className="note text-ink underline decoration-wavy underline-offset-4 md:mt-2 md:inline-block"
-              >
-                @antonio10bc
-              </a>
-            </div>
+            <div aria-hidden className="hidden md:block" />
             <div className="order-1 md:order-none">
               <SpellPills instagram={PERSON.instagram} />
             </div>
