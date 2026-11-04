@@ -17,6 +17,7 @@ const config: Config = {
         ink: '#141214',     // Tinta: texto, trazos y manchas
         mute: '#5F5A60',    // Lápiz: notas secundarias (6:1 sobre papel)
         smudge: '#F1EFEC',  // Hueco de una imagen mientras carga, nada más
+        alert: '#E0322A',   // Rojo: SOLO la X que cierra el minijuego (pedido expreso; la única excepción de color)
       },
       fontFamily: {
         sans: ['var(--font-shantell)', 'ui-rounded', 'system-ui', 'sans-serif'],

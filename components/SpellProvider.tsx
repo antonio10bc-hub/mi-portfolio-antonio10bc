@@ -115,6 +115,17 @@ export function SpellProvider({ lang, children }: { lang: Lang; children: React.
     }
   }, []);
 
+  // Mientras se juega, lo que no es del juego se apaga (`.spell-dim` en globals.css):
+  // así lo que se dibuja se lee sobre papel casi limpio.
+  useEffect(() => {
+    const root = document.documentElement;
+    if (active) root.dataset.spellActive = "";
+    else delete root.dataset.spellActive;
+    return () => {
+      delete root.dataset.spellActive;
+    };
+  }, [active]);
+
   // La capa se retira sola cuando ni hay juego ni hechizos sueltos recientes.
   useEffect(() => {
     if (active || !layerOn) return;

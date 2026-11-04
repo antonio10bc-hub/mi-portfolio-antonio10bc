@@ -258,13 +258,28 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
   return createPortal(
     // El contenedor no recoge el puntero: solo el canvas (mientras se dibuja) y la X.
     <div className="pointer-events-none fixed inset-0 z-40 select-none">
-      {/* La letra que toca, enorme y casi invisible, en el centro: se puede calcar. */}
+      {/* La letra que toca, enorme en el centro, como un surco para calcarla: relleno
+          de lápiz muy suave y un contorno discontinuo bien visible que avanza despacio. */}
       {active && status !== "done" && (
-        <div aria-hidden className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <span key={step} className="hand-display animate-fade-in text-[min(56vw,52vh)] text-ink/5">
+        <svg aria-hidden className="pointer-events-none absolute inset-0 h-full w-full overflow-visible">
+          <text
+            key={step}
+            x="50%"
+            y="50%"
+            dominantBaseline="central"
+            textAnchor="middle"
+            className="hand-display spell-groove animate-fade-in"
+            style={{ fontSize: "min(56vw, 52vh)" }}
+            fill="rgba(20, 18, 20, 0.07)"
+            stroke="rgba(20, 18, 20, 0.5)"
+            strokeWidth={3}
+            strokeDasharray="14 10"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             {current.letter}
-          </span>
-        </div>
+          </text>
+        </svg>
       )}
 
       {/* Al terminar deja de recoger el puntero: así se puede pulsar "otra vez" o "cerrar" en el lema. */}
@@ -284,9 +299,10 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
           type="button"
           onClick={onClose}
           aria-label={t.close}
-          className="pointer-events-auto absolute right-[max(1rem,env(safe-area-inset-right))] top-[max(1rem,env(safe-area-inset-top))] p-2 text-ink transition-transform duration-300 hover:rotate-90 md:right-8 md:top-6"
+          // En rojo (la única excepción de color de la interfaz, pedida expresamente): se ve al momento.
+          className="pointer-events-auto absolute right-[max(1rem,env(safe-area-inset-right))] top-[max(1rem,env(safe-area-inset-top))] p-2 text-alert transition-transform duration-300 hover:rotate-90 md:right-8 md:top-6"
         >
-          <svg viewBox="0 0 24 24" className="h-7 w-7 overflow-visible" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round">
+          <svg viewBox="0 0 24 24" className="h-9 w-9 overflow-visible" fill="none" stroke="currentColor" strokeWidth={3.5} strokeLinecap="round">
             <path d="M4.5 5.5 C9 10 14 15 19.5 18.5 M18.5 4.5 C14 9.5 9.5 14 5 19.5" />
           </svg>
         </button>
