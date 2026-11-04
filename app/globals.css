@@ -303,19 +303,16 @@
 
 /*
  * Minijuego de hechizos: mientras está en marcha (<html data-spell-active>, lo pone
- * SpellProvider), todo lo que no es del juego se apaga casi del todo y deja de recoger
- * el puntero. Quedan a plena tinta el marcador y el mago, y lo dibujado se lee sobre
- * papel casi limpio.
+ * SpellProvider), la barra de arriba y la fila de abajo se apagan un poco y dejan de
+ * recoger el puntero. La obra que flota se ve entera: es donde caen los hechizos.
  */
 .spell-dim {
   transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 [data-spell-active] .spell-dim {
-  opacity: 0.07;
+  opacity: 0.35;
   pointer-events: none;
-  /* Las estrellas parpadean animando la opacidad, que ganaría a la de arriba. */
-  animation: none;
 }
 
 /* El surco de la letra guía: contorno discontinuo que avanza despacio, "calca por aquí". */

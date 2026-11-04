@@ -14,7 +14,8 @@ import { areaAround, confetti, INK, projectile, puff, spell, type Effect, type V
  *  - Suelto: solo pinta los hechizos de las marcas de abajo, de la varita a la obra
  *    que flota; no recoge el puntero, la página se sigue usando.
  *  - Minijuego (`active`): recoge el trazo, enseña la letra guía y la X, bloquea el
- *    scroll y lee cada letra.
+ *    scroll y lee cada letra. Cada letra acertada lanza su hechizo contra la obra que
+ *    flota, igual que su marca; al completar el nombre, la lluvia de cruces.
  * El mago es el de la home: la varita sale de su SVG y las poses van en su
  * envoltorio (`wizardRef`). Todo lo que se mueve va en un único bucle de
  * requestAnimationFrame mientras la capa está montada.
@@ -68,6 +69,25 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
     return { x: r.left + (r.width - 240 * scale) / 2 + 8 * scale, y: r.top + (r.height - 290 * scale) / 2 + 180 * scale };
   }, [wizardRef]);
 
+  /**
+   * Lanza un hechizo contra la obra que flota: de la varita a su centro, y el hechizo
+   * llena toda la obra (no solo un punto). Lo usan los botones y el minijuego: dibujar
+   * una letra bien hace lo mismo que pulsar su marca.
+   */
+  const castAtWork = useCallback(
+    (element: Element) => {
+      const box = targetRef.current?.getBoundingClientRect();
+      const area = box ? { x: box.left, y: box.top, w: box.width, h: box.height } : areaAround({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+      const at = { x: area.x + area.w / 2, y: area.y + area.h / 2 };
+      strike("wizard-cast", 750);
+      const hit = () => add(spell(element, area, window.innerHeight));
+      // El rayo cae del cielo; lo demás sale de la varita.
+      if (element === "lightning") window.setTimeout(hit, 180);
+      else add(projectile(wandTip(), at, hit));
+    },
+    [add, strike, targetRef, wandTip],
+  );
+
   /** Lee lo dibujado y lanza el hechizo o el humo. */
   const read = useCallback(() => {
     readTimer.current = null;
@@ -93,12 +113,9 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
 
     fading.current.push({ points, life: 1, shake: false });
     setStatus("casting");
-    strike("wizard-cast", 750);
     setMessage(t.elements[element]);
-    const cast = () => add(spell(element, areaAround(at), window.innerHeight));
-    // El rayo cae del cielo; lo demás sale de la varita.
-    if (element === "lightning") window.setTimeout(cast, 180);
-    else add(projectile(wandTip(), at, cast));
+    // Como pulsar su marca: el hechizo cae sobre la obra que flota, a la vista.
+    castAtWork(element);
 
     const last = current === NAME.length - 1;
     window.setTimeout(
@@ -116,7 +133,7 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
       },
       last ? 2200 : 1500,
     );
-  }, [add, setMessage, setStatus, setStep, strike, t, wandTip]);
+  }, [add, castAtWork, setMessage, setStatus, setStep, strike, t]);
 
   // Canvas a pantalla completa con su densidad de píxeles, y el bucle de dibujo.
   useEffect(() => {
@@ -135,9 +152,15 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
     resize();
     window.addEventListener("resize", resize);
 
+    // El trazo lleva debajo un borde de papel, como los hechizos: sin él, la tinta se
+    // pierde sobre una foto oscura (en el minijuego se dibuja encima de la obra).
     const ink = (points: Point[], dx = 0) => {
-      ctx.strokeStyle = INK;
-      ctx.lineWidth = INK_WIDTH;
+      trace(points, dx, "#FFFFFF", INK_WIDTH + 6);
+      trace(points, dx, INK, INK_WIDTH);
+    };
+    const trace = (points: Point[], dx: number, color: string, width: number) => {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
       ctx.beginPath();
@@ -188,28 +211,18 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
     }
   }, [step]);
 
-  // Hechizo suelto: de la varita al centro de la obra que flota. Se registra en el
-  // proveedor y lanza el que estuviera esperando a que la capa se montara.
+  // Hechizo suelto: se registra en el proveedor y lanza el que estuviera esperando a
+  // que la capa se montara.
   useEffect(() => {
-    const cast = (element: Element) => {
-      // El hechizo llena toda la obra que flota, no solo su centro.
-      const box = targetRef.current?.getBoundingClientRect();
-      const area = box ? { x: box.left, y: box.top, w: box.width, h: box.height } : areaAround({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
-      const at = { x: area.x + area.w / 2, y: area.y + area.h / 2 };
-      strike("wizard-cast", 750);
-      const hit = () => add(spell(element, area, window.innerHeight));
-      if (element === "lightning") window.setTimeout(hit, 180);
-      else add(projectile(wandTip(), at, hit));
-    };
-    castRef.current = cast;
+    castRef.current = castAtWork;
     if (pendingRef.current) {
-      cast(pendingRef.current);
+      castAtWork(pendingRef.current);
       pendingRef.current = null;
     }
     return () => {
       castRef.current = null;
     };
-  }, [add, castRef, pendingRef, strike, targetRef, wandTip]);
+  }, [castAtWork, castRef, pendingRef]);
 
   // Teclado, scroll del fondo y foco: solo en el minijuego.
   useEffect(() => {
@@ -258,20 +271,36 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
   return createPortal(
     // El contenedor no recoge el puntero: solo el canvas (mientras se dibuja) y la X.
     <div className="pointer-events-none fixed inset-0 z-40 select-none">
-      {/* La letra que toca, enorme en el centro, como un surco para calcarla: relleno
-          de lápiz muy suave y un contorno discontinuo bien visible que avanza despacio. */}
+      {/* La letra que toca, enorme en el centro, como un surco para calcarla: un
+          contorno discontinuo bien visible que avanza despacio, sobre un borde de papel. */}
       {active && status !== "done" && (
-        <svg aria-hidden className="pointer-events-none absolute inset-0 h-full w-full overflow-visible">
+        <svg key={step} aria-hidden className="pointer-events-none absolute inset-0 h-full w-full animate-fade-in overflow-visible">
+          {/* Debajo, el mismo contorno en papel y más grueso: el surco se ve también
+              sobre una foto oscura, como los trazos de los hechizos. */}
           <text
-            key={step}
             x="50%"
             y="50%"
             dominantBaseline="central"
             textAnchor="middle"
-            className="hand-display spell-groove animate-fade-in"
+            className="hand-display"
             style={{ fontSize: "min(56vw, 52vh)" }}
-            fill="rgba(20, 18, 20, 0.07)"
-            stroke="rgba(20, 18, 20, 0.5)"
+            fill="rgba(255, 255, 255, 0.18)"
+            stroke="#FFFFFF"
+            strokeOpacity={0.85}
+            strokeWidth={8}
+            strokeLinejoin="round"
+          >
+            {current.letter}
+          </text>
+          <text
+            x="50%"
+            y="50%"
+            dominantBaseline="central"
+            textAnchor="middle"
+            className="hand-display spell-groove"
+            style={{ fontSize: "min(56vw, 52vh)" }}
+            fill="none"
+            stroke="rgba(20, 18, 20, 0.7)"
             strokeWidth={3}
             strokeDasharray="14 10"
             strokeLinecap="round"
@@ -300,7 +329,8 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
           onClick={onClose}
           aria-label={t.close}
           // En rojo (la única excepción de color de la interfaz, pedida expresamente): se ve al momento.
-          className="pointer-events-auto absolute right-[max(1rem,env(safe-area-inset-right))] top-[max(1rem,env(safe-area-inset-top))] p-2 text-alert transition-transform duration-300 hover:rotate-90 md:right-8 md:top-6"
+          // Bajo la barra de arriba, para no pisar el idioma ni "Madrid, ES".
+          className="pointer-events-auto absolute right-[max(0.5rem,env(safe-area-inset-right))] top-[calc(env(safe-area-inset-top)+4.25rem)] p-2 text-alert transition-transform duration-300 hover:rotate-90 md:right-8 md:top-20"
         >
           <svg viewBox="0 0 24 24" className="h-9 w-9 overflow-visible" fill="none" stroke="currentColor" strokeWidth={3.5} strokeLinecap="round">
             <path d="M4.5 5.5 C9 10 14 15 19.5 18.5 M18.5 4.5 C14 9.5 9.5 14 5 19.5" />

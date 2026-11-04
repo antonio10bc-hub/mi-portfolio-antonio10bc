@@ -78,7 +78,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
           {/* La escena: la frase y, debajo, la obra que flota y el mago que la sostiene. */}
           <section className="relative flex min-h-0 flex-1 flex-col">
             {STARS.map((star, i) => (
-              <Cross key={i} className={`spell-dim absolute hidden animate-twinkle text-ink md:block ${star.className}`} style={{ animationDelay: star.delay }} />
+              <Cross key={i} className={`absolute hidden animate-twinkle text-ink md:block ${star.className}`} style={{ animationDelay: star.delay }} />
             ))}
 
             {/* En el minijuego, la frase deja su sitio al marcador y a los mensajes. */}
@@ -89,7 +89,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
                 móvil y en fila en escritorio, con la varita apuntando a la obra. */}
             <div className="relative mt-6 min-h-0 flex-1 md:mt-10">
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 md:flex-row md:gap-[clamp(1.5rem,4vw,4rem)]">
-                <div className="spell-dim aspect-[4/3] h-[48%] max-w-[88%] md:h-[72%] md:max-w-[46%]">
+                <div className="aspect-[4/3] h-[48%] max-w-[88%] md:h-[72%] md:max-w-[46%]">
                   <FloatingWork works={works} labels={{ photo: t.photoKind, game: t.gameKind }} sizes="(max-width: 768px) 88vw, 46vw" />
                 </div>
                 <div className="relative z-10 aspect-[240/290] h-[36%] shrink-0 md:h-[56%]">
@@ -101,8 +101,8 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
 
           {/* Abajo: las píldoras a la izquierda y los hechizos a la derecha (en el
               móvil, una fila encima de la otra, cada una pegada a su lado).
-              `spell-dim`: en el minijuego se apaga, como la barra, las estrellas y la
-              obra; solo el marcador y el mago quedan a plena tinta. */}
+              `spell-dim`: en el minijuego se apaga un poco, como la barra; la obra
+              que flota se ve entera porque ahí caen los hechizos. */}
           <div className="spell-dim flex shrink-0 flex-col gap-2 md:flex-row md:items-end md:justify-between md:gap-6">
             <div className="self-start">
               <SpellPills instagram={PERSON.instagram} />
