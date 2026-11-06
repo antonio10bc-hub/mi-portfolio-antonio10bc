@@ -124,7 +124,10 @@ export function InkPill({ seed, fill = false, width = 2.2, className = "" }: { s
       ref={ref}
       aria-hidden
       viewBox={box ? `0 0 ${box.w} ${box.h}` : undefined}
-      className={`pointer-events-none absolute inset-0 h-full w-full min-w-0 overflow-visible ${className}`}
+      // Siempre en tinta: el botón que la lleva cambia su color a papel al activarse
+      // (para invertir el texto o el icono), y en `currentColor` la píldora se
+      // pintaba en blanco sobre blanco y desaparecía.
+      className={`pointer-events-none absolute inset-0 h-full w-full min-w-0 overflow-visible text-ink ${className}`}
     >
       {box && box.w > 0 && (
         <>
