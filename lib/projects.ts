@@ -66,4 +66,13 @@ export const PROJECTS: Project[] = [
     video: "/videos/projects/tanques",
     tint: "#3A3868",
   },
+  {
+    name: "Call of Farm Duty",
+    href: "https://call-of-farm-duty-game.vercel.app/",
+    tagline: "A voxel farm in retro DS style where you harvest the wheat with a sniper rifle: shoot from the watchtowers, chain kill streaks, stop alien thieves and grow the farm plot by plot.",
+    taglineEs: "Una granja voxel con estética retro de DS donde la cosecha se hace con un rifle de francotirador: dispara desde las torres, encadena rachas, frena a los alienígenas ladrones y haz crecer la granja parcela a parcela.",
+    screenshot: "/images/projects/call-of-farm-duty.webp",
+    video: "/videos/projects/call-of-farm-duty",
+    tint: "#73A8C1",
+  },
 ];
