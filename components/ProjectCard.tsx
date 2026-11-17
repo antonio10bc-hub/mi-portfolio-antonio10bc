@@ -44,8 +44,9 @@ export default function ProjectCard({
         <span className="note">{t.game}</span>
       </div>
 
+      {/* La ventana del juego ocupa el 75% del ancho de la ficha (pedido: un 25% más pequeña). */}
       <div
-        className={`ink-host relative mt-5 transition-transform duration-700 ease-spring group-hover:rotate-0 ${tilt}`}
+        className={`ink-host relative mt-5 w-3/4 transition-transform duration-700 ease-spring group-hover:rotate-0 ${tilt}`}
       >
         <div className="relative aspect-[16/10] overflow-hidden" style={{ backgroundColor: project.tint }}>
           {/* Las capturas ya son WebP de 1280px optimizados: se sirven tal cual, sin
