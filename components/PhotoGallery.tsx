@@ -117,7 +117,7 @@ export default function PhotoGallery({ lang }: { lang: Lang }) {
             {/* Pie a mano: el título y su número. */}
             <span className="mt-5 flex items-baseline justify-between gap-3 px-1">
               <span className="hand-display text-[1.5rem] md:text-[1.75rem]">{photo.title}</span>
-              <span className="note shrink-0">#{pad(index + 1)}</span>
+              <span className="note shrink-0 tabular-nums">#{pad(index + 1)}</span>
             </span>
           </button>
         );
@@ -165,7 +165,7 @@ export default function PhotoGallery({ lang }: { lang: Lang }) {
 
               <figcaption className="flex items-baseline gap-4">
                 <span className="hand-display text-[1.75rem] md:text-[2.25rem]">{selectedPhoto.title}</span>
-                <span className="note">
+                <span className="note tabular-nums">
                   {pad((selectedIndex ?? 0) + 1)} / {pad(PHOTOS.length)}
                 </span>
               </figcaption>

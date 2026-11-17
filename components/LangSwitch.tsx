@@ -30,7 +30,7 @@ export default function LangSwitch({ lang, label }: { lang: Lang; label: string 
             onClick={() => choose(l)}
             data-track="language_changed"
             data-track-to={l}
-            className={`uppercase transition-colors duration-300 ${
+            className={`hit press uppercase duration-300 [--hit:-14px_-4px] ${
               l === lang ? "text-ink underline decoration-wavy decoration-2 underline-offset-4" : "text-mute hover:text-ink"
             }`}
           >

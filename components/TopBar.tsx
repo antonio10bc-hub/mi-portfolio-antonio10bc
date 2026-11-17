@@ -50,7 +50,7 @@ export default function TopBar({ lang, current, className = "" }: { lang: string
               aria-label={section.label}
               aria-current={active ? "page" : undefined}
               title={section.label}
-              className={`group relative grid h-10 w-10 shrink-0 place-items-center transition-colors duration-300 md:h-11 md:w-11
+              className={`hit press group relative grid h-10 w-10 shrink-0 place-items-center duration-300 [--hit:-2px] md:h-11 md:w-11 md:[--hit:0px]
                           ${active ? "text-paper" : "text-ink hover:text-paper focus-visible:text-paper"}`}
             >
               <InkPill

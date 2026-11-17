@@ -33,7 +33,7 @@ export default async function PhotographyPage({ params }: { params: Promise<{ la
               rel="noopener noreferrer"
               aria-label="Instagram @antonio10bc"
               data-track="instagram_clicked"
-              className="hand font-semibold text-ink underline decoration-wavy decoration-2 underline-offset-[6px] transition-colors duration-300 hover:text-mute"
+              className="hit hand font-semibold text-ink [--hit:-12px_-4px] underline decoration-wavy decoration-2 underline-offset-[6px] transition-colors duration-300 hover:text-mute"
             >
               @antonio10bc
             </a>

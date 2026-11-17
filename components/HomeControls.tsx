@@ -13,7 +13,7 @@ import type { Element } from "@/lib/spellbook";
  */
 
 const pill =
-  "group relative inline-flex h-9 shrink-0 items-center justify-center px-5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink transition-colors duration-300 hover:text-paper focus-visible:text-paper md:h-10 md:px-6 md:text-xs";
+  "hit press group relative inline-flex h-9 shrink-0 items-center justify-center px-5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink duration-300 [--hit:-4px_0px_-3px] md:[--hit:-2px_0px] hover:text-paper focus-visible:text-paper md:h-10 md:px-6 md:text-xs";
 
 function PillShape({ seed }: { seed: string }) {
   return <InkPill seed={seed} fill className="group-hover:[&_.ink-pill-fill]:opacity-100 group-focus-visible:[&_.ink-pill-fill]:opacity-100" />;
@@ -86,7 +86,7 @@ export function SpellMarks() {
             aria-label={t.elementNames[element]}
             title={t.elementNames[element]}
             onClick={() => castFree(element)}
-            className="group relative grid h-8 w-8 place-items-center text-ink transition-transform duration-300 ease-spring hover:-translate-y-1 md:h-9 md:w-9"
+            className="hit group relative grid h-8 w-8 place-items-center text-ink transition-transform duration-300 ease-spring [--hit:-5px] hover:-translate-y-1 active:scale-[0.96] active:duration-100 md:h-9 md:w-9"
           >
             {lastCast === element && <ScribbleCircle key={`${element}-${castCount}`} seed={`mark-${element}`} width={2} draw className="!-inset-0.5 !h-[calc(100%+4px)] !w-[calc(100%+4px)]" />}
             <svg aria-hidden viewBox="0 0 24 24" className="h-[22px] w-[22px] overflow-visible">

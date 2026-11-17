@@ -30,6 +30,11 @@
     color: #FFFFFF;
   }
 
+  /* Un toque no espera al doble toque para hacer zoom. */
+  a, button {
+    touch-action: manipulation;
+  }
+
   :focus-visible {
     outline: 2.5px solid #141214;
     outline-offset: 4px;
@@ -63,6 +68,7 @@
    * Al pasar el ratón por un `.group` el rebote se invierte: las letras bailan.
    */
   .hand-display {
+    text-wrap: balance;
     @apply font-sans font-extrabold lowercase leading-[0.86] tracking-[-0.02em];
     font-variation-settings: "INFM" 100, "BNCE" 55;
     transition: font-variation-settings 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -86,6 +92,7 @@
 
   /* Texto corrido, a mano. */
   .hand {
+    text-wrap: pretty;
     @apply font-sans text-[15px] leading-[1.5] md:text-base;
     font-weight: 440;
   }
@@ -324,4 +331,29 @@
 
 .spell-groove {
   animation: spell-groove 1.8s linear infinite;
+}
+
+/*
+ * Zona táctil: amplía lo que se puede pulsar sin cambiar lo que se ve. `--hit` es
+ * cuánto sobresale por cada lado (negativo); se elige para llegar a ~44px sin pisar
+ * al vecino.
+ */
+.hit {
+  position: relative;
+}
+
+.hit::before {
+  content: "";
+  position: absolute;
+  inset: var(--hit, -6px);
+}
+
+/* Al pulsar, el botón cede un poco, rápido; al soltar vuelve con su propia transición. */
+.press {
+  transition-property: color, background-color, transform;
+}
+
+.press:active {
+  transform: scale(0.96);
+  transition-duration: 100ms;
 }
