@@ -793,3 +793,215 @@ export function confetti(width: number): Effect & { stop(): void } {
     },
   };
 }
+
+// --- Gatos contra el cristal -----------------------------------------------------
+
+const CAT_GREY = "#A9A5AA";
+type CatCoat = "white" | "grey" | "ink" | "spotted";
+
+type GlassCat = {
+  x: number;
+  y: number;
+  r: number; // radio del cuerpo
+  rot: number;
+  coat: CatCoat;
+  arrive: number; // segundo en que se pega al cristal
+  pop: number; // segundo en que hace pluf
+  look: number; // -1..1: hacia dónde mira
+  spots: { x: number; y: number; r: number }[];
+};
+
+/**
+ * Un gato aplastado contra el cristal, visto desde dentro de la pantalla: cuerpo
+ * chafado, orejas, ojos entornados, nariz y boca en "w", y las dos patas delanteras
+ * planas contra el vidrio con sus almohadillas. `squash` es lo pegado que está (1:
+ * del todo); `alpha`, la tinta.
+ */
+function glassCat(ctx: CanvasRenderingContext2D, c: GlassCat, squash: number, alpha: number) {
+  const fill = c.coat === "ink" ? INK : c.coat === "grey" ? CAT_GREY : PAPER;
+  const line = c.coat === "ink" ? PAPER : INK;
+  const r = c.r;
+  ctx.save();
+  ctx.translate(c.x, c.y);
+  ctx.rotate(c.rot);
+  // Contra el cristal se ensancha y se aplana un poco.
+  ctx.scale(1 + 0.1 * squash, 1 - 0.06 * squash);
+  ctx.globalAlpha = alpha;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  const w = Math.max(3, r * 0.045);
+
+  const shape = (path: () => void, f: string, stroke = INK, lw = w) => {
+    ctx.beginPath();
+    path();
+    ctx.fillStyle = f;
+    ctx.fill();
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = lw;
+    ctx.stroke();
+  };
+
+  // Cuerpo y cabeza: una sola mancha redonda con las orejas.
+  shape(() => {
+    ctx.moveTo(-r * 0.62, -r * 0.42);
+    ctx.lineTo(-r * 0.5, -r * 0.98); // oreja izquierda
+    ctx.lineTo(-r * 0.18, -r * 0.62);
+    ctx.quadraticCurveTo(0, -r * 0.7, r * 0.18, -r * 0.62);
+    ctx.lineTo(r * 0.5, -r * 0.98); // oreja derecha
+    ctx.lineTo(r * 0.62, -r * 0.42);
+    ctx.bezierCurveTo(r * 1.08, -r * 0.05, r * 1.02, r * 0.78, 0, r * 0.88);
+    ctx.bezierCurveTo(-r * 1.02, r * 0.78, -r * 1.08, -r * 0.05, -r * 0.62, -r * 0.42);
+    ctx.closePath();
+  }, fill);
+
+  // Manchas del gato moteado.
+  if (c.coat === "spotted") {
+    ctx.fillStyle = INK;
+    c.spots.forEach((s) => {
+      ctx.beginPath();
+      ctx.ellipse(s.x * r, s.y * r, s.r * r, s.r * r * 0.8, 0.4, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  // Cara, algo desplazada hacia donde mira.
+  const fx = c.look * r * 0.08;
+  ctx.strokeStyle = line;
+  ctx.fillStyle = line;
+  ctx.lineWidth = w;
+  // Ojos entornados de gusto (dos arcos).
+  for (const sx of [-1, 1]) {
+    ctx.beginPath();
+    ctx.arc(fx + sx * r * 0.28, -r * 0.2, r * 0.11, Math.PI * 1.1, Math.PI * 1.9);
+    ctx.stroke();
+  }
+  // Nariz chafada contra el vidrio y boca en "w".
+  ctx.beginPath();
+  ctx.ellipse(fx, -r * 0.02, r * 0.09 * (1 + 0.5 * squash), r * 0.06, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(fx - r * 0.16, r * 0.06);
+  ctx.quadraticCurveTo(fx - r * 0.08, r * 0.16, fx, r * 0.05);
+  ctx.quadraticCurveTo(fx + r * 0.08, r * 0.16, fx + r * 0.16, r * 0.06);
+  ctx.stroke();
+  // Bigotes.
+  ctx.lineWidth = w * 0.6;
+  for (const sx of [-1, 1]) {
+    for (const k of [0, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(fx + sx * r * 0.22, r * (0.0 + k * 0.08));
+      ctx.lineTo(fx + sx * r * 0.62, r * (-0.06 + k * 0.14));
+      ctx.stroke();
+    }
+  }
+
+  // Las dos patas delanteras, planas contra el cristal: almohadilla grande y cuatro deditos.
+  for (const sx of [-1, 1]) {
+    const px = sx * r * 0.42;
+    const py = r * 0.55;
+    shape(() => ctx.ellipse(px, py, r * 0.26 * (1 + 0.15 * squash), r * 0.22, 0, 0, Math.PI * 2), fill);
+    ctx.fillStyle = c.coat === "ink" ? CAT_GREY : INK;
+    ctx.beginPath();
+    ctx.ellipse(px, py + r * 0.05, r * 0.1, r * 0.08, 0, 0, Math.PI * 2);
+    ctx.fill();
+    for (let k = 0; k < 4; k++) {
+      const a = Math.PI * (1.15 + k * 0.23);
+      ctx.beginPath();
+      ctx.ellipse(px + Math.cos(a) * r * 0.15, py + Math.sin(a) * r * 0.13, r * 0.045, r * 0.04, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
+/**
+ * Lluvia de gatos (el premio del minijuego): gatos que se pegan contra el cristal
+ * por dentro de la pantalla, uno tras otro, hasta taparla entera; aguantan un
+ * momento y hacen pluf, cada uno en su nube de humo. `onDone` se llama cuando ya
+ * no queda ninguno.
+ */
+export function catFlood(width: number, height: number, onDone: () => void): Effect {
+  // Rejilla al tresbolillo con solape: ningún hueco de la web a la vista.
+  const r = Math.max(70, Math.min(150, Math.min(width, height) * 0.2));
+  const dx = r * 1.22;
+  const dy = r * 1.08;
+  const cats: GlassCat[] = [];
+  for (let row = -1, y = -r * 0.3; y < height + r; row++, y += dy) {
+    for (let x = (row % 2 ? 0 : dx / 2) - dx; x < width + dx; x += dx) {
+      cats.push({
+        x: x + rand(-r, r) * 0.12,
+        y: y + rand(-r, r) * 0.12,
+        r: r * rand(0.95, 1.12),
+        rot: rand(-0.35, 0.35),
+        coat: (["white", "grey", "ink", "spotted"] as const)[Math.floor(Math.random() * 4)],
+        arrive: 0,
+        pop: 0,
+        look: rand(-1, 1),
+        spots: Array.from({ length: 3 }, () => ({ x: rand(-0.6, 0.6), y: rand(-0.2, 0.7), r: rand(0.08, 0.16) })),
+      });
+    }
+  }
+  // Llegan desordenados y cada vez más deprisa; al llenarse, aguantan y explotan.
+  cats.sort(() => Math.random() - 0.5);
+  const FILL = 2.4;
+  cats.forEach((c, i) => (c.arrive = FILL * Math.pow(i / cats.length, 0.75)));
+  // Se dibujan en orden de llegada: los nuevos quedan encima.
+  const HOLD = FILL + 0.9;
+  const POP = 0.7;
+  const order = [...cats].sort(() => Math.random() - 0.5);
+  order.forEach((c, i) => (c.pop = HOLD + (POP * i) / order.length));
+  const END = HOLD + POP + 0.7;
+  let t = 0;
+  let done = false;
+  return {
+    get shake() {
+      // Un golpecito cada vez que llega uno, mientras se llena.
+      return t < FILL ? 1.5 : 0;
+    },
+    update(dt) {
+      t += dt;
+      if (t >= END && !done) {
+        done = true;
+        onDone();
+      }
+      return t < END;
+    },
+    draw(ctx) {
+      for (const c of cats) {
+        const since = t - c.arrive;
+        if (since < 0) continue;
+        if (t < c.pop) {
+          // Golpe contra el cristal: llega algo más grande y se queda pegado.
+          const k = Math.min(1, since / 0.22);
+          const s = k < 1 ? 1.35 - 0.35 * ease(k) : 1;
+          ctx.save();
+          ctx.translate(c.x, c.y);
+          ctx.scale(s, s);
+          ctx.translate(-c.x, -c.y);
+          glassCat(ctx, c, ease(k), Math.min(1, since / 0.08));
+          ctx.restore();
+        } else {
+          // Pluf: se hincha, se desvanece y deja un poco de humo y alguna cruz.
+          const k = (t - c.pop) / 0.45;
+          if (k >= 1) continue;
+          ctx.save();
+          ctx.translate(c.x, c.y);
+          ctx.scale(1 + 0.25 * k, 1 + 0.25 * k);
+          ctx.translate(-c.x, -c.y);
+          glassCat(ctx, c, 1, 1 - ease(k));
+          ctx.restore();
+          pen(ctx, 3, 1 - k);
+          for (let n = 0; n < 5; n++) {
+            const a = (n / 5) * Math.PI * 2 + c.rot;
+            const d = c.r * (0.4 + 0.6 * ease(k));
+            ctx.beginPath();
+            ctx.arc(c.x + Math.cos(a) * d, c.y + Math.sin(a) * d * 0.8, c.r * 0.16 * (1 + k), 0, Math.PI * 2);
+            ctx.stroke();
+          }
+          cross(ctx, c.x, c.y - c.r * (0.5 + k), c.r * 0.12, k * 3, 3);
+          ctx.globalAlpha = 1;
+        }
+      }
+    },
+  };
+}

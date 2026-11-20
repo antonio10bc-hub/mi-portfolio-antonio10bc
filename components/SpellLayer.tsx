@@ -6,7 +6,7 @@ import { useSpell } from "@/components/SpellProvider";
 import { track } from "@/lib/analytics";
 import { DICTS } from "@/lib/i18n";
 import { matches, NAME, type Element, type Point } from "@/lib/spellbook";
-import { areaAround, confetti, INK, projectile, puff, spell, type Effect, type Vec } from "@/lib/spells";
+import { areaAround, catFlood, INK, projectile, puff, spell, type Effect, type Vec } from "@/lib/spells";
 
 /*
  * La capa de los hechizos (ver SpellProvider): un canvas transparente a pantalla
@@ -24,6 +24,8 @@ import { areaAround, confetti, INK, projectile, puff, spell, type Effect, type V
 /** Pausa tras el último trazo antes de leer la letra: deja dibujar la barra de la "t" o el punto de la "i". */
 const READ_DELAY = 650;
 const MAX_DPR = 2;
+/** Fallos seguidos en la misma letra tras los que vale cualquier trazo que no sea un toque. */
+const MERCY_AFTER = 2;
 /** Grosor del trazo de las letras: el de un rotulador, a juego con la tinta de los dibujos. */
 const INK_WIDTH = 7;
 
@@ -51,7 +53,7 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
   const readTimer = useRef<number | null>(null);
   const stepRef = useRef(0);
   const statusRef = useRef(status);
-  const celebration = useRef<ReturnType<typeof confetti> | null>(null);
+  const misses = useRef(0);
 
   useEffect(() => {
     stepRef.current = step;
@@ -102,7 +104,12 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
     const current = stepRef.current;
     const { letter, element } = NAME[current];
 
-    if (!matches(points, letter).ok) {
+    // Red de seguridad: tras MERCY_AFTER fallos en la misma letra, vale cualquier
+    // trazo con algo de tamaño (un toque suelto no).
+    const size = Math.max(box.maxX - box.minX, box.maxY - box.minY);
+    const mercy = misses.current >= MERCY_AFTER && size > 30;
+    if (!mercy && !matches(points, letter).ok) {
+      misses.current += 1;
       fading.current.push({ points, life: 1, shake: true });
       add(puff(at));
       strike("wizard-shake", 600);
@@ -111,6 +118,7 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
       return;
     }
 
+    misses.current = 0;
     fading.current.push({ points, life: 1, shake: false });
     setStatus("casting");
     setMessage(t.elements[element]);
@@ -123,9 +131,11 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
         setStep(current + 1);
         if (last) {
           setStatus("done");
-          celebration.current = confetti(window.innerWidth);
-          add(celebration.current);
           track("minigame_completed");
+          // El premio: la pantalla se llena de gatos pegados al cristal, hacen pluf y
+          // vuelve la web de siempre (se cierra el minijuego).
+          if (matchMedia("(prefers-reduced-motion: reduce)").matches) window.setTimeout(onClose, 1800);
+          else add(catFlood(window.innerWidth, window.innerHeight, onClose));
         } else {
           setStatus("drawing");
           setMessage(t.drawLetter(NAME[current + 1].letter));
@@ -133,7 +143,7 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
       },
       last ? 2200 : 1500,
     );
-  }, [add, castAtWork, setMessage, setStatus, setStep, strike, t]);
+  }, [add, castAtWork, onClose, setMessage, setStatus, setStep, strike, t]);
 
   // Canvas a pantalla completa con su densidad de píxeles, y el bucle de dibujo.
   useEffect(() => {
@@ -203,14 +213,6 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
     };
   }, []);
 
-  // "Otra vez" (en el lema) devuelve el paso a 0: se acaba la lluvia de cruces.
-  useEffect(() => {
-    if (step === 0) {
-      celebration.current?.stop();
-      celebration.current = null;
-    }
-  }, [step]);
-
   // Hechizo suelto: se registra en el proveedor y lanza el que estuviera esperando a
   // que la capa se montara.
   useEffect(() => {
@@ -238,8 +240,7 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
       document.body.style.overflow = overflow;
       window.removeEventListener("keydown", onKey);
       if (readTimer.current) window.clearTimeout(readTimer.current);
-      celebration.current?.stop();
-      celebration.current = null;
+      misses.current = 0;
       strokes.current = [];
     };
   }, [active, onClose]);
@@ -322,7 +323,8 @@ export default function SpellLayer({ pendingRef }: { pendingRef: React.RefObject
         onPointerCancel={onPointerUp}
       />
 
-      {active && (
+      {/* Mientras llegan los gatos (al terminar) la X sobra: el juego se cierra solo. */}
+      {active && status !== "done" && (
         <button
           ref={closeRef}
           type="button"

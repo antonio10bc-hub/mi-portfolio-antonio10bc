@@ -171,14 +171,15 @@ export function score(points: Point[]): Record<Letter, number> {
 }
 
 /**
- * Por encima de esto, lo dibujado no se parece a la letra. Medido con letras a mano
- * sintéticas (estiradas, inclinadas, giradas, con temblor y trazos en otro orden):
- * el 99% puntúa por debajo de 1.62 y el máximo fue 1.91; garabatos al azar, la
- * mitad por encima de 2.2 y solo el 10% por debajo de 1.6.
+ * Por encima de esto, lo dibujado no se parece a la letra. Muy permisivo a propósito:
+ * con 1.8 había que dibujar casi perfecto y la gente se atascaba. Medido con letras
+ * dibujadas con descuido (deformadas, inclinadas, giradas, temblonas y sin cerrar):
+ * con 2.6 y LENIENCY 2 se aceptan todas; muchos garabatos también pasan, y no
+ * importa: es un juego para que salga, no un examen.
  */
-const GARBAGE = 1.8;
-/** La letra que toca se acepta aunque otra puntúe algo mejor: el juego es amable. */
-const LENIENCY = 1.3;
+const GARBAGE = 2.6;
+/** La letra que toca se acepta aunque otra se parezca hasta el doble: el juego es amable. */
+const LENIENCY = 2;
 
 /**
  * ¿Es lo dibujado la letra que toca? Acepta si es la mejor, o si queda cerca de
